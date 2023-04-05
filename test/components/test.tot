@@ -1,0 +1,11 @@
+<d:html>
+    <div>
+        TEST {{ props.b }}
+    </div>
+</d:html>
+<d:js>
+    console.log("test");
+    console.log("{{ props.a }}");
+</d:js>
+<d:css>
+</d:css>

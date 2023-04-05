@@ -1,0 +1,28 @@
+{
+  "name": "rinojs",
+  "version": "0.0.1",
+  "description": "Serverside/PC Web Page Templating system that is similar to the popular web frameworks",
+  "main": "dist/index.js",
+  "bin": "dist/index.js",
+  "scripts": {
+    "pack": "npx webpack --config webpack.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/opdev1004/rinojs.git"
+  },
+  "keywords": [
+    "rino",
+    "templating"
+  ],
+  "author": "Victor Chanil Park",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/opdev1004/rinojs/issues"
+  },
+  "homepage": "https://github.com/opdev1004/rinojs#readme",
+  "devDependencies": {
+    "webpack": "^5.76.3",
+    "webpack-cli": "^5.0.1"
+  }
+}
