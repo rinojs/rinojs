@@ -45,8 +45,11 @@ module.exports = class Rino
                     let targetArray = target.split(",");
                     let targetName = targetArray[0].trim().substring(11, target.length);
                     let componentDirName = targetArray[1].trim();
-                    let props = await tot.getDataByName(targetArray[2].trim());
-                    compResult = await this.buildComponent(componentDirName, targetName, JSON.parse(props));
+                    let props;
+
+                    if (targetArray[2] !== undefined) props = JSON.parse(await tot.getDataByName(targetArray[2].trim()))
+
+                    compResult = await this.buildComponent(componentDirName, targetName, props);
                 }
                 else
                 {
@@ -110,8 +113,11 @@ module.exports = class Rino
                     let targetArray = target.split(",");
                     let targetName = targetArray[0].trim().substring(11, target.length);
                     let componentDirName = targetArray[1].trim();
-                    let props = await tot.getDataByName(targetArray[2].trim());
-                    compResult = await this.buildComponent(componentDirName, targetName, JSON.parse(props));
+                    let props;
+
+                    if (targetArray[2] !== undefined) props = JSON.parse(await tot.getDataByName(targetArray[2].trim()))
+
+                    compResult = await this.buildComponent(componentDirName, targetName, props);
                 }
                 else
                 {
