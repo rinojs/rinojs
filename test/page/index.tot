@@ -11,7 +11,7 @@
     </head>
     <body>
         <div class="test">
-            {{ components.test, test }}
+            {{ components.test, ./components, test }}
         </div>
         <div id="{{ data.testid }}">
         </div>

@@ -9,7 +9,7 @@ async function test()
         testid: 'test'
     }
 
-    let page = await rino.buildPage("./page/index.tot", "./components");
+    let page = await rino.buildPage("./page/index.tot");
     page = await rino.buildData(page, data);
     await rino.writeFiles("./dist/", page);
 }

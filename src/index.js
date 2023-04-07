@@ -1,5 +1,5 @@
 const fs = require('fs');
-const Tot = require('./tot');
+const Tot = require('totjs');
 
 
 module.exports = class Rino
@@ -8,7 +8,7 @@ module.exports = class Rino
     {
     }
 
-    async buildPage(filename, componentsname)
+    async buildPage(filename)
     {
         const tot = new Tot(filename);
 
@@ -44,8 +44,9 @@ module.exports = class Rino
                 {
                     let targetArray = target.split(",");
                     let targetName = targetArray[0].trim().substring(11, target.length);
-                    let props = await tot.getDataByName(targetArray[1].trim());
-                    compResult = await this.buildComponent(componentsname, targetName, JSON.parse(props));
+                    let componentDirName = targetArray[1].trim();
+                    let props = await tot.getDataByName(targetArray[2].trim());
+                    compResult = await this.buildComponent(componentDirName, targetName, JSON.parse(props));
                 }
                 else
                 {
@@ -108,8 +109,9 @@ module.exports = class Rino
                 {
                     let targetArray = target.split(",");
                     let targetName = targetArray[0].trim().substring(11, target.length);
-                    let prop = await tot.getDataByName(targetArray[1].trim().substring(5));
-                    compResult = await this.buildComponent(componentsname, targetName, JSON.parse(prop));
+                    let componentDirName = targetArray[1].trim();
+                    let props = await tot.getDataByName(targetArray[2].trim());
+                    compResult = await this.buildComponent(componentDirName, targetName, JSON.parse(props));
                 }
                 else
                 {

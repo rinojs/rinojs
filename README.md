@@ -1,5 +1,8 @@
 # Rino.js 🦏
-Serverside/PC Web Page Templating system that is similar to the popular web frameworks. It is rinojs because the name rhino, rhinojs and rino are being used by others.
+Serverside/PC Web Page Templating system that is similar to the popular web frameworks. It is "rinojs" because the name rhino, rhinojs and rino are being used by others.
+
+## 📢 Notice
+From version 0.1.0 how we load component is different. So if you have used v0.0.1, you need to update your codes.
 
 ## 💪 The things you can do with Rino.js:
 ```
@@ -30,9 +33,9 @@ async function test()
       testid: 'test'
   }
 
-  // rino.buildPage(path, path) will build page and components.
+  // rino.buildPage(pathToTotFile) will build page and components.
   // Properties will be applied to the page as well.
-  let page = await rino.buildPage("path/to/page/index.tot", "path/to/components/directory/components");
+  let page = await rino.buildPage("path/to/page/index.tot");
   // rino.buildData(page object, data object) will build data into the page.
   // You must call buildData() after buildPage()
   page = await rino.buildData(page, data);
@@ -56,8 +59,8 @@ test();
     </head>
     <body>
         <div class="test">
-            <!-- This is how you pass properties. name of component then name of properties -->
-            {{ components.test, test }}
+            <!-- This is how you pass properties. name of component, the path of component, name of properties -->
+            {{ components.test, ./components, test }}
         </div>
         <div id="{{ data.testid }}">
         </div>
@@ -77,7 +80,7 @@ test();
 
     console.log("loaded")
 </d:js>
-// The example below is a JSON property that you can pass to the components
+// The example below is a JSON property that you can pass to a component
 // You can have multiple different properties, so you can pass different properties to different components
 <d:test>
     {
