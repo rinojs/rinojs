@@ -1,6 +1,6 @@
 {
   "name": "rinojs",
-  "version": "0.1.1",
+  "version": "0.2.1",
   "description": "Serverside/PC Web Page Templating system that is similar to the popular web frameworks",
   "main": "dist/index.js",
   "bin": "dist/index.js",
@@ -21,11 +21,13 @@
     "url": "https://github.com/opdev1004/rinojs/issues"
   },
   "homepage": "https://github.com/opdev1004/rinojs#readme",
-  "devDependencies": {
-    "webpack": "^5.76.3",
-    "webpack-cli": "^5.0.1"
-  },
   "dependencies": {
-    "totjs": "^0.0.5"
+    "chokidar": "^3.5.3",
+    "totjs": "^0.0.5",
+    "ws": "^8.13.0"
+  },
+  "devDependencies": {
+    "webpack": "^5.78.0",
+    "webpack-cli": "^5.0.1"
   }
 }

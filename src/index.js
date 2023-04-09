@@ -1,11 +1,120 @@
+const path = require('path');
 const fs = require('fs');
 const Tot = require('totjs');
-
+const chokidar = require('chokidar');
+const http = require('http');
+const WebSocket = require('ws');
+const { exec } = require('child_process');
 
 module.exports = class Rino
 {
     constructor()
     {
+    }
+
+    async dev(data, pageFilename, projectDirname, distDirname)
+    {
+        await this.rebuild(data, pageFilename, distDirname);
+
+        const port = 3000;
+        const url = `http://localhost:${ port }`
+        const server = http.createServer((req, res) =>
+        {
+            const filePath = path.join(distDirname, req.url);
+
+            fs.readFile(filePath, 'utf8', (error, data) =>
+            {
+                if (error)
+                {
+                    fs.readFile(path.join(filePath, 'index.html'), 'utf8', (error, data) =>
+                    {
+                        if (error)
+                        {
+                            req.statusCode = 404;
+                            res.end('File not found');
+                        }
+                        else
+                        {
+
+                            data = this.injectReload(data)
+                            res.end(data);
+                        }
+                    });
+                }
+                else
+                {
+                    data = this.injectReload(data)
+                    res.end(data);
+                }
+            });
+        });
+
+        server.listen(port, () =>
+        {
+            console.log('Server listening on port 3000');
+            console.log('Check http://localhost:3000');
+        });
+
+        const wss = new WebSocket.Server({ server });
+
+        wss.on('connection', (ws) =>
+        {
+            ws.on('message', (message) =>
+            {
+                if (message === 'reload')
+                {
+                    wss.clients.forEach((client) =>
+                    {
+                        client.send('reload');
+                    });
+                }
+            });
+        });
+
+        if (process.platform === 'darwin') exec(`open ${ url }`);
+        else if (process.platform === 'win32') exec(`start ${ url }`);
+        else exec(`xdg-open ${ url }`);
+
+        chokidar.watch(projectDirname).on('change', async (filepath) =>
+        {
+            console.clear();
+            console.log(`File ${ filepath } has been changed`);
+            console.log("Rebuilding...");
+            await this.rebuild(data, pageFilename, distDirname);
+            wss.clients.forEach((client) =>
+            {
+                client.send('reload');
+            });
+            console.log('Server listening on port 3000');
+            console.log('Check http://localhost:3000');
+        })
+    }
+
+    injectReload(data)
+    {
+        const reloadScript = `
+        <head>
+        <script>
+            const ws = new WebSocket('ws://localhost:3000');
+
+            ws.onmessage = (event) => {
+                console.log(event.data);
+                if (event.data === 'reload') {
+                    location.reload();
+                }
+            };
+        </script>
+        `;
+        return data.replace("<head>", reloadScript);
+    }
+
+    async rebuild(data, pageFilename, distDirname)
+    {
+        let page = await this.buildPage(pageFilename);
+        page = await this.buildData(page, data);
+        await this.writeFiles(distDirname, page);
+
+        console.log("Build is completed!");
     }
 
     async buildPage(filename)
@@ -72,9 +181,7 @@ module.exports = class Rino
 
     async buildComponent(dirname, name, props = undefined)
     {
-        if (dirname[dirname.length - 1] !== '/') dirname = dirname + '/';
-
-        const tot = new Tot(dirname + name + ".tot");
+        const tot = new Tot(path.join(dirname, `/${ name }.tot`));
 
         let html = await tot.getDataByName("html");
         let js = await tot.getDataByName("js");
@@ -226,36 +333,19 @@ module.exports = class Rino
 
     async writeFiles(dirname, obj)
     {
-        if (dirname[dirname.length - 1] !== '/') dirname = dirname + '/';
-
-        await fs.writeFile(`${ dirname }index.html`, obj.html, (error) =>
+        try
         {
-            if (error)
-            {
-                console.error(error);
-                return false;
-            }
-        });
-
-        await fs.writeFile(`${ dirname }main.js`, obj.js, (error) =>
+            await fs.promises.writeFile(path.join(dirname, "/index.html"), obj.html);
+            await fs.promises.writeFile(path.join(dirname, "/main.js"), obj.js);
+            await fs.promises.writeFile(path.join(dirname, "/style.css"), obj.css);
+            return true;
+        }
+        catch (error)
         {
-            if (error)
-            {
-                console.error(error);
-                return false;
-            }
-        });
-
-        await fs.writeFile(`${ dirname }style.css`, obj.css, (error) =>
-        {
-            if (error)
-            {
-                console.error(error);
-                return false;
-            }
-        });
-
-        console.log(`The files are written in ${ dirname }`);
+            console.error(`You may need to manually create a new directory at ${ dirname }`);
+            console.error(error);
+            return false;
+        }
     }
 
     async getValueFromObj(target, data)

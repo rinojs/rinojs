@@ -1,6 +1,6 @@
 <d:html>
     <div>
-        TEST {{ props.b }}
+        TEST {{ props.b }} !!
     </div>
 </d:html>
 <d:js>
