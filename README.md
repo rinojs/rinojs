@@ -2,24 +2,8 @@
 Serverside/PC Web Page Templating system that is similar to the popular web frameworks. It is "rinojs" because the name rhino, rhinojs and rino are being used by others.
 
 ## 📢 Notice
-### 👍 For peopls who using version < v 0.2.1
-v 0.2.0 is broken do not use it.
-
-One of big change that has been made for v 0.2.1, now you can live development. If you use
-```
-// projectDirname is normally the src directory that contains index.js and .tot files
-dev(data, pageFilename, projectDirname, distDirname) 
-```
-your page will be automatically built when there's an update in your project.
-
-And the change will be automatically loaded in the web browser.
-
-Don't miss this feature as you can live development just like other frontend web frameworks.
-
-And now rino.js is trying to use absolute paths instead of relative paths as it can cause some problems. So if you can try to use absolute paths.
-
-### For peopls who using version < v 0.1.0
-From version 0.1.0 how we load component is different. So if you have used v0.0.1, you need to update your codes after upgrading to the version >= v 0.1.0 .
+### 👍 For peopls who using version < v 0.3.0
+Use the most recent Rino.js please. I found a bug with checking name for the nested components. This is needed for avoiding infinite recursion.
 
 ## 💪 The things you can do with Rino.js:
 ```
