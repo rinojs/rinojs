@@ -5,6 +5,7 @@ const chokidar = require('chokidar');
 const http = require('http');
 const WebSocket = require('ws');
 const { exec } = require('child_process');
+const net = require('net');
 
 module.exports = class Rino
 {
@@ -16,8 +17,90 @@ module.exports = class Rino
     {
         await this.rebuild(data, pageFilename, distDirname);
 
-        const port = 3000;
+        let port = await this.findPort(3000);
+        const server = this.createServer(distDirname, port);
+        const wss = this.createWSS(server);
         const url = `http://localhost:${ port }`
+
+        this.openBrowser(url);
+        this.createWatcher(data, pageFilename, projectDirname, distDirname, port, wss);
+    }
+
+    async findPort(port)
+    {
+        let result = await this.isPortInUse(port)
+
+        if (result)
+        {
+            return await this.findPort(port + 1);
+        }
+        else
+        {
+            return port;
+        }
+    }
+
+    isPortInUse(port)
+    {
+        return new Promise((resolve, reject) =>
+        {
+            const server = net.createServer()
+                .once('error', error =>
+                {
+                    if (error.code !== 'EADDRINUSE') return reject(error);
+                    resolve(true);
+                })
+                .once('listening', () =>
+                {
+                    server.close();
+                    resolve(false);
+                })
+                .listen(port);
+        });
+    }
+
+    createWSS(server)
+    {
+        const wss = new WebSocket.Server({ server });
+
+        wss.on('connection', (ws) =>
+        {
+            ws.on('message', (message) =>
+            {
+                if (message === 'reload')
+                {
+                    wss.clients.forEach((client) =>
+                    {
+                        client.send('reload');
+                    });
+                }
+            });
+        });
+
+        return wss;
+    }
+
+    createWatcher(data, pageFilename, projectDirname, distDirname, port, wss)
+    {
+        const watcher = chokidar.watch(projectDirname).on('change', async (filepath) =>
+        {
+            console.clear();
+            console.log(`File ${ filepath } has been changed`);
+            console.log("Rebuilding...");
+            await this.rebuild(data, pageFilename, distDirname);
+            wss.clients.forEach((client) =>
+            {
+                client.send('reload');
+            });
+            console.log(`Server listening on port ${ port }`);
+            console.log(`Check http://localhost:${ port }`);
+        })
+
+        return watcher;
+    }
+
+    createServer(distDirname, port)
+    {
         const server = http.createServer((req, res) =>
         {
             res.setHeader('Access-Control-Allow-Origin', 'http://localhost, http://localhost');
@@ -46,7 +129,7 @@ module.exports = class Rino
                             if (fileext === '.html')
                             {
                                 res.setHeader('Content-Type', 'text/html; charset=utf-8');
-                                data = this.injectReload(data)
+                                data = this.injectReload(data, port)
                             }
                             res.end(data);
                         }
@@ -59,7 +142,7 @@ module.exports = class Rino
                     if (fileext === '.html')
                     {
                         res.setHeader('Content-Type', 'text/html; charset=utf-8');
-                        data = this.injectReload(data)
+                        data = this.injectReload(data, port)
                     }
                     else if (fileext === '.mjs' || fileext === '.js')
                     {
@@ -81,50 +164,25 @@ module.exports = class Rino
 
         server.listen(port, () =>
         {
-            console.log('Server listening on port 3000');
-            console.log('Check http://localhost:3000');
+            console.log(`Server listening on port ${ port }`);
+            console.log(`Check http://localhost:${ port }`);
         });
 
-        const wss = new WebSocket.Server({ server });
+        return server;
+    }
 
-        wss.on('connection', (ws) =>
-        {
-            ws.on('message', (message) =>
-            {
-                if (message === 'reload')
-                {
-                    wss.clients.forEach((client) =>
-                    {
-                        client.send('reload');
-                    });
-                }
-            });
-        });
-
+    openBrowser(url)
+    {
         if (process.platform === 'darwin') exec(`open ${ url }`);
         else if (process.platform === 'win32') exec(`start ${ url }`);
         else exec(`xdg-open ${ url }`);
-
-        chokidar.watch(projectDirname).on('change', async (filepath) =>
-        {
-            console.clear();
-            console.log(`File ${ filepath } has been changed`);
-            console.log("Rebuilding...");
-            await this.rebuild(data, pageFilename, distDirname);
-            wss.clients.forEach((client) =>
-            {
-                client.send('reload');
-            });
-            console.log('Server listening on port 3000');
-            console.log('Check http://localhost:3000');
-        })
     }
 
-    injectReload(data)
+    injectReload(data, port)
     {
         const reloadScript = `
         <script type="text/javascript">
-            const ws = new WebSocket('ws://localhost:3000');
+            const ws = new WebSocket('ws://localhost:${ port }');
 
             ws.onmessage = (event) => {
                 console.log(event.data);

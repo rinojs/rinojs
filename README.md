@@ -2,8 +2,9 @@
 Serverside/PC Web Page Templating system that is similar to the popular web frameworks. It is "rinojs" because the name rhino, rhinojs and rino are being used by others.
 
 ## 📢 Notice
-### 👍 For peopls who using version < v 0.5.0
-Use the most recent Rino.js please. I have fixed an issue with live development.
+### 👍 For peopls who using version < v 0.5.1
+Use the most recent Rino.js please. I have fixed a critical issue with live development in the version 0.5.0.
+From version 0.5.1, now live development will try to find available port number automatically from 3000.
 
 ## 💪 The things you can do with Rino.js:
 ```
