@@ -25,14 +25,17 @@ module.exports = class Rino
             res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
             res.setHeader('Access-Control-Expose-Headers', 'Authorization');
             res.setHeader('Access-Control-Max-Age', '86400');
-            const filePath = path.join(distDirname, req.url);
+            let filePath = path.join(distDirname, req.url);
 
             fs.readFile(filePath, 'utf8', (error, data) =>
             {
                 if (error)
                 {
-                    fs.readFile(path.join(filePath, 'index.html'), 'utf8', (error, data) =>
+                    filePath = path.join(filePath, 'index.html');
+                    fs.readFile(filePath, 'utf8', (error, data) =>
                     {
+                        let fileext = path.extname(filePath);
+
                         if (error)
                         {
                             req.statusCode = 404;
@@ -40,8 +43,11 @@ module.exports = class Rino
                         }
                         else
                         {
-                            res.setHeader('Content-Type', 'text/html; charset=utf-8');
-                            data = this.injectReload(data)
+                            if (fileext === '.html')
+                            {
+                                res.setHeader('Content-Type', 'text/html; charset=utf-8');
+                                data = this.injectReload(data)
+                            }
                             res.end(data);
                         }
                     });
@@ -49,7 +55,13 @@ module.exports = class Rino
                 else
                 {
                     let fileext = path.extname(filePath);
-                    if (fileext === '.mjs' || fileext === '.js')
+
+                    if (fileext === '.html')
+                    {
+                        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+                        data = this.injectReload(data)
+                    }
+                    else if (fileext === '.mjs' || fileext === '.js')
                     {
                         res.setHeader('Content-Type', 'application/javascript, text/javascript, module');
                     }
@@ -62,7 +74,6 @@ module.exports = class Rino
                         res.setHeader('Content-Type', 'application/octet-stream');
                     }
 
-                    data = this.injectReload(data)
                     res.end(data);
                 }
             });
@@ -112,8 +123,7 @@ module.exports = class Rino
     injectReload(data)
     {
         const reloadScript = `
-        <head>
-        <script>
+        <script type="text/javascript">
             const ws = new WebSocket('ws://localhost:3000');
 
             ws.onmessage = (event) => {
@@ -123,8 +133,9 @@ module.exports = class Rino
                 }
             };
         </script>
+        </head>
         `;
-        return data.replace("<head>", reloadScript);
+        return data.replace("</head>", reloadScript);
     }
 
     async rebuild(data, pageFilename, distDirname)

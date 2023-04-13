@@ -16,7 +16,7 @@
         <div id="{{ data.testid }}">
         </div>
         <div>
-            it is successfully built and showing the test results!!!!
+            it is successfully built and showing the test results!!
         </div>
 
         <script type="module">
