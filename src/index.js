@@ -20,6 +20,11 @@ module.exports = class Rino
         const url = `http://localhost:${ port }`
         const server = http.createServer((req, res) =>
         {
+            res.setHeader('Access-Control-Allow-Origin', 'http://localhost, http://localhost');
+            res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+            res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+            res.setHeader('Access-Control-Expose-Headers', 'Authorization');
+            res.setHeader('Access-Control-Max-Age', '86400');
             const filePath = path.join(distDirname, req.url);
 
             fs.readFile(filePath, 'utf8', (error, data) =>
@@ -35,7 +40,7 @@ module.exports = class Rino
                         }
                         else
                         {
-
+                            res.setHeader('Content-Type', 'text/html; charset=utf-8');
                             data = this.injectReload(data)
                             res.end(data);
                         }
@@ -43,6 +48,20 @@ module.exports = class Rino
                 }
                 else
                 {
+                    let fileext = path.extname(filePath);
+                    if (fileext === '.mjs' || fileext === '.js')
+                    {
+                        res.setHeader('Content-Type', 'application/javascript, text/javascript, module');
+                    }
+                    else if (fileext === '.css')
+                    {
+                        res.setHeader('Content-Type', 'text/css');
+                    }
+                    else
+                    {
+                        res.setHeader('Content-Type', 'application/octet-stream');
+                    }
+
                     data = this.injectReload(data)
                     res.end(data);
                 }
