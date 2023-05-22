@@ -9,7 +9,7 @@ async function test()
     }
 
     let rino = new Rino();
-    await rino.dev(data, path.resolve("./page/index.tot"), path.join(__dirname, "./"), path.join(__dirname, "../testdist"));
+    await rino.dev(data, path.resolve("./page/index.tot"), path.join(__dirname, "./"), path.join(__dirname, "../testdist"), { css: "style.css", js: "main.js" });
 
     /*
     let page = await rino.buildPage("./page/index.tot");

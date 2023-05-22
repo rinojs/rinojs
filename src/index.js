@@ -13,9 +13,9 @@ module.exports = class Rino
     {
     }
 
-    async dev(data, pageFilename, projectDirname, distDirname)
+    async dev(data, pageFilename, projectDirname, distDirname, filenames = undefined)
     {
-        await this.rebuild(data, pageFilename, distDirname);
+        await this.rebuild(data, pageFilename, distDirname, filenames);
 
         let port = await this.findPort(3000);
         const server = this.createServer(distDirname, port);
@@ -23,7 +23,7 @@ module.exports = class Rino
         const url = `http://localhost:${ port }`
 
         this.openBrowser(url);
-        this.createWatcher(data, pageFilename, projectDirname, distDirname, port, wss);
+        this.createWatcher(data, pageFilename, projectDirname, distDirname, port, wss, filenames);
     }
 
     async findPort(port)
@@ -80,18 +80,21 @@ module.exports = class Rino
         return wss;
     }
 
-    createWatcher(data, pageFilename, projectDirname, distDirname, port, wss)
+    createWatcher(data, pageFilename, projectDirname, distDirname, port, wss, filenames = undefined)
     {
         const watcher = chokidar.watch(projectDirname).on('change', async (filepath) =>
         {
             console.clear();
             console.log(`File ${ filepath } has been changed`);
             console.log("Rebuilding...");
-            await this.rebuild(data, pageFilename, distDirname);
-            wss.clients.forEach((client) =>
+            await this.rebuild(data, pageFilename, distDirname, filenames).then(() =>
             {
-                client.send('reload');
+                wss.clients.forEach((client) =>
+                {
+                    client.send('reload');
+                });
             });
+
             console.log(`Server listening on port ${ port }`);
             console.log(`Check http://localhost:${ port }`);
         })
@@ -196,11 +199,11 @@ module.exports = class Rino
         return data.replace("</head>", reloadScript);
     }
 
-    async rebuild(data, pageFilename, distDirname)
+    async rebuild(data, pageFilename, distDirname, filenames = undefined)
     {
         let page = await this.buildPage(pageFilename);
         page = await this.buildData(page, data);
-        await this.writeFiles(distDirname, page);
+        await this.writeFiles(distDirname, page, filenames);
 
         console.log("Build is completed!");
     }
@@ -302,7 +305,7 @@ module.exports = class Rino
             let targetArray = target.split(",");
             let targetName = targetArray[0].trim().substring(11, target.length);
 
-            if (target.substring(0, 11) == "components." && !targetName.includes(name))
+            if (target.substring(0, 11) == "components." && targetName !== name)
             {
                 let compResult;
                 let componentDirName = targetArray[1].trim();
@@ -419,18 +422,40 @@ module.exports = class Rino
         return result;
     }
 
-    async writeFiles(dirname, obj)
+    async writeFiles(dirname, obj, filenames = undefined)
     {
         try
         {
-            await fs.promises.writeFile(path.join(dirname, "/index.html"), obj.html);
-            await fs.promises.writeFile(path.join(dirname, "/main.js"), obj.js);
-            await fs.promises.writeFile(path.join(dirname, "/style.css"), obj.css);
+            const stats = await fs.promises.stat(dirname);
+
+            if (!stats.isDirectory()) throw new Error(`${ dirname } is not a directroy`);
+            if (!fs.existsSync(dirname))
+            {
+                await fs.promises.mkdir(dirname);
+            }
+
+            if (!filenames) 
+            {
+                filenames = {
+                    html: "/index.html",
+                    js: "/main.js",
+                    css: "/style.css"
+                };
+            }
+            else
+            {
+                if (!filenames.html) filenames.html = "/index.html";
+                if (!filenames.css) filenames.css = "/main.js";
+                if (!filenames.js) filenames.js = "/style.css";
+            }
+
+            await fs.promises.writeFile(path.join(dirname, filenames.html), obj.html);
+            await fs.promises.writeFile(path.join(dirname, filenames.js), obj.js);
+            await fs.promises.writeFile(path.join(dirname, filenames.css), obj.css);
             return true;
         }
         catch (error)
         {
-            console.error(`You may need to manually create a new directory at ${ dirname }`);
             console.error(error);
             return false;
         }

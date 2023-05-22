@@ -2,9 +2,8 @@
 Serverside/PC Web Page Templating system that is similar to the popular web frameworks. It is "rinojs" because the name rhino, rhinojs and rino are being used by others.
 
 ## 📢 Notice
-### 👍 For peopls who using version < v 0.5.1
-Use the most recent Rino.js please. I have fixed a critical issue with live development in the version 0.5.0.
-From version 0.5.1, now live development will try to find available port number automatically from 3000.
+### 👍 For people who using version < version 0.6.0
+Use the most recent Rino.js please. From version 0.6.0, now you can name the html, js and css files. And from this version if dist directory does not exist, Rino.js will create a new directory before writing html, js and css files.
 
 ## 💪 The things you can do with Rino.js:
 ```
@@ -42,7 +41,7 @@ async function test()
     }
 
     let rino = new Rino();
-    await rino.dev(data, path.resolve("./page/index.tot"), path.join(__dirname, "./"), path.join(__dirname, "../testdist"));
+    await rino.dev(data, path.resolve("./page/index.tot"), path.join(__dirname, "./"), path.join(__dirname, "../testdist"), { html: "index.html", css: "style.css", js: "main.js" });
 }
 
 test();
