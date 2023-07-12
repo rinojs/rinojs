@@ -2,29 +2,26 @@
     <!DOCTYPE html>
     <html lang="en">
     <head>
-        <script src="main.js"></script>
         <link rel="stylesheet" href="style.css">
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{{ data.title }}</title>
+        <title>{{ @data.title }}</title>
     </head>
     <body>
         <div class="test">
-            {{ components.test, ./components, test }}
+            {{ @component.test, ./pcomponents, test }}
         </div>
-        <div id="{{ data.testid }}">
+        <div id="{{ @data.testid }}">
         </div>
         <div>
             it is successfully built and showing the test results!!
         </div>
-
-        <script type="module">
-            import { add } from './test.mjs';
-
-            console.log(add(2, 3));
-        </script>
-
+        <div id="test">asdasdass</div>
+        {{ component.comptest, ./components, componentHTML }}
+        <button @click="addComponent();">Click me to add innerHTML</button>
+        <div id="comptesting"></div>
+        <script src="main.js"></script>
     </body>
     </html>
 </d:html>
@@ -35,11 +32,23 @@
     }
 </d:css>
 <d:js>
-    function test() {
-        document.getElementById("{{ data.testid }}").innerHTML = "^ _ ^";
+    import { reqworks } from 'reqtest'
+    import { add, minus } from 'add'
+
+    function addComponent()
+    {
+        document.getElementById('comptesting').innerHTML = document.getElementById('comptesting').innerHTML + componentHTML;
     }
 
+    function test() {
+        document.getElementById("{{ @data.testid }}").innerHTML = "^ _ ^";
+    }
+
+    test()
+    console.log("reqworks: " + reqworks());
     console.log("loaded")
+    console.log(add(5, 10));
+    console.log(minus(5, 10));
 </d:js>
 <d:test>
     {

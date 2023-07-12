@@ -1,8 +1,0 @@
-<d:html>
-    Nested components in different directories
-</d:html>
-<d:js>
-    console.log("temp working!");
-</d:js>
-<d:css>
-</d:css>

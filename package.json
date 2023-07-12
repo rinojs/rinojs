@@ -1,11 +1,12 @@
 {
   "name": "rinojs",
-  "version": "0.6.0",
+  "version": "0.7.1",
   "description": "Serverside/PC Web Page Templating system that is similar to the popular web frameworks",
   "main": "dist/index.js",
   "bin": "dist/index.js",
   "scripts": {
-    "pack": "npx webpack --config webpack.config.js"
+    "pack": "npx webpack --config webpack.config.js",
+    "test": "node test/test.js"
   },
   "repository": {
     "type": "git",
@@ -22,7 +23,14 @@
   },
   "homepage": "https://github.com/opdev1004/rinojs#readme",
   "dependencies": {
+    "@rollup/plugin-commonjs": "^25.0.2",
+    "@rollup/plugin-node-resolve": "^15.1.0",
+    "@rollup/plugin-terser": "^0.4.3",
+    "@rollup/plugin-virtual": "^3.0.1",
     "chokidar": "^3.5.3",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "rollup": "^3.26.2",
     "totjs": "^0.0.5",
     "ws": "^8.13.0"
   },

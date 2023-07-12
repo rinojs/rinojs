@@ -1,0 +1,8 @@
+<d:html>
+    Nested components in different directories asdas
+</d:html>
+<d:js>
+    console.log(add(8, 10));
+</d:js>
+<d:css>
+</d:css>
