@@ -1,7 +1,8 @@
 const { dev } = require('./core/dev');
 const { rebuild } = require('./core/rebuild');
 const { buildPage } = require('./core/page');
-const { buildComponent } = require('./core/pcomponent');
+const { buildPComponent } = require('./core/pcomponent');
+const { buildComponent } = require('./core/component');
 const { writeFiles } = require('./core/write-files');
 const { findPort, isPortInUse } = require('./core/find-port');
 
@@ -75,11 +76,26 @@ module.exports = class Rino
         props: `json string data for injecting to the html, css and javascript`
     }
     */
+    async buildPComponent(args)
+    {
+        await buildPComponent(args);
+    }
+
+    /* 
+    buildComponent()
+    arguments: args
+    args: {
+        dirname: `This is the directory path. The directory where the component .tot file is.`,
+        name: `file name of tot file without .tot extension`,
+        data: `json data for injecting to the html, css and javascript`,
+        props: `json string data for injecting to the html, css and javascript`
+        htmlName: `Name of the variable for HTML content`
+    }
+    */
     async buildComponent(args)
     {
         await buildComponent(args);
     }
-
 
     /*
     writeFiles()
