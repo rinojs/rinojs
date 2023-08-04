@@ -10,7 +10,7 @@
     </head>
     <body>
         <div class="test">
-            {{ @component.test, ./pcomponents, test }}
+            {{ @component.test, ./test/pcomponents, test }}
         </div>
         <div id="{{ @data.testid }}">
         </div>
@@ -18,7 +18,7 @@
             it is successfully built and showing the test results!!
         </div>
         <div id="test">asdasdass</div>
-        {{ component.comptest, ./components, componentHTML }}
+        {{ component.comptest, ./test/components, componentHTML }}
         <button @click="addComponent();">Click me to add innerHTML</button>
         <div id="comptesting"></div>
         <script src="main.js"></script>
@@ -32,8 +32,8 @@
     }
 </d:css>
 <d:js>
-    import { reqworks } from 'reqtest'
-    import { add, minus } from 'add'
+    import { reqworks } from 'test/reqtest'
+    import { add, minus } from 'test/add'
 
     function addComponent()
     {

@@ -9,32 +9,37 @@ const { createWatcher } = require('./watcher');
 dev()
 arguments: args
 args: {
-    data: `json data for injecting to the html, css and javascript`,
-    pageFilename: `File name for the page, strting .tot file.`,
+    pages:[
+        {
+            data: `json data for injecting to the html, css and javascript`,
+            pageFilename: `File name for the page, strting .tot file.`,
+            distDirname: `This is the directory where the output files will be stored.`,
+            filenames: {
+                html: `filename for html, default is /index.html`,
+                css: `filename for css, default is /style.css`,
+                js: `filename for js, default is /main.js`
+            }
+        }, ... pages continue
+    ],
+    root: `This is the directory of root where the output files will be stored.`,
     projectDirname: `Where your project files are. src directory path. This is for checking changes.`
-    distDirname: `This is the directory where the output files will be stored.`,
-    filenames: {
-        html: `filename for html, default is /index.html`,
-        css: `filename for css, default is /style.css`,
-        js: `filename for js, default is /main.js`
-    }
 }
 */
 async function dev(args)
 {
-    await rebuild({ data: args.data, pageFilename: args.pageFilename, distDirname: args.distDirname, filenames: args.filenames });
+    for (let page of args.pages)
+    {
+        await rebuild({ data: page.data, pageFilename: page.pageFilename, distDirname: page.distDirname, filenames: page.filenames });
+    }
 
     let port = await findPort(3000);
-    const server = await createServer(args.distDirname, port);
+    const server = await createServer(args.root, port);
     const wss = await createWSS(server);
     const url = `http://localhost:${ port }`
 
     await openBrowser(url);
-    await createWatcher(args.data, args.pageFilename, args.projectDirname, args.distDirname, port, wss, args.filenames);
+    await createWatcher(args.pages, args.projectDirname, port, wss);
 }
-
-
-
 
 
 module.exports = { dev }

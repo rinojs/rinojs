@@ -5,7 +5,7 @@ const cors = require('cors');
 const http = require('http');
 const { injectReload } = require('./inject-reload.js');
 
-async function createServer(distDirname, port)
+async function createServer(root, port)
 {
     const app = express();
     app.use(cors({
@@ -18,7 +18,7 @@ async function createServer(distDirname, port)
 
     app.use(async (req, res, next) =>
     {
-        let filePath = path.join(distDirname, req.url);
+        let filePath = path.join(root, req.url);
 
         await fs.readFile(filePath, 'utf8', async (error, data) =>
         {
@@ -55,7 +55,7 @@ async function createServer(distDirname, port)
         })
     })
 
-    app.use(express.static(distDirname));
+    app.use(express.static(root));
 
     const server = http.createServer(app);
 

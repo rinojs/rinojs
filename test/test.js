@@ -10,14 +10,19 @@ async function test()
 
     let rino = new Rino();
     let args = {
-        data: data,
-        pageFilename: path.resolve("./page/index.tot"),
-        projectDirname: path.resolve(__dirname, "./"),
-        distDirname: path.resolve(__dirname, "../testdist"),
-        filenames: {
-            css: "style.css",
-            js: "main.js"
-        }
+        pages: [
+            {
+                data: data,
+                pageFilename: path.resolve(__dirname, "./page/index.tot"),
+                distDirname: path.resolve(__dirname, "../testdist"),
+                filenames: {
+                    css: "style.css",
+                    js: "main.js"
+                }
+            }
+        ],
+        root: path.resolve(__dirname, "../testdist"),
+        projectDirname: path.resolve(__dirname, "./")
     }
 
     await rino.dev(args);

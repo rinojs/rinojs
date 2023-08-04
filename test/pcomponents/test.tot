@@ -1,7 +1,7 @@
 <d:html>
     <div>
         TEST {{ @props.b }} !!
-        {{ @component.temp, ./pcomponents/test/ }} test!!
+        {{ @component.temp, ./test/pcomponents/test/ }} test!!
     </div>
 </d:html>
 <d:js>

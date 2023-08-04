@@ -1,6 +1,6 @@
 {
   "name": "rinojs",
-  "version": "0.7.2",
+  "version": "0.8.0",
   "description": "Serverside/PC Web Page Templating system that is similar to the popular web frameworks",
   "main": "dist/index.js",
   "bin": "dist/index.js",
@@ -14,7 +14,14 @@
   },
   "keywords": [
     "rino",
-    "templating"
+    "templating",
+    "static-site-generator",
+    "static-site-generation",
+    "static-site-building",
+    "frontend-development",
+    "templating-tool",
+    "rinojs",
+    "webframework"
   ],
   "author": "Victor Chanil Park",
   "license": "MIT",
