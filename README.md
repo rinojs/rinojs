@@ -12,32 +12,29 @@ For CSS library, I recommend 'Bulma' and material UI design. Tailwind CSS can be
 
 By the way there will be CMS based on Rino. I already started developing a dashboard for rinocms.
 
-### 👍 For people who use version < v0.8.0 and new people
+### 👍 For people who use version < v0.8.1 and new people
 
-From version 0.8.0, now dev() function takes multiple pages. Since I am trying to replace other web frameworks with rino.js, I've noticed it is important feature. So you need to update what you are passing as a parameter for dev() function.
+From version 0.8.1, now you can preload javascript and css.
 
 ```
-/*
-dev()
-arguments: args
-args: {
-    pages:[
-        {
-            data: `json data for injecting to the html, css and javascript`,
-            pageFilename: `File name for the page, strting .tot file.`,
-            distDirname: `This is the directory where the output files will be stored.`,
-            filenames: {
-                html: `filename for html, default is /index.html`,
-                css: `filename for css, default is /style.css`,
-                js: `filename for js, default is /main.js`
-            }
-        }, ... pages continue
-    ],
-    root: `This is the directory of root where the output files will be stored.`,
-    projectDirname: `Where your project files are. src directory path. This is for checking changes.`
-}
-*/
+{{ @preload.preload, ./test/preloads }}
 ```
+
+From version 0.9.0, I am plannning to change syntax for component and preload. So be aware that you may need to change update your project.
+
+```
+{{ @component, ./test/pcomponents/test.tot }}
+{{ @preload, ./test/preloads/preload.tot }}
+```
+
+instead of
+
+```
+{{ @component.test, ./test/pcomponents}}
+{{ @preload.preload, ./test/preloads }}
+```
+
+So it will be more making sense that you are passing the path of file for component and preload.
 
 ### 🤷‍♂️ About path sensitivity
 
@@ -198,7 +195,7 @@ Now this does not have '@'. Because only preprocessed syntax start with '@'.
 
 ### 8. Javascript import and require
 
-In version 0.7.0, you can import and require Javascript files (packages and modules). However you should only import and require from entry .tot file.
+From version 0.7.0, you can import and require Javascript modules. However you should only import and require from entry .tot file. From version 0.8.1, you can preload tot files. So it is much better to place them in the first tot file that is preloading.
 
 - Only use it from starting file. For example: index.tot
 - Once loaded it is available from whole scope, every tot file that is connected to entry .tot file
@@ -211,7 +208,15 @@ import somemodule from "somemodule"
 
 In version 0.7.0, variables and functions that is on global scope (top layer) will be accessible from web browser. Which literally means that there can be replacing same name or causing error if ther are same names. This may change in the future. But I recommend using unique names for your functions and variables.
 
-### 9. Building full website just like Next, Nuxt and others
+### 10. Preloading
+
+From version 0.8.1, you can preload javascript and css with tot file. Which means they are going to placed at the very beginning of javascript and css files. Now you better manage importing and anything that has to run first.
+
+```
+{{ @preload.preload, ./test/preloads }}
+```
+
+### 11. Building full website just like Next, Nuxt and others
 
 Since rino.js generates html, css and javascript file this is possible.
 
@@ -432,9 +437,17 @@ console.log("The component is loaded successfully!");
 
 etc.
 
-## 💪 Sponsor
+## 💪 Support Rino!
 
-[Github sponsor page](https://github.com/sponsors/opdev1004)
+### 👼 Become a Sponsor
+
+- [Ko-fi](https://ko-fi.com/geargom)
+- [Github sponsor page](https://github.com/sponsors/opdev1004)
+
+### 🎁 Shop
+
+- [RB Rino Shop](https://www.redbubble.com/shop/ap/149559711)
+- [RB Geargom Shop](https://www.redbubble.com/people/Geargom/shop)
 
 ## 👨‍💻 Author
 

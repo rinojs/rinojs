@@ -4,6 +4,7 @@ const { buildSingleData } = require('./data-handler');
 const { buildSingleProps } = require('./props');
 const { getValueFromObj } = require('./value-getter');
 const { buildComponent } = require('./component');
+const { buildPreload } = require('./preload');
 
 /* 
 buildPComponent()
@@ -33,7 +34,9 @@ async function buildPComponent(args)
     let result = {
         html: "",
         css: css,
-        js: js
+        js: js,
+        prelaodJS: "",
+        preloadCSS: ""
     };
 
     while (html.length > 0)
@@ -60,6 +63,18 @@ async function buildPComponent(args)
         else if (target.substring(0, 7) == "@props." && args.props)
         {
             result.html = result.html + await getValueFromObj(target.substring(7), args.props);
+        }
+        else if (target.substring(0, 9) == "@preload.")
+        {
+            let preloadResult;
+            let targetArray = target.split(",");
+            let targetName = targetArray[0].trim().substring(9, target.length);
+            let preloadDirName = targetArray[1].trim();
+
+            preloadResult = await buildPreload({ dirname: preloadDirName, name: targetName, data: args.data });
+
+            result.prelaodJS = result.prelaodJS + preloadResult.js;
+            result.preloadCSS = result.preloadCSS + preloadResult.css;
         }
         else if (target.substring(0, 10) == "component.")
         {
@@ -104,6 +119,9 @@ async function buildPComponent(args)
             {
                 compResult = await buildPComponent({ dirname: componentDirName, name: targetName, data: args.data });
             }
+
+            if (compResult.prelaodJS) result.prelaodJS = result.prelaodJS + compResult.prelaodJS;
+            if (compResult.preloadCSS) result.preloadCSS = result.preloadCSS + compResult.preloadCSS;
 
             result.html = result.html + compResult.html;
             result.css = result.css + compResult.css;

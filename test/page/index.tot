@@ -2,6 +2,7 @@
     <!DOCTYPE html>
     <html lang="en">
     <head>
+        {{ @preload.preload, ./test/preloads }}
         <link rel="stylesheet" href="style.css">
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -32,9 +33,9 @@
     }
 </d:css>
 <d:js>
-    import { reqworks } from 'test/reqtest'
-    import { add, minus } from 'test/add'
 
+    preloaded();
+    testCompPreload();
     function addComponent()
     {
         document.getElementById('comptesting').innerHTML = document.getElementById('comptesting').innerHTML + componentHTML;

@@ -1,0 +1,14 @@
+<d:js>
+import { reqworks } from 'test/reqtest'
+import { add, minus } from 'test/add'
+
+function preloaded()
+{
+    console.log("This is preloaded function!");
+}
+</d:js>
+<d:css>
+h5 {
+    color: #666;
+}
+</d:css>

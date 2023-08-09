@@ -1,7 +1,7 @@
 {
   "name": "rinojs",
-  "version": "0.8.0",
-  "description": "Serverside/PC Web Page Templating system that is similar to the popular web frameworks",
+  "version": "0.8.1",
+  "description": "Fast learning, preprocessing, intuitive web framework",
   "main": "dist/index.js",
   "bin": "dist/index.js",
   "scripts": {
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/opdev1004/rinojs.git"
+    "url": "git+https://github.com/rinojs/rinojs.git"
   },
   "keywords": [
     "rino",
@@ -26,9 +26,9 @@
   "author": "Victor Chanil Park",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/opdev1004/rinojs/issues"
+    "url": "https://github.com/rinojs/rinojs/discussions"
   },
-  "homepage": "https://github.com/opdev1004/rinojs#readme",
+  "homepage": "https://rinojs.org/",
   "dependencies": {
     "@rollup/plugin-commonjs": "^25.0.2",
     "@rollup/plugin-node-resolve": "^15.1.0",

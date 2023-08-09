@@ -1,0 +1,8 @@
+<d:js>
+function testCompPreload()
+{
+    console.log("CompPreload!");
+}
+</d:js>
+<d:css>
+</d:css>
