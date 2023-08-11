@@ -1,4 +1,4 @@
-const { rebuild } = require('./rebuild');
+const { buildMultiple } = require('./build-multiple');
 const { findPort } = require('./find-port');
 const { createServer } = require('./server');
 const { createWSS } = require('./wss');
@@ -27,10 +27,7 @@ args: {
 */
 async function dev(args)
 {
-    for (let page of args.pages)
-    {
-        await rebuild({ data: page.data, pageFilename: page.pageFilename, distDirname: page.distDirname, filenames: page.filenames });
-    }
+    await buildMultiple(args.pages);
 
     let port = await findPort(3000);
     const server = await createServer(args.root, port);

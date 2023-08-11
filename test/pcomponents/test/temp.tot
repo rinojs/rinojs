@@ -1,5 +1,5 @@
 <d:html>
-    {{ @preload.preload2, ./test/preloads }}
+    {{ @preload, ./test/preloads/preload2.tot }}
     Nested components in different directories asdas
 </d:html>
 <d:js>

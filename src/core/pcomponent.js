@@ -10,14 +10,14 @@ const { buildPreload } = require('./preload');
 buildPComponent()
 arguments: args
 args: {
-    dirname: `This is the directory path. The directory where the component .tot file is.`,
-    name: `file name of tot file without .tot extension`,
+    filename: `This is the file path of tot file.`,
     data: `json data for injecting to the html, css and javascript`,
+    props: properties that is passed from the parent.
 }
 */
 async function buildPComponent(args)
 {
-    const tot = new Tot(path.join(args.dirname, `/${ args.name }.tot`));
+    const tot = new Tot(path.resolve(args.filename));
 
     let html = await tot.getDataByName("html");
     let css = await buildSingleData(await tot.getDataByName("css"), args.data);
@@ -36,13 +36,15 @@ async function buildPComponent(args)
         css: css,
         js: js,
         prelaodJS: "",
-        preloadCSS: ""
+        preloadCSS: "",
+        componentJS: "",
+        componentCSS: ""
     };
 
     while (html.length > 0)
     {
         let start = html.indexOf("{{") + 2;
-        let end = html.indexOf("}}");
+        let end = html.indexOf("}}", start);
 
         if (start == 1 || end == -1)
         {
@@ -53,8 +55,6 @@ async function buildPComponent(args)
         result.html = result.html + html.substring(0, start - 2);
         let target = html.substring(start, end).trim();
         html = html.substring(end + 2);
-        let targetArray = target.split(",");
-        let targetName = targetArray[0].trim().substring(12, target.length);
 
         if (target.substring(0, 6) == "@data." && args.data)
         {
@@ -64,24 +64,22 @@ async function buildPComponent(args)
         {
             result.html = result.html + await getValueFromObj(target.substring(7), args.props);
         }
-        else if (target.substring(0, 9) == "@preload.")
+        else if (target.substring(0, 8) == "@preload")
         {
             let preloadResult;
             let targetArray = target.split(",");
-            let targetName = targetArray[0].trim().substring(9, target.length);
-            let preloadDirName = targetArray[1].trim();
+            let preloadFileName = targetArray[1].trim();
 
-            preloadResult = await buildPreload({ dirname: preloadDirName, name: targetName, data: args.data });
+            preloadResult = await buildPreload({ filename: preloadFileName, data: args.data });
 
             result.prelaodJS = result.prelaodJS + preloadResult.js;
             result.preloadCSS = result.preloadCSS + preloadResult.css;
         }
-        else if (target.substring(0, 10) == "component.")
+        else if (target.substring(0, 9) == "component")
         {
             let compResult;
             let targetArray = target.split(",");
-            let targetName = targetArray[0].trim().substring(10, target.length);
-            let componentDirName = targetArray[1].trim();
+            let componentFilename = targetArray[1].trim();
             let htmlName = targetArray[2].trim();
 
             if (targetArray.length > 3)
@@ -90,22 +88,21 @@ async function buildPComponent(args)
 
                 if (targetArray[3]) props = JSON.parse(await tot.getDataByName(targetArray[3].trim()))
 
-                compResult = await buildComponent({ dirname: componentDirName, name: targetName, data: args.data, props: props, htmlName: htmlName });
+                compResult = await buildComponent({ filename: componentFilename, data: args.data, props: props, htmlName: htmlName });
             }
             else
             {
-                compResult = await buildComponent({ dirname: componentDirName, name: targetName, data: args.data, htmlName: htmlName });
+                compResult = await buildComponent({ filename: componentFilename, data: args.data, htmlName: htmlName });
             }
 
-            result.css = result.css + compResult.css;
-            result.js = compResult.js + result.js;
+            result.componentJS = result.componentJS + compResult.js;
+            result.componentCSS = result.componentCSS + compResult.css;
         }
-        else if (target.substring(0, 11) == "@component." && targetName !== args.name)
+        else if (target.substring(0, 10) == "@component")
         {
             let compResult;
             let targetArray = target.split(",");
-            let targetName = targetArray[0].trim().substring(11, target.length);
-            let componentDirName = targetArray[1].trim();
+            let componentFilename = targetArray[1].trim();
 
             if (targetArray.length > 2)
             {
@@ -113,15 +110,17 @@ async function buildPComponent(args)
 
                 if (targetArray[2]) props = JSON.parse(await tot.getDataByName(targetArray[2].trim()))
 
-                compResult = await buildPComponent({ dirname: componentDirName, name: targetName, data: args.data, props: props });
+                compResult = await buildPComponent({ filename: componentFilename, data: args.data, props: props });
             }
             else
             {
-                compResult = await buildPComponent({ dirname: componentDirName, name: targetName, data: args.data });
+                compResult = await buildPComponent({ filename: componentFilename, data: args.data });
             }
 
             if (compResult.prelaodJS) result.prelaodJS = result.prelaodJS + compResult.prelaodJS;
             if (compResult.preloadCSS) result.preloadCSS = result.preloadCSS + compResult.preloadCSS;
+            if (compResult.componentJS) result.componentJS = result.componentJS + compResult.componentJS;
+            if (compResult.componentCSS) result.componentCSS = result.componentCSS + compResult.componentCSS;
 
             result.html = result.html + compResult.html;
             result.css = result.css + compResult.css;

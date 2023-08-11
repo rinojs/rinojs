@@ -2,7 +2,7 @@
     <!DOCTYPE html>
     <html lang="en">
     <head>
-        {{ @preload.preload, ./test/preloads }}
+        {{ @preload, ./test/preloads/preload.tot }}
         <link rel="stylesheet" href="style.css">
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,7 +11,7 @@
     </head>
     <body>
         <div class="test">
-            {{ @component.test, ./test/pcomponents, test }}
+            {{ @component, ./test/pcomponents/test.tot, test }}
         </div>
         <div id="{{ @data.testid }}">
         </div>
@@ -19,7 +19,7 @@
             it is successfully built and showing the test results!!
         </div>
         <div id="test">asdasdass</div>
-        {{ component.comptest, ./test/components, componentHTML }}
+        {{ component, ./test/components/comptest.tot, componentHTML }}
         <button @click="addComponent();">Click me to add innerHTML</button>
         <div id="comptesting"></div>
         <script src="main.js"></script>

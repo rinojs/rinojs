@@ -4,11 +4,21 @@ const { buildSingleData } = require('./data-handler');
 const { buildSingleProps } = require('./props');
 const { replaceEvents } = require('./syntax-handler');
 
+/* 
+buildComponent()
+arguments: args
+args: {
+    filename: `This is the file path of tot file.`,
+    data: `json data for injecting to the html, css and javascript`,
+    props: `properties that is passed from the parent.`,
+    htmlName: `Name of the variable for html content.`,
+}
+*/
 async function buildComponent(args)
 {
     try
     {
-        const tot = new Tot(path.join(args.dirname, `/${ args.name }.tot`));
+        const tot = new Tot(path.resolve(args.filename));
 
         let html = await tot.getDataByName("html");
         let css = await tot.getDataByName("css");

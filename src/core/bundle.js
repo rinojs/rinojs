@@ -1,4 +1,3 @@
-
 const rollup = require('rollup');
 const virtual = require('@rollup/plugin-virtual');
 const terser = require('@rollup/plugin-terser');

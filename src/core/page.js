@@ -41,7 +41,7 @@ async function buildPage(args)
     while (html.length > 0)
     {
         let start = html.indexOf("{{") + 2;
-        let end = html.indexOf("}}");
+        let end = html.indexOf("}}", start);
 
         if (start == 1 || end == -1)
         {
@@ -57,25 +57,24 @@ async function buildPage(args)
         {
             result.html = result.html + await getValueFromObj(target.substring(6), args.data)
         }
-        else if (target.substring(0, 9) == "@preload.")
+        else if (target.substring(0, 8) == "@preload")
         {
             let preloadResult;
             let targetArray = target.split(",");
-            let targetName = targetArray[0].trim().substring(9, target.length);
-            let preloadDirName = targetArray[1].trim();
+            let preloadFileName = targetArray[1].trim();
 
-            preloadResult = await buildPreload({ dirname: preloadDirName, name: targetName, data: args.data });
+            preloadResult = await buildPreload({ filename: preloadFileName, data: args.data });
+
             if (result.js.includes(`//rino.js js preload marker`)) result.js = result.js.replace(`//rino.js js preload marker`, preloadResult.js + `\n//rino.js js preload marker\n`);
             else result.js = `${ preloadResult.js }\n//rino.js js preload marker\n${ result.js }`;
             if (result.css.includes(`/* rino.js css preload marker */`)) result.css = result.css.replace(`/* rino.js css preload marker */`, preloadResult.css + `\n/* rino.js css preload marker */\n`);
             else result.css = `${ preloadResult.css }\n/* rino.js css preload marker */\n${ result.css }`;
         }
-        else if (target.substring(0, 10) == "component.")
+        else if (target.substring(0, 9) == "component")
         {
             let compResult;
             let targetArray = target.split(",");
-            let targetName = targetArray[0].trim().substring(10, target.length);
-            let componentDirName = targetArray[1].trim();
+            let componentFilename = targetArray[1].trim();
             let htmlName = targetArray[2].trim();
 
             if (targetArray.length > 3)
@@ -84,22 +83,23 @@ async function buildPage(args)
 
                 if (targetArray[3]) props = JSON.parse(await tot.getDataByName(targetArray[3].trim()))
 
-                compResult = await buildComponent({ dirname: componentDirName, name: targetName, data: args.data, props: props, htmlName: htmlName });
+                compResult = await buildComponent({ filename: componentFilename, data: args.data, props: props, htmlName: htmlName });
             }
             else
             {
-                compResult = await buildComponent({ dirname: componentDirName, name: targetName, data: args.data, htmlName: htmlName });
+                compResult = await buildComponent({ filename: componentFilename, data: args.data, htmlName: htmlName });
             }
 
-            result.css = result.css + compResult.css;
-            result.js = compResult.js + result.js;
+            if (result.js.includes(`//rino.js js preload marker`)) result.js = result.js.replace(`//rino.js js preload marker`, `\n//rino.js js preload marker\n` + compResult.js);
+            else result.js = `//rino.js js preload marker\n${ compResult.js }\n${ result.js }`;
+            if (result.css.includes(`/* rino.js css preload marker */`)) result.css = result.css.replace(`/* rino.js css preload marker */`, `\n/* rino.js css preload marker */\n` + compResult.css);
+            else result.css = `/* rino.js css preload marker */\n${ compResult.css }\n${ result.css }`;
         }
-        else if (target.substring(0, 11) == "@component.")
+        else if (target.substring(0, 10) == "@component")
         {
             let compResult;
             let targetArray = target.split(",");
-            let targetName = targetArray[0].trim().substring(11, target.length);
-            let componentDirName = targetArray[1].trim();
+            let componentFilename = targetArray[1].trim();
 
             if (targetArray.length > 2)
             {
@@ -107,11 +107,11 @@ async function buildPage(args)
 
                 if (targetArray[2]) props = JSON.parse(await tot.getDataByName(targetArray[2].trim()))
 
-                compResult = await buildPComponent({ dirname: componentDirName, name: targetName, data: args.data, props: props });
+                compResult = await buildPComponent({ filename: componentFilename, data: args.data, props: props });
             }
             else
             {
-                compResult = await buildPComponent({ dirname: componentDirName, name: targetName, data: args.data });
+                compResult = await buildPComponent({ filename: componentFilename, data: args.data });
             }
 
             if (compResult.prelaodJS)
@@ -124,6 +124,18 @@ async function buildPage(args)
             {
                 if (result.css.includes(`/* rino.js css preload marker */`)) result.css = result.css.replace(`/* rino.js css preload marker */`, compResult.preloadCSS + `\n/* rino.js css preload marker */\n`);
                 else result.css = `${ compResult.preloadCSS }\n/* rino.js css preload marker */\n${ result.css }`;
+            }
+
+            if (compResult.componentJS)
+            {
+                if (result.js.includes(`//rino.js js preload marker`)) result.js = result.js.replace(`//rino.js js preload marker`, `\n//rino.js js preload marker\n` + compResult.componentJS);
+                else result.js = `//rino.js js preload marker\n${ compResult.componentJS }\n${ result.js }`;
+            }
+
+            if (compResult.componentCSS)
+            {
+                if (result.css.includes(`/* rino.js css preload marker */`)) result.css = result.css.replace(`/* rino.js css preload marker */`, `\n/* rino.js css preload marker */\n` + compResult.componentCSS);
+                else result.css = `/* rino.js css preload marker */\n${ compResult.componentCSS }\n${ result.css }`;
             }
 
             result.html = result.html + compResult.html;

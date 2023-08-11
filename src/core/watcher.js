@@ -1,4 +1,4 @@
-const { rebuild } = require('./rebuild');
+const { buildMultiple } = require('./build-multiple');
 const chokidar = require('chokidar');
 
 async function createWatcher(pages, projectDirname, port, wss)
@@ -9,10 +9,7 @@ async function createWatcher(pages, projectDirname, port, wss)
         console.log(`File ${ filepath } has been changed`);
         console.log("Rebuilding...");
 
-        for (let page of pages)
-        {
-            await rebuild({ data: page.data, pageFilename: page.pageFilename, distDirname: page.distDirname, filenames: page.filenames });
-        }
+        await buildMultiple(pages);
 
         wss.clients.forEach((client) =>
         {

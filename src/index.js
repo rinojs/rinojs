@@ -1,10 +1,13 @@
 const { dev } = require('./core/dev');
-const { rebuild } = require('./core/rebuild');
+const { build } = require('./core/build');
+const { buildMultiple } = require('./core/build-multiple');
 const { buildPage } = require('./core/page');
 const { buildPComponent } = require('./core/pcomponent');
 const { buildComponent } = require('./core/component');
 const { writeFiles } = require('./core/write-files');
 const { findPort, isPortInUse } = require('./core/find-port');
+const { encodeCode, decodeCode } = require('./core/entities');
+const { loadJSON } = require('./core/json-loader');
 
 module.exports = class Rino
 {
@@ -39,7 +42,7 @@ module.exports = class Rino
     }
 
     /* 
-    rebuild()
+    build()
     arguments: args
     args: {
         data: `json data for injecting to the html, css and javascript`,
@@ -52,9 +55,30 @@ module.exports = class Rino
         }
     }
     */
-    async rebuild(args)
+    async build(args)
     {
-        await rebuild(args);
+        await build(args);
+    }
+
+    /*
+    buildMultiple()
+    arguments: pages
+    pages:[
+        {
+            data: `json data for injecting to the html, css and javascript`,
+            pageFilename: `File name for the page, strting .tot file.`,
+            distDirname: `This is the directory where the output files will be stored.`,
+            filenames: {
+                html: `filename for html, default is /index.html`,
+                css: `filename for css, default is /style.css`,
+                js: `filename for js, default is /main.js`
+            }
+        }, ... pages continue
+    ]
+    */
+    async buildMultiple(pages)
+    {
+        await buildMultiple(pages);
     }
 
     /* 
@@ -72,13 +96,12 @@ module.exports = class Rino
 
 
     /* 
-    buildComponent()
+    buildPComponent()
     arguments: args
     args: {
-        dirname: `This is the directory path. The directory where the component .tot file is.`,
-        name: `file name of tot file without .tot extension`,
+        filename: `This is the file path of tot file.`,
         data: `json data for injecting to the html, css and javascript`,
-        props: `json string data for injecting to the html, css and javascript`
+        props: properties that is passed from the parent.
     }
     */
     async buildPComponent(args)
@@ -90,11 +113,10 @@ module.exports = class Rino
     buildComponent()
     arguments: args
     args: {
-        dirname: `This is the directory path. The directory where the component .tot file is.`,
-        name: `file name of tot file without .tot extension`,
+        filename: `This is the file path of tot file.`,
         data: `json data for injecting to the html, css and javascript`,
-        props: `json string data for injecting to the html, css and javascript`
-        htmlName: `Name of the variable for HTML content`
+        props: `properties that is passed from the parent.`,
+        htmlName: `Name of the variable for html content.`,
     }
     */
     async buildComponent(args)
@@ -130,5 +152,23 @@ module.exports = class Rino
     async isPortInUse(port)
     {
         return await isPortInUse(port);
+    }
+
+    // For entity
+    async encodeCode(page)
+    {
+        return await encodeCode(page);
+    }
+
+    // For entity
+    async decodeCode(page)
+    {
+        return await decodeCode(page);
+    }
+
+    // For manage data of pages in JSON.
+    async loadJSON(filename, encoding = "utf8")
+    {
+        return await loadJSON(filename, encoding);
     }
 }

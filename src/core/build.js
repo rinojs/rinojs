@@ -1,8 +1,9 @@
 const { buildPage } = require('./page');
 const { writeFiles } = require('./write-files');
+const { encodeCode } = require('./entities');
 
 /* 
-rebuild()
+build()
 arguments: args
 args: {
     data: `json data for injecting to the html, css and javascript`,
@@ -15,13 +16,12 @@ args: {
     }
 }
 */
-async function rebuild(args)
+async function build(args)
 {
     let page = await buildPage({ filename: args.pageFilename, data: args.data });
+    page.html = await encodeCode(page.html);
 
     await writeFiles(args.distDirname, page, args.filenames);
-
-    console.log("Build is completed!");
 }
 
-module.exports = { rebuild }
+module.exports = { build }

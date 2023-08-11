@@ -7,14 +7,14 @@ const { buildSingleProps } = require('./props');
 buildPreload()
 arguments: args
 args: {
-    dirname: `This is the directory path. The directory where the component .tot file is.`,
+    filename: `This is the file path. The directory where the component .tot file is.`,
     name: `file name of tot file without .tot extension`,
     data: `json data for injecting to the html, css and javascript`,
 }
 */
 async function buildPreload(args)
 {
-    const tot = new Tot(path.join(args.dirname, `/${ args.name }.tot`));
+    const tot = new Tot(path.resolve(args.filename));
 
     let css = await buildSingleData(await tot.getDataByName("css"), args.data);
     let js = await buildSingleData(await tot.getDataByName("js"), args.data);
