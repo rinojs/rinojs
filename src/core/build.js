@@ -1,6 +1,5 @@
 const { buildPage } = require('./page');
 const { writeFiles } = require('./write-files');
-const { encodeCode } = require('./entities');
 
 /* 
 build()
@@ -19,7 +18,6 @@ args: {
 async function build(args)
 {
     let page = await buildPage({ filename: args.pageFilename, data: args.data });
-    page.html = await encodeCode(page.html);
 
     await writeFiles(args.distDirname, page, args.filenames);
 }
