@@ -5,6 +5,7 @@ const { buildSingleProps } = require('./props');
 const { getValueFromObj } = require('./value-getter');
 const { buildComponent } = require('./component');
 const { buildPreload } = require('./preload');
+const { encodeCode } = require('./entities');
 
 /* 
 buildPComponent()
@@ -22,7 +23,7 @@ async function buildPComponent(args)
     let html = await tot.getDataByName("html");
     let css = await buildSingleData(await tot.getDataByName("css"), args.data);
     let js = await buildSingleData(await tot.getDataByName("js"), args.data);
-
+    html = await encodeCode(html);
 
     if (!html) html = "";
     if (!js) js = "";

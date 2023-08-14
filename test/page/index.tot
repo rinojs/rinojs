@@ -22,6 +22,18 @@
         {{ component, ./test/components/comptest.tot, componentHTML }}
         <button @click="addComponent();">Click me to add innerHTML</button>
         <div id="comptesting"></div>
+                    <pre>
+                        <code>
+                            <\d:html>
+                                {{ @component.test, ./src/components }}
+                            <\/d:html>
+                        </code>
+                    </pre>
+                    <br />
+                    <h2 class="subtitle">
+                        ./src/components/test.tot
+                    </h2>
+
         <script src="main.js"></script>
     </body>
     </html>

@@ -1,5 +1,3 @@
-const entities = require("entities");
-
 async function encodeCode(page)
 {
     let temp = page;
@@ -18,7 +16,12 @@ async function encodeCode(page)
 
         result = result + temp.substring(0, start);
         let code = temp.substring(start, end);
-        result = result + entities.encodeHTML(code); + "</code>";
+        code = code.replaceAll("&", "&amp;");
+        code = code.replaceAll("{{", "&lcub;&lcub;");
+        code = code.replaceAll("}}", "&rcub;&rcub;");
+        code = code.replaceAll("<", "&lt;");
+        code = code.replaceAll(">", "&gt;");
+        result = result + code + "</code>";
         temp = temp.substring(end + 7);
     }
 
@@ -43,7 +46,12 @@ async function decodeCode(page)
 
         result = result + temp.substring(0, start);
         let code = temp.substring(start, end);
-        result = result + entities.decodeHTML(code); + "</code>";
+        code = code.replaceAll("&amp;", "&");
+        code = code.replaceAll("&lcub;&lcub;", "{{");
+        code = code.replaceAll("&rcub;&rcub;", "{{");
+        code = code.replaceAll("&lt;", "<");
+        code = code.replaceAll("&gt;", ">");
+        result = result + code + "</code>";
         temp = temp.substring(end + 7);
     }
 

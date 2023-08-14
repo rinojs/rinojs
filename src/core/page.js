@@ -6,6 +6,7 @@ const { buildSingleData } = require('./data-handler');
 const { getValueFromObj } = require('./value-getter');
 const { bundlejs } = require('./bundle');
 const { buildPreload } = require('./preload');
+const { encodeCode } = require('./entities');
 
 /* 
 buildPage()
@@ -22,6 +23,7 @@ async function buildPage(args)
     let html = await tot.getDataByName("html");
     let css = await tot.getDataByName("css");
     let js = await tot.getDataByName("js");
+    html = await encodeCode(html);
 
     if (!html) html = "";
     if (!js) js = "";
