@@ -10,7 +10,7 @@ async function buildProps(obj, data)
 
 async function buildSingleProps(text, data)
 {
-    if (!text || !data) return text;
+    if (!text || !data || text.indexOf("@props.") == -1) return text;
 
     let tmp = text;
     let result = "";

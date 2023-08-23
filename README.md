@@ -10,31 +10,106 @@ npm i rinojs
 
 ## 📢 Notice
 
-### 📖 Documentation
+### 👍 For people who use version < v1.1.0
 
-Documentation will be available from [https://rinojs.org/](https://rinojs.org/). And README will be updated once documentation is done.
+In version 1.1.0, we have added and changed some stuffs.
 
-### 👍 For people who use version < v1.0.1
+1. Added `{{ @tot.tagname, .tot file path }}`, now you can dynamically add data from tot files. Which means @data isn't the only way to pass some data into pages now. You can use it for reuseable data. It all applies to HTML, CSS and Javascript.
 
-In version 1.0.1, `<code>` and entities and escaping problem with templating are fixed. Please use the latest version.
+2. Added `loadTot(filename, encoding="utf8")` function. You can use it for passing data of other languages. So now this is official way of supporting localization in Rino. This will help you reuse page structure. If you are using pages.js, Now you can load data from tot file and pass it to page like this:
 
-Within `<code>` tag, html will be preprocessed so `&`, `<`, `>`, `{{`, `}}` will be replaced with entities. So the code can be displayed as content.
-
-And if you want to include `<d:html></d:html>, <d:css></d:css>, <d:js></d:js>`. Make sure you escape them like this:
+#### `/src/index.js`
 
 ```
-<\d:html><\/d:html>
-<\d:css><\/d:css>
-<\d:js><\/d:js>
+const Rino = require('../src/index.js');
+const path = require('path');
+const { pages } = require("./pages.js");
+
+async function main()
+{
+    let rino = new Rino();
+    let args = {
+        pages: await pages(),
+        root: path.resolve(__dirname, "../dist"),
+        projectDirname: path.resolve(__dirname, "./")
+    }
+
+    await rino.dev(args);
+}
+
+main();
 ```
 
-Within string they should be:
+#### `/src/pages.js`
 
 ```
-<\\d:html><\\/d:html>
-<\\d:css><\\/d:css>
-<\\d:js><\/d:js>
+const path = require('path');
+const Rino = require('../src/index.js');
+
+async function pages()
+{
+    const rino = new Rino();
+
+    return [
+        {
+            data: {
+                title: 'Test Title',
+                testid: 'test',
+                i18n: await rino.loadTot("./tot/data.tot")
+            },
+            pageFilename: path.resolve(__dirname, "./page/index.tot"),
+            distDirname: path.resolve(__dirname, "../dist"),
+            filenames: {
+                css: "style.css",
+                js: "main.js"
+            }
+        },
+        {
+            data: {
+                title: 'Page2!',
+            },
+            pageFilename: path.resolve(__dirname, "./page/page2.tot"),
+            distDirname: path.resolve(__dirname, "../dist"),
+            filenames: {
+                html: "page2.html",
+                css: "page2-style.css",
+                js: "page2-main.js"
+            }
+        }
+    ];
+}
+
+module.exports = { pages }
 ```
+
+3. Now the functions will show their arguments properly, if you have javascript extensions installed from your code editor. Because I setup the default values for all the functions.
+
+4. I removed path.resolve() from core of Rino. I am not sure if there are more. However they are unnecessary and removed.
+
+5. I fixed some of minor bugs that I found during the test.
+
+## 📖 Documentation
+
+- [Introduction](https://rinojs.org/documents/introduction.html)
+- [Installation & Setup](https://rinojs.org/documents/installation.html)
+
+## 👨‍👩‍👧‍👦 **Sponsors**
+
+### 🔥 **IMMORTAL SUPPORTER**
+
+### 👼 **DIVINE SUPPORTER**
+
+### 🎻 **ANCIENT SUPPORTER**
+
+### ⚔ **LEGEND SUPPORTER**
+
+### 🌲 **ARCHON SUPPORTER**
+
+### 🍀 Crusader Supporter
+
+### ☘ Guardian Supporter
+
+### 🌱 Herald Supporter
 
 ## 💪 Support Rino!
 

@@ -7,18 +7,19 @@ const { getValueFromObj } = require('./value-getter');
 const { bundlejs } = require('./bundle');
 const { buildPreload } = require('./preload');
 const { encodeCode } = require('./entities');
+const { getDataFromTot, buildSingleFromTot } = require('./tot-handler')
 
 /* 
 buildPage()
 arguments: args
 args: {
     filename: `File name for the page, strting .tot file path.`,
-    data: `json data for injecting to the html, css and javascript`,
+    data: `js object, json data for injecting to the html, css and javascript`
 }
 */
-async function buildPage(args)
+async function buildPage(filename, data = null)
 {
-    const tot = new Tot(args.filename);
+    const tot = new Tot(filename);
 
     let html = await tot.getDataByName("html");
     let css = await tot.getDataByName("css");
@@ -29,8 +30,8 @@ async function buildPage(args)
     if (!js) js = "";
     if (!css) css = "";
 
-    css = await buildSingleData(css, args.data);
-    js = await buildSingleData(js, args.data);
+    css = await buildSingleFromTot(await buildSingleData(css, data));
+    js = await buildSingleFromTot(await buildSingleData(js, data));
 
     let result = {
         html: "",
@@ -55,9 +56,14 @@ async function buildPage(args)
         let target = html.substring(start, end).trim();
         html = html.substring(end + 2);
 
-        if (target.substring(0, 6) == "@data.")
+        if (target.substring(0, 5) == "@tot.")
         {
-            result.html = result.html + await getValueFromObj(target.substring(6), args.data)
+            let targetArray = target.split(",");
+            result.html = result.html + await getDataFromTot(targetArray[0].substring(5), targetArray[1].trim());
+        }
+        else if (target.substring(0, 6) == "@data.")
+        {
+            result.html = result.html + await getValueFromObj(target.substring(6), data)
         }
         else if (target.substring(0, 8) == "@preload")
         {
@@ -65,7 +71,7 @@ async function buildPage(args)
             let targetArray = target.split(",");
             let preloadFileName = targetArray[1].trim();
 
-            preloadResult = await buildPreload({ filename: preloadFileName, data: args.data });
+            preloadResult = await buildPreload(preloadFileName, data);
 
             if (result.js.includes(`//rino.js js preload marker`)) result.js = result.js.replace(`//rino.js js preload marker`, preloadResult.js + `\n//rino.js js preload marker\n`);
             else result.js = `${ preloadResult.js }\n//rino.js js preload marker\n${ result.js }`;
@@ -85,11 +91,11 @@ async function buildPage(args)
 
                 if (targetArray[3]) props = JSON.parse(await tot.getDataByName(targetArray[3].trim()))
 
-                compResult = await buildComponent({ filename: componentFilename, data: args.data, props: props, htmlName: htmlName });
+                compResult = await buildComponent(componentFilename, htmlName, data, props);
             }
             else
             {
-                compResult = await buildComponent({ filename: componentFilename, data: args.data, htmlName: htmlName });
+                compResult = await buildComponent(componentFilename, htmlName, data);
             }
 
             if (result.js.includes(`//rino.js js preload marker`)) result.js = result.js.replace(`//rino.js js preload marker`, `\n//rino.js js preload marker\n` + compResult.js);
@@ -109,11 +115,11 @@ async function buildPage(args)
 
                 if (targetArray[2]) props = JSON.parse(await tot.getDataByName(targetArray[2].trim()))
 
-                compResult = await buildPComponent({ filename: componentFilename, data: args.data, props: props });
+                compResult = await buildPComponent(componentFilename, data, props);
             }
             else
             {
-                compResult = await buildPComponent({ filename: componentFilename, data: args.data });
+                compResult = await buildPComponent(componentFilename, data);
             }
 
             if (compResult.prelaodJS)

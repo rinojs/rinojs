@@ -1,12 +1,13 @@
 const { buildPage } = require('./page');
 const { writeFiles } = require('./write-files');
-
+const Tot = require('totjs');
 /* 
 build()
 arguments: args
 args: {
-    data: `json data for injecting to the html, css and javascript`,
     pageFilename: `File name for the page, strting .tot file.`,
+    data: `js object, json data for injecting to the html, css and javascript`,
+    totFilename: `File path of .tot that contains data.`,
     distDirname: `This is the directory where the output files will be stored.`,
     filenames: {
         html: `filename for html, default is /index.html`,
@@ -15,11 +16,11 @@ args: {
     }
 }
 */
-async function build(args)
+async function build(pageFilename, distDirname, data = null, filenames = { html: "", css: "", js: "" })
 {
-    let page = await buildPage({ filename: args.pageFilename, data: args.data });
+    let page = await buildPage(pageFilename, data);
 
-    await writeFiles(args.distDirname, page, args.filenames);
+    await writeFiles(distDirname, page, filenames);
 }
 
 module.exports = { build }

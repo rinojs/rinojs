@@ -2,8 +2,8 @@ const { build } = require('./build');
 
 /* 
 buildMultiple()
-arguments: pages
-pages:[
+argument:
+[
     {
         data: `json data for injecting to the html, css and javascript`,
         pageFilename: `File name for the page, strting .tot file.`,
@@ -18,9 +18,14 @@ pages:[
 */
 async function buildMultiple(pages)
 {
-    for (let page of pages)
+    let size = pages.length;
+
+    console.clear();
+
+    for (let i = 0; i < size; i++)
     {
-        await build({ data: page.data, pageFilename: page.pageFilename, distDirname: page.distDirname, filenames: page.filenames });
+        await build(pages[i].pageFilename, pages[i].distDirname, pages[i].data, pages[i].filenames);
+        console.log(`Building ${ i + 1 }/${ size }`);
     }
 
     console.log("Build is completed!");

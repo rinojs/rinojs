@@ -1,16 +1,16 @@
-const { getValueFromObj } = require('./value-getter');
+const path = require('path');
+const Tot = require('totjs');
 
-async function buildData(obj, data)
+
+async function getDataFromTot(tagname, filename)
 {
-    obj.html = await buildSingleData(obj.html, data);
-    obj.js = await buildSingleData(obj.js, data);
-    obj.css = await buildSingleData(obj.css, data);
-    return obj;
+    const tot = new Tot(path.resolve(filename));
+    return await tot.getDataByName(tagname);
 }
 
-async function buildSingleData(text, data)
+async function buildSingleFromTot(text)
 {
-    if (!text || !data || text.indexOf("@data.") == -1) return text;
+    if (!text || text.indexOf("@tot.") == -1) return text;
 
     let tmp = text;
     let result = "";
@@ -30,9 +30,10 @@ async function buildSingleData(text, data)
         let target = tmp.substring(start, end).trim();
         tmp = tmp.substring(end + 2);
 
-        if (target.substring(0, 6) == "@data.")
+        if (target.substring(0, 5) == "@tot.")
         {
-            result = result + await getValueFromObj(target.substring(6), data)
+            let targetArray = target.split(",");
+            result = result + await getDataFromTot(targetArray[0].substring(5), targetArray[1].trim());
         }
         else
         {
@@ -43,4 +44,5 @@ async function buildSingleData(text, data)
     return result;
 }
 
-module.exports = { buildData, buildSingleData }
+
+module.exports = { getDataFromTot, buildSingleFromTot }

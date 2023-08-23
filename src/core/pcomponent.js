@@ -1,4 +1,3 @@
-const path = require('path');
 const Tot = require('totjs');
 const { buildSingleData } = require('./data-handler');
 const { buildSingleProps } = require('./props');
@@ -6,31 +5,32 @@ const { getValueFromObj } = require('./value-getter');
 const { buildComponent } = require('./component');
 const { buildPreload } = require('./preload');
 const { encodeCode } = require('./entities');
+const { getDataFromTot, buildSingleFromTot } = require('./tot-handler')
 
 /* 
 buildPComponent()
-arguments: args
-args: {
+arguments:
+{
     filename: `This is the file path of tot file.`,
-    data: `json data for injecting to the html, css and javascript`,
+    data: `js object, json data for injecting to the html, css and javascript`,
     props: properties that is passed from the parent.
 }
 */
-async function buildPComponent(args)
+async function buildPComponent(filename, data = null, props = null)
 {
-    const tot = new Tot(path.resolve(args.filename));
+    const tot = new Tot(filename);
 
     let html = await tot.getDataByName("html");
-    let css = await buildSingleData(await tot.getDataByName("css"), args.data);
-    let js = await buildSingleData(await tot.getDataByName("js"), args.data);
+    let css = await tot.getDataByName("css");
+    let js = await tot.getDataByName("js");
     html = await encodeCode(html);
 
     if (!html) html = "";
     if (!js) js = "";
     if (!css) css = "";
 
-    css = await buildSingleProps(await buildSingleData(css, args.data), args.props);
-    js = await buildSingleProps(await buildSingleData(js, args.data), args.props);
+    css = await buildSingleFromTot(await buildSingleProps(await buildSingleData(css, data), props));
+    js = await buildSingleFromTot(await buildSingleProps(await buildSingleData(js, data), props));
 
     let result = {
         html: "",
@@ -57,13 +57,18 @@ async function buildPComponent(args)
         let target = html.substring(start, end).trim();
         html = html.substring(end + 2);
 
-        if (target.substring(0, 6) == "@data." && args.data)
+        if (target.substring(0, 5) == "@tot.")
         {
-            result.html = result.html + await getValueFromObj(target.substring(6), args.data)
+            let targetArray = target.split(",");
+            result.html = result.html + await getDataFromTot(targetArray[0].substring(5), targetArray[1].trim());
         }
-        else if (target.substring(0, 7) == "@props." && args.props)
+        else if (target.substring(0, 6) == "@data." && data)
         {
-            result.html = result.html + await getValueFromObj(target.substring(7), args.props);
+            result.html = result.html + await getValueFromObj(target.substring(6), data)
+        }
+        else if (target.substring(0, 7) == "@props." && props)
+        {
+            result.html = result.html + await getValueFromObj(target.substring(7), props);
         }
         else if (target.substring(0, 8) == "@preload")
         {
@@ -71,7 +76,7 @@ async function buildPComponent(args)
             let targetArray = target.split(",");
             let preloadFileName = targetArray[1].trim();
 
-            preloadResult = await buildPreload({ filename: preloadFileName, data: args.data });
+            preloadResult = await buildPreload(preloadFileName, data);
 
             result.prelaodJS = result.prelaodJS + preloadResult.js;
             result.preloadCSS = result.preloadCSS + preloadResult.css;
@@ -89,11 +94,11 @@ async function buildPComponent(args)
 
                 if (targetArray[3]) props = JSON.parse(await tot.getDataByName(targetArray[3].trim()))
 
-                compResult = await buildComponent({ filename: componentFilename, data: args.data, props: props, htmlName: htmlName });
+                compResult = await buildComponent(componentFilename, htmlName, data, props);
             }
             else
             {
-                compResult = await buildComponent({ filename: componentFilename, data: args.data, htmlName: htmlName });
+                compResult = await buildComponent(componentFilename, htmlName, data);
             }
 
             result.componentJS = result.componentJS + compResult.js;
@@ -111,11 +116,11 @@ async function buildPComponent(args)
 
                 if (targetArray[2]) props = JSON.parse(await tot.getDataByName(targetArray[2].trim()))
 
-                compResult = await buildPComponent({ filename: componentFilename, data: args.data, props: props });
+                compResult = await buildPComponent(componentFilename, data, props);
             }
             else
             {
-                compResult = await buildPComponent({ filename: componentFilename, data: args.data });
+                compResult = await buildPComponent(componentFilename, data);
             }
 
             if (compResult.prelaodJS) result.prelaodJS = result.prelaodJS + compResult.prelaodJS;
