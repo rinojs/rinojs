@@ -10,6 +10,10 @@ npm i rinojs
 
 ## 📢 Notice
 
+### 👍 For people who use version < v1.1.1
+
+In version 1.1.1, I removed entity for `&` in `<code></code>`
+
 ### 👍 For people who use version < v1.1.0
 
 In version 1.1.0, we have added and changed some stuffs.

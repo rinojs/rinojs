@@ -16,7 +16,6 @@ async function encodeCode(page)
 
         result = result + temp.substring(0, start);
         let code = temp.substring(start, end);
-        code = code.replaceAll("&", "&amp;");
         code = code.replaceAll("{{", "&lcub;&lcub;");
         code = code.replaceAll("}}", "&rcub;&rcub;");
         code = code.replaceAll("<", "&lt;");
@@ -46,7 +45,6 @@ async function decodeCode(page)
 
         result = result + temp.substring(0, start);
         let code = temp.substring(start, end);
-        code = code.replaceAll("&amp;", "&");
         code = code.replaceAll("&lcub;&lcub;", "{{");
         code = code.replaceAll("&rcub;&rcub;", "{{");
         code = code.replaceAll("&lt;", "<");
