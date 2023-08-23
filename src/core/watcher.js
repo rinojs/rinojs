@@ -5,11 +5,11 @@ async function createWatcher(pages, projectDirname, port, wss)
 {
     const watcher = chokidar.watch(projectDirname).on('change', async (filepath) =>
     {
-        console.clear();
-        console.log(`File ${ filepath } has been changed`);
-        console.log("Rebuilding...");
 
         await buildMultiple(pages);
+
+        console.log(`File ${ filepath } has been changed`);
+        console.log("Rebuilding...");
 
         wss.clients.forEach((client) =>
         {

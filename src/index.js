@@ -7,7 +7,7 @@ const { buildComponent } = require('./core/component');
 const { writeFiles } = require('./core/write-files');
 const { findPort, isPortInUse } = require('./core/find-port');
 const { encodeCode, decodeCode } = require('./core/entities');
-const { loadJSON } = require('./core/json-loader');
+const { loadJSON, loadTot } = require('./core/obj-handler');
 
 module.exports = class Rino
 {
@@ -15,11 +15,10 @@ module.exports = class Rino
     {
     }
 
-
     /* 
     dev()
-    arguments: args
-    args: {
+    arguments:
+    {
         pages:[
             {
                 data: `json data for injecting to the html, css and javascript`,
@@ -36,9 +35,9 @@ module.exports = class Rino
         projectDirname: `Where your project files are. src directory path. This is for checking changes.`
     }
     */
-    async dev(args)
+    async dev(args = { pages: [{ data: null, pageFilename: "", filenames: { html: "", css: "", js: "" } }], root: "", projectDirname: "" })
     {
-        await dev(args);
+        await dev(args.pages, args.root, args.projectDirname);
     }
 
     /* 
@@ -55,15 +54,15 @@ module.exports = class Rino
         }
     }
     */
-    async build(args)
+    async build(args = { pageFilename: "", distDirname: "", data: null, totFilename: "", filenames: { html: "", css: "", js: "" } })
     {
-        await build(args);
+        await build(args.pageFilename, args.distDirname, args.data, args.totFilename, args.filenames);
     }
 
-    /*
+    /* 
     buildMultiple()
-    arguments: pages
-    pages:[
+    argument:
+    [
         {
             data: `json data for injecting to the html, css and javascript`,
             pageFilename: `File name for the page, strting .tot file.`,
@@ -86,42 +85,41 @@ module.exports = class Rino
     arguments: args
     args: {
         filename: `File name for the page, strting .tot file path.`,
-        data: `json data for injecting to the html, css and javascript`,
+        data: `js object, json data for injecting to the html, css and javascript`,
     }
     */
-    async buildPage(args)
+    async buildPage(args = { filename: "", data: null })
     {
-        await buildPage(args);
+        await buildPage(args.filename, args.data);
     }
 
 
     /* 
     buildPComponent()
-    arguments: args
-    args: {
+    arguments:
+    {
         filename: `This is the file path of tot file.`,
-        data: `json data for injecting to the html, css and javascript`,
+        data: `js object, json data for injecting to the html, css and javascript`,
         props: properties that is passed from the parent.
     }
     */
-    async buildPComponent(args)
+    async buildPComponent(args = { filename: "", data: null, props: null })
     {
-        await buildPComponent(args);
+        await buildPComponent(args.filename, args.data, args.props);
     }
 
     /* 
     buildComponent()
-    arguments: args
-    args: {
+    arguments: {
         filename: `This is the file path of tot file.`,
-        data: `json data for injecting to the html, css and javascript`,
-        props: `properties that is passed from the parent.`,
         htmlName: `Name of the variable for html content.`,
+        data: `json data for injecting to the html, css and javascript`,
+        props: `properties that is passed from the parent.`
     }
     */
-    async buildComponent(args)
+    async buildComponent(args = { filename: "", htmlName: "", data: null, props: null })
     {
-        await buildComponent(args);
+        await buildComponent(args.filename, args.htmlName, args.data, args.props);
     }
 
     /*
@@ -154,21 +152,23 @@ module.exports = class Rino
         return await isPortInUse(port);
     }
 
-    // For entity
     async encodeCode(page)
     {
         return await encodeCode(page);
     }
 
-    // For entity
     async decodeCode(page)
     {
         return await decodeCode(page);
     }
 
-    // For manage data of pages in JSON.
     async loadJSON(filename, encoding = "utf8")
     {
         return await loadJSON(filename, encoding);
+    }
+
+    async loadTot(filename, encoding = "utf8")
+    {
+        return await loadTot(filename, encoding);
     }
 }

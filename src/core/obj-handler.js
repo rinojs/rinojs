@@ -1,4 +1,5 @@
 const fs = require('fs');
+const Tot = require('totjs');
 
 async function loadJSON(filename, encoding = "utf8")
 {
@@ -16,4 +17,10 @@ async function loadJSON(filename, encoding = "utf8")
     }
 }
 
-module.exports = { loadJSON }
+async function loadTot(filename, encoding = "utf8")
+{
+    const tot = new Tot(filename, encoding);
+    return await tot.getAll();
+}
+
+module.exports = { loadJSON, loadTot }

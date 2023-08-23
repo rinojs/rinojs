@@ -1,24 +1,23 @@
-const path = require('path');
 const Tot = require('totjs');
 const { buildSingleData } = require('./data-handler');
 const { buildSingleProps } = require('./props');
 const { replaceEvents } = require('./syntax-handler');
+const { buildSingleFromTot } = require('./tot-handler')
 
 /* 
 buildComponent()
-arguments: args
-args: {
+arguments: {
     filename: `This is the file path of tot file.`,
-    data: `json data for injecting to the html, css and javascript`,
-    props: `properties that is passed from the parent.`,
     htmlName: `Name of the variable for html content.`,
+    data: `json data for injecting to the html, css and javascript`,
+    props: `properties that is passed from the parent.`
 }
 */
-async function buildComponent(args)
+async function buildComponent(filename, htmlName, data = null, props = null)
 {
     try
     {
-        const tot = new Tot(path.resolve(args.filename));
+        const tot = new Tot(filename);
 
         let html = await tot.getDataByName("html");
         let css = await tot.getDataByName("css");
@@ -28,11 +27,11 @@ async function buildComponent(args)
         if (!js) js = "";
         if (!css) css = "";
 
-        html = await replaceEvents(await buildSingleProps(await buildSingleData(html, args.data), args.props));
-        css = await buildSingleProps(await buildSingleData(css, args.data), args.props);
-        js = await buildSingleProps(await buildSingleData(js, args.data), args.props);
+        html = await replaceEvents(await buildSingleFromTot(await buildSingleProps(await buildSingleData(html, data), props)));
+        css = await buildSingleFromTot(await buildSingleProps(await buildSingleData(css, data), props));
+        js = await buildSingleFromTot(await buildSingleProps(await buildSingleData(js, data), props));
 
-        html = "var " + args.htmlName + " = `" + html.replaceAll("`", "\`") + "`;\n" + args.htmlName + ";\n";
+        html = "var " + htmlName + " = `" + html.replaceAll("`", "\`") + "`;\n" + htmlName + ";\n";
         js = html + js;
 
         return { js: js, css: css };

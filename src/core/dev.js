@@ -7,8 +7,8 @@ const { createWatcher } = require('./watcher');
 
 /* 
 dev()
-arguments: args
-args: {
+arguments:
+{
     pages:[
         {
             data: `json data for injecting to the html, css and javascript`,
@@ -25,17 +25,17 @@ args: {
     projectDirname: `Where your project files are. src directory path. This is for checking changes.`
 }
 */
-async function dev(args)
+async function dev(pages = [{ data: null, pageFilename: "", filenames: { html: "", css: "", js: "" } }], root, projectDirname)
 {
-    await buildMultiple(args.pages);
+    await buildMultiple(pages);
 
     let port = await findPort(3000);
-    const server = await createServer(args.root, port);
+    const server = await createServer(root, port);
     const wss = await createWSS(server);
     const url = `http://localhost:${ port }`
 
     await openBrowser(url);
-    await createWatcher(args.pages, args.projectDirname, port, wss);
+    await createWatcher(pages, projectDirname, port, wss);
 }
 
 

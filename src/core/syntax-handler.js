@@ -1,5 +1,7 @@
 async function replaceEvents(html)
 {
+    if (!html) return "";
+
     let original = html;
     let result = "";
 

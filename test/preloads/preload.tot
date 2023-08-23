@@ -1,6 +1,6 @@
 <d:js>
-import { reqworks } from 'test/reqtest'
-import { add, minus } from 'test/add'
+import { reqworks } from 'reqtest'
+import { add, minus } from 'add'
 
 function preloaded()
 {

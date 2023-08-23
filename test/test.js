@@ -1,26 +1,12 @@
 const Rino = require('../src/index.js');
 const path = require('path');
+const { pages } = require("./pages.js");
 
 async function test()
 {
-    let data = {
-        title: 'Test Title',
-        testid: 'test'
-    }
-
     let rino = new Rino();
     let args = {
-        pages: [
-            {
-                data: data,
-                pageFilename: path.resolve(__dirname, "./page/index.tot"),
-                distDirname: path.resolve(__dirname, "../testdist"),
-                filenames: {
-                    css: "style.css",
-                    js: "main.js"
-                }
-            }
-        ],
+        pages: await pages(),
         root: path.resolve(__dirname, "../testdist"),
         projectDirname: path.resolve(__dirname, "./")
     }
