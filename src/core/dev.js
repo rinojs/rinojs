@@ -11,9 +11,11 @@ arguments:
 {
     pages:[
         {
-            data: `json data for injecting to the html, css and javascript`,
-            pageFilename: `File name for the page, strting .tot file.`,
+            pageFilename: `File name for the page, the entry .tot file.`,
             distDirname: `This is the directory where the output files will be stored.`,
+            tots: [{name: `name of this`, filename: `File path of .tot file`}, ...],
+            mds: [{nname: `name of this`, filename: `File path of .md file`}, ...],
+            data: `json data for injecting to the html, css and javascript`,
             filenames: {
                 html: `filename for html, default is /index.html`,
                 css: `filename for css, default is /style.css`,
@@ -25,7 +27,7 @@ arguments:
     projectDirname: `Where your project files are. src directory path. This is for checking changes.`
 }
 */
-async function dev(pages = [{ data: null, pageFilename: "", filenames: { html: "", css: "", js: "" } }], root, projectDirname)
+async function dev(pages = [{ pageFilename: "", distDirname: "", tots: [{ name: "", filename: "" }], mds: [{ name: "", filename: "" }], data: null, filenames: { html: "", css: "", js: "" } }], root, projectDirname)
 {
     await buildMultiple(pages);
 

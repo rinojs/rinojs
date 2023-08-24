@@ -21,9 +21,11 @@ module.exports = class Rino
     {
         pages:[
             {
-                data: `json data for injecting to the html, css and javascript`,
-                pageFilename: `File name for the page, strting .tot file.`,
+                pageFilename: `File name for the page, the entry .tot file.`,
                 distDirname: `This is the directory where the output files will be stored.`,
+                tots: [{name: `name of this`, filename: `File path of .tot file`}, ...],
+                mds: [{nname: `name of this`, filename: `File path of .md file`}, ...],
+                data: `json data for injecting to the html, css and javascript`,
                 filenames: {
                     html: `filename for html, default is /index.html`,
                     css: `filename for css, default is /style.css`,
@@ -44,9 +46,11 @@ module.exports = class Rino
     build()
     arguments: args
     args: {
-        data: `json data for injecting to the html, css and javascript`,
-        pageFilename: `File name for the page, strting .tot file.`,
+        pageFilename: `File name for the page, the entry .tot file.`,
         distDirname: `This is the directory where the output files will be stored.`,
+        tots: [{name: `name of this`, filename: `File path of .tot file`}, ...],
+        mds: [{nname: `name of this`, filename: `File path of .md file`}, ...],
+        data: `js object, json data for injecting to the html, css and javascript`,
         filenames: {
             html: `filename for html, default is /index.html`,
             css: `filename for css, default is /style.css`,
@@ -54,9 +58,9 @@ module.exports = class Rino
         }
     }
     */
-    async build(args = { pageFilename: "", distDirname: "", data: null, totFilename: "", filenames: { html: "", css: "", js: "" } })
+    async build(args = { pageFilename: "", distDirname: "", tots: [{ name: "", filename: "" }], mds: [{ name: "", filename: "" }], data: null, filenames: { html: "", css: "", js: "" } })
     {
-        await build(args.pageFilename, args.distDirname, args.data, args.totFilename, args.filenames);
+        await build(args.pageFilename, args.distDirname, args.tots, args.mds, args.data, args.filenames);
     }
 
     /* 
@@ -64,9 +68,11 @@ module.exports = class Rino
     argument:
     [
         {
-            data: `json data for injecting to the html, css and javascript`,
-            pageFilename: `File name for the page, strting .tot file.`,
+            pageFilename: `File name for the page, the entry .tot file.`,
             distDirname: `This is the directory where the output files will be stored.`,
+            tots: [{name: `name of this`, filename: `File path of .tot file`}, ...],
+            mds: [{nname: `name of this`, filename: `File path of .md file`}, ...],
+            data: `json data for injecting to the html, css and javascript`,
             filenames: {
                 html: `filename for html, default is /index.html`,
                 css: `filename for css, default is /style.css`,
@@ -75,7 +81,7 @@ module.exports = class Rino
         }, ... pages continue
     ]
     */
-    async buildMultiple(pages)
+    async buildMultiple(pages = [{ pageFilename: "", distDirname: "", tots: [{ name: "", filename: "" }], mds: [{ name: "", filename: "" }], data: null, filenames: { html: "", css: "", js: "" } }])
     {
         await buildMultiple(pages);
     }

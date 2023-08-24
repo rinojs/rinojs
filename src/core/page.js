@@ -8,6 +8,7 @@ const { bundlejs } = require('./bundle');
 const { buildPreload } = require('./preload');
 const { encodeCode } = require('./entities');
 const { getDataFromTot, buildSingleFromTot } = require('./tot-handler')
+const { loadMD } = require('./obj-handler');
 
 /* 
 buildPage()
@@ -56,7 +57,12 @@ async function buildPage(filename, data = null)
         let target = html.substring(start, end).trim();
         html = html.substring(end + 2);
 
-        if (target.substring(0, 5) == "@tot.")
+        if (target.substring(0, 3) == "@md")
+        {
+            let targetArray = target.split(",");
+            result.html = result.html + await loadMD(targetArray[1].trim());
+        }
+        else if (target.substring(0, 5) == "@tot.")
         {
             let targetArray = target.split(",");
             result.html = result.html + await getDataFromTot(targetArray[0].substring(5), targetArray[1].trim());

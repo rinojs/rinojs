@@ -1,17 +1,25 @@
 const path = require('path');
-const Rino = require('../src/index.js');
 
 async function pages()
 {
-    const rino = new Rino();
-
     return [
         {
             data: {
                 title: 'Test Title',
                 testid: 'test',
-                test: await rino.loadTot("./tot/data.tot")
             },
+            tots: [
+                {
+                    name: 'test',
+                    filename: './tot/data.tot'
+                }
+            ],
+            mds: [
+                {
+                    name: 'test',
+                    filename: './md/test.md'
+                }
+            ],
             pageFilename: path.resolve(__dirname, "./page/index.tot"),
             distDirname: path.resolve(__dirname, "../testdist"),
             filenames: {

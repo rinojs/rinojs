@@ -10,87 +10,66 @@ npm i rinojs
 
 ## 📢 Notice
 
-### 👍 For people who use version < v1.1.1
+### 👍 For people who use version < v1.2.0
 
-In version 1.1.1, I removed entity for `&` in `<code></code>`
+In version 1.2.0, I have added markdown support and more .tot file support + fixed minor bugs.
 
-### 👍 For people who use version < v1.1.0
-
-In version 1.1.0, we have added and changed some stuffs.
-
-1. Added `{{ @tot.tagname, .tot file path }}`, now you can dynamically add data from tot files. Which means @data isn't the only way to pass some data into pages now. You can use it for reuseable data. It all applies to HTML, CSS and Javascript.
-
-2. Added `loadTot(filename, encoding="utf8")` function. You can use it for passing data of other languages. So now this is official way of supporting localization in Rino. This will help you reuse page structure. If you are using pages.js, Now you can load data from tot file and pass it to page like this:
-
-#### `/src/index.js`
+1. How to add markdown:
 
 ```
-const Rino = require('../src/index.js');
-const path = require('path');
-const { pages } = require("./pages.js");
-
-async function main()
-{
-    let rino = new Rino();
-    let args = {
-        pages: await pages(),
-        root: path.resolve(__dirname, "../dist"),
-        projectDirname: path.resolve(__dirname, "./")
-    }
-
-    await rino.dev(args);
-}
-
-main();
+{{ @md, ./md/test.md }}
 ```
 
-#### `/src/pages.js`
+2. How to add markdown or .tot to data object:
+
+`./src/pages.js`
 
 ```
 const path = require('path');
-const Rino = require('../src/index.js');
 
 async function pages()
 {
-    const rino = new Rino();
-
     return [
         {
             data: {
                 title: 'Test Title',
                 testid: 'test',
-                i18n: await rino.loadTot("./tot/data.tot")
             },
+            tots: [
+                {
+                    name: 'test',
+                    filename: './tot/data.tot'
+                }
+            ],
+            mds: [
+                {
+                    name: 'test',
+                    filename: './md/test.md'
+                }
+            ],
             pageFilename: path.resolve(__dirname, "./page/index.tot"),
-            distDirname: path.resolve(__dirname, "../dist"),
+            distDirname: path.resolve(__dirname, "../testdist"),
             filenames: {
                 css: "style.css",
                 js: "main.js"
             }
-        },
-        {
-            data: {
-                title: 'Page2!',
-            },
-            pageFilename: path.resolve(__dirname, "./page/page2.tot"),
-            distDirname: path.resolve(__dirname, "../dist"),
-            filenames: {
-                html: "page2.html",
-                css: "page2-style.css",
-                js: "page2-main.js"
-            }
-        }
+        }, ... more pages
     ];
 }
 
 module.exports = { pages }
 ```
 
-3. Now the functions will show their arguments properly, if you have javascript extensions installed from your code editor. Because I setup the default values for all the functions.
+`./src/page/index.tot`
 
-4. I removed path.resolve() from core of Rino. I am not sure if there are more. However they are unnecessary and removed.
+```
+some html...
+{{ @data.tot.test.test }}
+{{ @data.md.test }}
+some html...
+```
 
-5. I fixed some of minor bugs that I found during the test.
+Rino is going to go through the list of markdown and tot files. And it is going to add data from files into the data object with name your provided.
 
 ## 📖 Documentation
 
