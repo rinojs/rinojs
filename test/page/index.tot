@@ -30,8 +30,10 @@
                         </code>
                     </pre>
                     <br />
-                    {{ @tot.test, ./tot/data.tot }}
-                    {{ @data.test.test }}
+                    {{ @tot.test, ./tot/data.tot }}2
+                    {{ @data.tot.test.test }}
+                    {{ @data.md.test }}
+                    {{ @md, ./md/test.md }}
                     <h2 class="subtitle">
                         ./src/components/test.tot
                     </h2>
