@@ -6,3 +6,4 @@ src/
 .gitignore
 jest.config.js
 webpack.config.js
+public/
