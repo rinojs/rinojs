@@ -22,12 +22,10 @@ async function buildMultiple(pages = [{ pageFilename: "", distDirname: "", tots:
 {
     let size = pages.length;
 
-    console.clear();
-
     for (let i = 0; i < size; i++)
     {
         await build(pages[i].pageFilename, pages[i].distDirname, pages[i].tots, pages[i].mds, pages[i].data, pages[i].filenames);
-        console.log(`Building ${ i + 1 }/${ size }`);
+        console.log(`Building ${ i + 1 }/${ size } pages`);
     }
 
     console.log("Build is completed!");

@@ -7,8 +7,9 @@ async function test()
     let rino = new Rino();
     let args = {
         pages: await pages(),
-        root: path.resolve(__dirname, "../testdist"),
-        projectDirname: path.resolve(__dirname, "./")
+        distRoot: path.resolve(__dirname, "../testdist"),
+        src: path.resolve(__dirname, "./"),
+        public: path.resolve(__dirname, "../public")
     }
 
     await rino.dev(args);

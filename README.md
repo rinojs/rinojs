@@ -10,66 +10,70 @@ npm i rinojs
 
 ## 📢 Notice
 
-### 👍 For people who use version < v1.2.0
+### 😎 For new people
 
-In version 1.2.0, I have added markdown support and more .tot file support + fixed minor bugs.
+Rino is ready for production. You can do static site generation and server side rendering. Build your website that services in multiple language. It is possible with default features like using markdown or [tot](https://github.com/opdev1004/totjs). Make sure you reuse the page and component template instead of creating each page for each language.
 
-1. How to add markdown:
+### 🤞 About documentation and official website updates
+
+I was working on them. but I need to build rino project starter first. So I can add it to the documentation. It won't take too long.
+
+If you are skilled and you don't mind reading stuffs for your production, then please read the code and the changes (maybe README.md) from github. Because you can use all the new features. It's not that difficult. 😉
+
+### 👍 For people who use version < v1.3.0
+
+In version 1.3.0, I have added features for public directory. Now assets in public directory will be copied and pasted into the dist directory. Also I changed some names and added `public` in the arguments for dev() function.
+
+`/src/index.js`
 
 ```
-{{ @md, ./md/test.md }}
-```
-
-2. How to add markdown or .tot to data object:
-
-`./src/pages.js`
-
-```
+const Rino = require('rinojs');
 const path = require('path');
+const { pages } = require("./pages.js");
 
-async function pages()
+async function build()
 {
-    return [
-        {
-            data: {
-                title: 'Test Title',
-                testid: 'test',
-            },
-            tots: [
-                {
-                    name: 'test',
-                    filename: './tot/data.tot'
-                }
-            ],
-            mds: [
-                {
-                    name: 'test',
-                    filename: './md/test.md'
-                }
-            ],
-            pageFilename: path.resolve(__dirname, "./page/index.tot"),
-            distDirname: path.resolve(__dirname, "../testdist"),
-            filenames: {
-                css: "style.css",
-                js: "main.js"
-            }
-        }, ... more pages
-    ];
+    let rino = new Rino();
+    let args = {
+        pages: await pages(),
+        distRoot: path.resolve(__dirname, "../dist"),
+        src: path.resolve(__dirname, "./"),
+        public: path.resolve(__dirname, "../public")
+    }
+
+    await rino.dev(args);
 }
 
-module.exports = { pages }
+build();
 ```
 
-`./src/page/index.tot`
+Now dev function will be like this:
 
 ```
-some html...
-{{ @data.tot.test.test }}
-{{ @data.md.test }}
-some html...
+/*
+dev()
+arguments:
+{
+    pages:[
+        {
+            pageFilename: `File name for the page, the entry .tot file.`,
+            distDirname: `This is the directory where the output files will be stored.`,
+            tots: [{name: `name of this`, filename: `File path of .tot file`}, ...],
+            mds: [{nname: `name of this`, filename: `File path of .md file`}, ...],
+            data: `json data for injecting to the html, css and javascript`,
+            filenames: {
+                html: `filename for html, default is /index.html`,
+                css: `filename for css, default is /style.css`,
+                js: `filename for js, default is /main.js`
+            }
+        }, ... pages continue
+    ],
+    distRoot: `This is the directory of root where the output files will be stored.`,
+    src: `Where your project files are. src directory path. This is for checking changes.`,
+    public: `public directory where you store asset files.`
+}
+*/
 ```
-
-Rino is going to go through the list of markdown and tot files. And it is going to add data from files into the data object with name your provided.
 
 ## 📖 Documentation
 

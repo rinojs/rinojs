@@ -15,7 +15,7 @@ module.exports = class Rino
     {
     }
 
-    /* 
+    /*
     dev()
     arguments:
     {
@@ -33,13 +33,14 @@ module.exports = class Rino
                 }
             }, ... pages continue
         ],
-        root: `This is the directory of root where the output files will be stored.`,
-        projectDirname: `Where your project files are. src directory path. This is for checking changes.`
+        distRoot: `This is the directory of root where the output files will be stored.`,
+        src: `Where your project files are. src directory path. This is for checking changes.`,
+        public: `public directory where you store asset files.`
     }
     */
-    async dev(args = { pages: [{ data: null, pageFilename: "", filenames: { html: "", css: "", js: "" } }], root: "", projectDirname: "" })
+    async dev(args = { pages: [{ data: null, pageFilename: "", filenames: { html: "", css: "", js: "" } }], distRoot: "", src: "", public: "" })
     {
-        await dev(args.pages, args.root, args.projectDirname);
+        await dev(args.pages, args.distRoot, args.src, args.public);
     }
 
     /* 
