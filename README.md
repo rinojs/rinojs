@@ -22,18 +22,44 @@ npm i rinojs
 
 Rino is ready for production. You can do static site generation and server side rendering. Build your website that services in multiple language. It is possible with default features like using markdown or [tot](https://github.com/opdev1004/totjs). Make sure you reuse the page and component template instead of creating each page for each language.
 
-### 🤞 About documentation and official website updates
+### 👍 For people who use version < v1.4.0
 
-I was working on them. but I need to build rino project starter first. So I can add it to the documentation. It won't take too long.
-
-If you are skilled and you don't mind reading stuffs for your production, then please read the code and the changes (maybe README.md) from github. Because you can use all the new features. It's not that difficult. 😉
-
-### 👍 For people who use version < v1.3.1
-
-From version 1.3.1, now you can start your project by:
+1. From version 1.4.0, we removed entity support for the `<code>` tags. Because it was breaking. Now the recommended and safe way is using markdown. And you can reuse it again just like a component. Less typing than entities.
 
 ```
-npm create rino
+{{ @md, ./src/mds/somecode.md }}
+```
+
+./src/mds/somecode.md: \`\`\`Some code\`\`\`
+
+2. We have changed markdown package. The one in version < 1.4.0 was generating weird html output. Now you will get better result for using markdown.
+
+3. dev() function's `public` argument is changed to `publicDirname`. I have changed it because it may matter when we need packed version of Rino.
+
+```
+    /*
+dev()
+arguments:
+{
+    pages:[
+        {
+            pageFilename: `File name for the page, the entry .tot file.`,
+            distDirname: `This is the directory where the output files will be stored.`,
+            tots: [{name: `name of this`, filename: `File path of .tot file`}, ...],
+            mds: [{nname: `name of this`, filename: `File path of .md file`}, ...],
+            data: `json data for injecting to the html, css and javascript`,
+            filenames: {
+                html: `filename for html, default is /index.html`,
+                css: `filename for css, default is /style.css`,
+                js: `filename for js, default is /main.js`
+            }
+        }, ... pages continue
+    ],
+    distRoot: `This is the directory of root where the output files will be stored.`,
+    src: `Where your project files are. src directory path. This is for checking changes.`,
+    publicDirname: `public directory where you store asset files.`
+}
+*/
 ```
 
 ## 📖 Documentation

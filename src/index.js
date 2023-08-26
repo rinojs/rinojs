@@ -6,7 +6,6 @@ const { buildPComponent } = require('./core/pcomponent');
 const { buildComponent } = require('./core/component');
 const { writeFiles } = require('./core/write-files');
 const { findPort, isPortInUse } = require('./core/find-port');
-const { encodeCode, decodeCode } = require('./core/entities');
 const { loadJSON, loadTot } = require('./core/obj-handler');
 
 module.exports = class Rino
@@ -35,12 +34,12 @@ module.exports = class Rino
         ],
         distRoot: `This is the directory of root where the output files will be stored.`,
         src: `Where your project files are. src directory path. This is for checking changes.`,
-        public: `public directory where you store asset files.`
+        publicDirname: `public directory where you store asset files.`
     }
     */
-    async dev(args = { pages: [{ data: null, pageFilename: "", filenames: { html: "", css: "", js: "" } }], distRoot: "", src: "", public: "" })
+    async dev(args = { pages: [{ data: null, pageFilename: "", filenames: { html: "", css: "", js: "" } }], distRoot: "", src: "", publicDirname: "" })
     {
-        await dev(args.pages, args.distRoot, args.src, args.public);
+        await dev(args.pages, args.distRoot, args.src, args.publicDirname);
     }
 
     /* 
@@ -157,16 +156,6 @@ module.exports = class Rino
     async isPortInUse(port)
     {
         return await isPortInUse(port);
-    }
-
-    async encodeCode(page)
-    {
-        return await encodeCode(page);
-    }
-
-    async decodeCode(page)
-    {
-        return await decodeCode(page);
     }
 
     async loadJSON(filename, encoding = "utf8")

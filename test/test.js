@@ -9,7 +9,7 @@ async function test()
         pages: await pages(),
         distRoot: path.resolve(__dirname, "../testdist"),
         src: path.resolve(__dirname, "./"),
-        public: path.resolve(__dirname, "../public")
+        publicDirname: path.resolve(__dirname, "../public")
     }
 
     await rino.dev(args);
