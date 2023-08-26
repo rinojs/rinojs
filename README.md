@@ -3,7 +3,11 @@
 Fast learning, preprocessing, intuitive web framework. It is "rinojs" because the name rhino, rhinojs and rino are being used by others.
 
 ## ▶️ Installation
-
+The recommended way to start your Rino project:
+```
+npm create rino
+```
+For manual setup:
 ```
 npm i rinojs
 ```
