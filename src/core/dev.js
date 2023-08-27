@@ -26,19 +26,19 @@ arguments:
     ],
     distRoot: `This is the directory of root where the output files will be stored.`,
     src: `Where your project files are. src directory path. This is for checking changes.`,
-    public: `public directory where you store asset files.`
+    publicDirname: `public directory where you store asset files.`
 }
 */
-async function dev(pages = [{ pageFilename: "", distDirname: "", tots: [{ name: "", filename: "" }], mds: [{ name: "", filename: "" }], data: null, filenames: { html: "", css: "", js: "" } }], distRoot, src, public)
+async function dev(pages = [{ pageFilename: "", distDirname: "", tots: [{ name: "", filename: "" }], mds: [{ name: "", filename: "" }], data: null, filenames: { html: "", css: "", js: "" } }], distRoot, src, publicDirname)
 {
-    if (pages.length == 0 || !distRoot || !src || !public)
+    if (pages.length == 0 || !distRoot || !src || !publicDirname)
     {
         console.error(`Dev Error: All the arguments are required. Please fill them all.`);
         return false;
     }
 
     console.log(`Copying assets now...`);
-    await copyAssets(public, distRoot);
+    await copyAssets(publicDirname, distRoot);
     console.log(`Copying assets is done...`);
 
     await buildMultiple(pages);
@@ -49,7 +49,7 @@ async function dev(pages = [{ pageFilename: "", distDirname: "", tots: [{ name: 
     const url = `http://localhost:${ port }`
 
     await openBrowser(url);
-    await createWatcher(pages, distRoot, src, public, port, wss);
+    await createWatcher(pages, distRoot, src, publicDirname, port, wss);
 }
 
 

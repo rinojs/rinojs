@@ -1,7 +1,6 @@
 const fs = require('fs').promises;
 const Tot = require('totjs');
-const MarkdownIt = require('markdown-it')
-const md = new MarkdownIt();
+const { marked } = require('marked');
 
 async function loadJSON(filename, encoding = "utf8")
 {
@@ -36,7 +35,7 @@ async function loadMD(filename, encoding = "utf8")
             else return data;
         });
 
-        return md.render(data);
+        return marked.parse(data);
     }
     catch (error)
     {

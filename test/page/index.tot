@@ -24,9 +24,6 @@
         <div id="comptesting"></div>
                     <pre>
                         <code>
-                            <\d:html>
-                                {{ @component.test, ./src/components }}
-                            <\/d:html>
                         </code>
                     </pre>
                     <br />
