@@ -1,12 +1,13 @@
 {
   "name": "rinojs",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Fast learning, preprocessing, intuitive web framework",
   "main": "dist/index.js",
   "bin": "dist/index.js",
   "scripts": {
     "test": "node test/test.js",
-    "pack": "rollup -c"
+    "pack": "node pack/index.js",
+    "build": "rollup -c"
   },
   "repository": {
     "type": "git",

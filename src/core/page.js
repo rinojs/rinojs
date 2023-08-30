@@ -1,6 +1,6 @@
 const Tot = require('totjs');
 const { buildComponent } = require('./component');
-const { replaceEvents } = require('./syntax-handler');
+const { replaceEvents } = require('./event-syntax');
 const { buildSingleData } = require('./data-handler');
 const { getValueFromObj } = require('./value-getter');
 const { bundlejs } = require('./bundle');

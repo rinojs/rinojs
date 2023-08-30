@@ -18,9 +18,9 @@ npm i rinojs
 
 ## 📢 Notice
 
-### 👍 For people who use version < v1.5.0
+### 👍 For people who use version < v1.5.2
 
-From version v1.5.0, we fixed syntax of Rino.js to work with Rinokit. Rinokit is a Runtime library that use similar algorithm for building a runtime component and print data in the component. So `props` and `{{ component }}` are removed. Because props is making things verbose. And `{{ component }}` feature is moved to rinokit and it does better job.
+From version v1.5.2, we updated `@event` algorithm to check `@` first so there's no need to perform unnecessary operations. And now we empty dist directory before build new version of pages. **If you have anything that is important in `/dist` from using old versions, make sure get them out of dist folder before use new version.**
 
 ## 📖 Documentation
 
