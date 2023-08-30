@@ -2,7 +2,6 @@ const { dev } = require('./core/dev');
 const { build } = require('./core/build');
 const { buildMultiple } = require('./core/build-multiple');
 const { buildPage } = require('./core/page');
-const { buildPComponent } = require('./core/pcomponent');
 const { buildComponent } = require('./core/component');
 const { writeFiles } = require('./core/write-files');
 const { findPort, isPortInUse } = require('./core/find-port');
@@ -101,31 +100,16 @@ module.exports = class Rino
 
 
     /* 
-    buildPComponent()
+    buildComponent()
     arguments:
     {
         filename: `This is the file path of tot file.`,
-        data: `js object, json data for injecting to the html, css and javascript`,
-        props: properties that is passed from the parent.
+        data: `js object, json data for injecting to the html, css and javascript`
     }
     */
-    async buildPComponent(args = { filename: "", data: null, props: null })
+    async buildComponent(args = { filename: "", data: null })
     {
-        await buildPComponent(args.filename, args.data, args.props);
-    }
-
-    /* 
-    buildComponent()
-    arguments: {
-        filename: `This is the file path of tot file.`,
-        htmlName: `Name of the variable for html content.`,
-        data: `json data for injecting to the html, css and javascript`,
-        props: `properties that is passed from the parent.`
-    }
-    */
-    async buildComponent(args = { filename: "", htmlName: "", data: null, props: null })
-    {
-        await buildComponent(args.filename, args.htmlName, args.data, args.props);
+        await buildComponent(args.filename, args.data);
     }
 
     /*
@@ -158,11 +142,19 @@ module.exports = class Rino
         return await isPortInUse(port);
     }
 
+    /*
+    loadJSON()
+    arguments: filename: `filename for json`
+    */
     async loadJSON(filename, encoding = "utf8")
     {
         return await loadJSON(filename, encoding);
     }
 
+    /*
+    loadTot()
+    arguments: filename: `filename for tot`
+    */
     async loadTot(filename, encoding = "utf8")
     {
         return await loadTot(filename, encoding);

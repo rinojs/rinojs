@@ -1,45 +1,101 @@
 const Tot = require('totjs');
 const { buildSingleData } = require('./data-handler');
-const { buildSingleProps } = require('./props');
-const { replaceEvents } = require('./syntax-handler');
-const { buildSingleFromTot } = require('./tot-handler')
+const { getValueFromObj } = require('./value-getter');
+const { buildPreload } = require('./preload');
+const { getDataFromTot, buildSingleFromTot } = require('./tot-handler')
+const { loadMD } = require('./obj-handler');
 
 /* 
 buildComponent()
-arguments: {
+arguments:
+{
     filename: `This is the file path of tot file.`,
-    htmlName: `Name of the variable for html content.`,
-    data: `json data for injecting to the html, css and javascript`,
-    props: `properties that is passed from the parent.`
+    data: `js object, json data for injecting to the html, css and javascript`,
 }
 */
-async function buildComponent(filename, htmlName, data = null, props = null)
+async function buildComponent(filename, data = null)
 {
-    try
+    const tot = new Tot(filename);
+
+    let html = await tot.getDataByName("html");
+    let css = await tot.getDataByName("css");
+    let js = await tot.getDataByName("js");
+
+    if (!html) html = "";
+    if (!js) js = "";
+    if (!css) css = "";
+
+    css = await buildSingleFromTot(await buildSingleData(css, data));
+    js = await buildSingleFromTot(await buildSingleData(js, data));
+
+    let result = {
+        html: "",
+        css: css,
+        js: js,
+        prelaodJS: "",
+        preloadCSS: ""
+    };
+
+    while (html.length > 0)
     {
-        const tot = new Tot(filename);
+        let start = html.indexOf("{{") + 2;
+        let end = html.indexOf("}}", start);
 
-        let html = await tot.getDataByName("html");
-        let css = await tot.getDataByName("css");
-        let js = await tot.getDataByName("js");
+        if (start == 1 || end == -1)
+        {
+            result.html = result.html + html;
+            break;
+        }
 
-        if (!html) throw new Error("Need html to build a component");
-        if (!js) js = "";
-        if (!css) css = "";
+        result.html = result.html + html.substring(0, start - 2);
+        let target = html.substring(start, end).trim();
+        html = html.substring(end + 2);
 
-        html = await replaceEvents(await buildSingleFromTot(await buildSingleProps(await buildSingleData(html, data), props)));
-        css = await buildSingleFromTot(await buildSingleProps(await buildSingleData(css, data), props));
-        js = await buildSingleFromTot(await buildSingleProps(await buildSingleData(js, data), props));
+        if (target.substring(0, 3) == "@md")
+        {
+            let targetArray = target.split(",");
+            result.html = result.html + await loadMD(targetArray[1].trim());
+        }
+        else if (target.substring(0, 5) == "@tot.")
+        {
+            let targetArray = target.split(",");
+            result.html = result.html + await getDataFromTot(targetArray[0].substring(5), targetArray[1].trim());
+        }
+        else if (target.substring(0, 6) == "@data." && data)
+        {
+            result.html = result.html + await getValueFromObj(target.substring(6), data)
+        }
+        else if (target.substring(0, 8) == "@preload")
+        {
+            let preloadResult;
+            let targetArray = target.split(",");
+            let preloadFileName = targetArray[1].trim();
 
-        html = "var " + htmlName + " = `" + html.replaceAll("`", "\`") + "`;\n" + htmlName + ";\n";
-        js = html + js;
+            preloadResult = await buildPreload(preloadFileName, data);
 
-        return { js: js, css: css };
+            result.prelaodJS = result.prelaodJS + preloadResult.js;
+            result.preloadCSS = result.preloadCSS + preloadResult.css;
+        }
+        else if (target.substring(0, 10) == "@component")
+        {
+            let targetArray = target.split(",");
+            let componentFilename = targetArray[1].trim();
+            let compResult = await buildComponent(componentFilename, data);
+
+            if (compResult.prelaodJS) result.prelaodJS = result.prelaodJS + compResult.prelaodJS;
+            if (compResult.preloadCSS) result.preloadCSS = result.preloadCSS + compResult.preloadCSS;
+
+            result.html = result.html + compResult.html;
+            result.css = result.css + compResult.css;
+            result.js = result.js + compResult.js;
+        }
+        else
+        {
+            result.html = result.html + `{{ ${ target } }}`;
+        }
     }
-    catch (error)
-    {
-        console.error(error);
-    }
+
+    return result;
 }
 
 module.exports = { buildComponent }

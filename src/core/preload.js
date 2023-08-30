@@ -1,7 +1,6 @@
 const path = require('path');
 const Tot = require('totjs');
 const { buildSingleData } = require('./data-handler');
-const { buildSingleProps } = require('./props');
 const { buildSingleFromTot } = require('./tot-handler')
 
 /* 
