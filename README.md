@@ -18,9 +18,9 @@ npm i rinojs
 
 ## 📢 Notice
 
-### 👍 For people who use version < v1.5.2
+### 👍 For people who use version < v1.5.3
 
-From version v1.5.2, we updated `@event` algorithm to check `@` first so there's no need to perform unnecessary operations. And now we empty dist directory before build new version of pages. **If you have anything that is important in `/dist` from using old versions, make sure get them out of dist folder before use new version.**
+From version v1.5.3, fixed the slow building speed caused by 1.5.2.
 
 ## 📖 Documentation
 
