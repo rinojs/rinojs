@@ -14,7 +14,8 @@ function emptyDirectory(directoryPath)
         {
             emptyDirectory(filePath);
             fs.rmdirSync(filePath);
-        } else
+        }
+        else
         {
             fs.unlinkSync(filePath);
         }

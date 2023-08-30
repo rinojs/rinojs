@@ -7,7 +7,7 @@ async function createWatcher(pages, distRoot, src, publicDirname, port, wss)
 {
     const watcher = chokidar.watch([src, publicDirname]).on('change', async (filepath) =>
     {
-        emptyDirectory(distRoot);
+        emptyDirectory(distRoot, publicDirname);
 
         console.clear();
         console.log(`Copying assets now...`);

@@ -38,7 +38,7 @@ async function dev(pages = [{ pageFilename: "", distDirname: "", tots: [{ name: 
         return false;
     }
 
-    emptyDirectory(distRoot);
+    emptyDirectory(distRoot, publicDirname);
 
     console.log(`Copying assets now...`);
     await copyAssets(publicDirname, distRoot);
