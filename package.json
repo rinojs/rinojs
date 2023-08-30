@@ -1,12 +1,12 @@
 {
   "name": "rinojs",
-  "version": "1.4.0",
+  "version": "1.5.1",
   "description": "Fast learning, preprocessing, intuitive web framework",
   "main": "dist/index.js",
   "bin": "dist/index.js",
   "scripts": {
     "test": "node test/test.js",
-    "build": "rollup -c"
+    "pack": "rollup -c"
   },
   "repository": {
     "type": "git",
@@ -31,6 +31,7 @@
   "homepage": "https://rinojs.org/",
   "dependencies": {
     "@rollup/plugin-commonjs": "^25.0.2",
+    "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.1.0",
     "@rollup/plugin-terser": "^0.4.3",
     "@rollup/plugin-virtual": "^3.0.1",
@@ -42,8 +43,5 @@
     "rollup": "^3.26.2",
     "totjs": "^0.1.2",
     "ws": "^8.13.0"
-  },
-  "devDependencies": {
-    "@rollup/plugin-json": "^6.0.0"
   }
 }
