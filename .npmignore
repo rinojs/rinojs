@@ -8,3 +8,5 @@ jest.config.js
 rollup.config.js
 public/
 depdist/
+build/
+pack/

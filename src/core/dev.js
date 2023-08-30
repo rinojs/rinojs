@@ -5,6 +5,7 @@ const { createWSS } = require('./wss');
 const { openBrowser } = require('./browser');
 const { createWatcher } = require('./watcher');
 const { copyAssets } = require('./assets');
+const { emptyDirectory } = require('./empty-directory');
 
 /*
 dev()
@@ -36,6 +37,8 @@ async function dev(pages = [{ pageFilename: "", distDirname: "", tots: [{ name: 
         console.error(`Dev Error: All the arguments are required. Please fill them all.`);
         return false;
     }
+
+    emptyDirectory(distRoot);
 
     console.log(`Copying assets now...`);
     await copyAssets(publicDirname, distRoot);
