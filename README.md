@@ -18,14 +18,25 @@ npm i rinojs
 
 ## 📢 Notice
 
-### 👍 For people who use version < v1.5.3
+### 👍 For people who use version < v1.5.4
 
-From version v1.5.3, fixed the slow building speed caused by 1.5.2.
+From version v1.5.4, fixed the bug from v1.5.2. Please use the latest version.
 
 ## 📖 Documentation
 
-- [Introduction](https://rinojs.org/documents/introduction.html)
+- [Rino.js Introduction](https://rinojs.org/documents/introduction.html)
+- [Rinokit Introduction](https://rinojs.org/documents/rinokit.html)
 - [Installation & Setup](https://rinojs.org/documents/installation.html)
+
+### 👼 Become a Sponsor
+
+- [Ko-fi](https://ko-fi.com/opdev1004)
+- [Github sponsor page](https://github.com/sponsors/opdev1004)
+
+### 🎁 Shop
+
+- [RB Rino Shop](https://www.redbubble.com/shop/ap/149559711)
+- [RB Geargom Shop](https://www.redbubble.com/people/Geargom/shop)
 
 ## 👨‍👩‍👧‍👦 **Sponsors**
 
@@ -46,16 +57,6 @@ From version v1.5.3, fixed the slow building speed caused by 1.5.2.
 ### 🌱 Herald Supporter
 
 ## 💪 Support Rino!
-
-### 👼 Become a Sponsor
-
-- [Ko-fi](https://ko-fi.com/opdev1004)
-- [Github sponsor page](https://github.com/sponsors/opdev1004)
-
-### 🎁 Shop
-
-- [RB Rino Shop](https://www.redbubble.com/shop/ap/149559711)
-- [RB Geargom Shop](https://www.redbubble.com/people/Geargom/shop)
 
 ## 👨‍💻 Author
 

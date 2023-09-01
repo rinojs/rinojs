@@ -3,36 +3,52 @@ const path = require('path');
 
 function emptyDirectory(directoryPath, targetDirectory = null, exceptionList = [])
 {
-    const files = fs.readdirSync(directoryPath);
-
-    if (targetDirectory)
+    try
     {
-        const targetFiles = fs.readdirSync(targetDirectory);
+        if (!fs.existsSync(directoryPath))
+        {
+            fs.mkdirSync(directoryPath);
+            return false;
+        }
 
-        for (const file of targetFiles)
+        const files = fs.readdirSync(directoryPath);
+
+        if (targetDirectory)
+        {
+            const targetFiles = fs.readdirSync(targetDirectory);
+
+            for (const file of targetFiles)
+            {
+                const filePath = path.join(directoryPath, file);
+                exceptionList.push(filePath);
+            }
+        }
+
+        for (const file of files)
         {
             const filePath = path.join(directoryPath, file);
-            exceptionList.push(filePath);
+            const stat = fs.statSync(filePath);
+
+            if (!exceptionList.includes(filePath))
+            {
+                if (stat.isDirectory())
+                {
+                    emptyDirectory(filePath, null, exceptionList);
+                    fs.rmdirSync(filePath);
+                }
+                else
+                {
+                    fs.unlinkSync(filePath);
+                }
+            }
         }
+
+        return true;
     }
-
-    for (const file of files)
+    catch (error)
     {
-        const filePath = path.join(directoryPath, file);
-        const stat = fs.statSync(filePath);
-
-        if (!exceptionList.includes(filePath))
-        {
-            if (stat.isDirectory())
-            {
-                emptyDirectory(filePath, null, exceptionList);
-                fs.rmdirSync(filePath);
-            }
-            else
-            {
-                fs.unlinkSync(filePath);
-            }
-        }
+        console.error(error);
+        return false;
     }
 }
 
