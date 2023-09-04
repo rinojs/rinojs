@@ -29,7 +29,7 @@ You can do something like this now:
 ```
 <d:html>
 some html...
-{ @component, ./file-path, button-component, color }
+{{ @component, ./file-path, button-component, color }}
 some html...
 </d:html>
 <d:button-component>
@@ -45,10 +45,10 @@ some color css or value
 ```
 <d:html>
 some html...
-{ @props[0] }
+{{ @props[0] }}
 </d:html>
 <d:css>
-{ @props[1] }
+{{ @props[1] }}
 </d:css>
 ```
 
