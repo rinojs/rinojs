@@ -104,12 +104,13 @@ module.exports = class Rino
     arguments:
     {
         filename: `This is the file path of tot file.`,
-        data: `js object, json data for injecting to the html, css and javascript`
+        data: `js object, json data for injecting to the html, css and javascript`,
+        props: properties that is passed from the parent. List.
     }
     */
-    async buildComponent(args = { filename: "", data: null })
+    async buildComponent(args = { filename: "", data: null, props: [] })
     {
-        await buildComponent(args.filename, args.data);
+        await buildComponent(args.filename, args.data, args.props);
     }
 
     /*

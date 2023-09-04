@@ -1,6 +1,7 @@
 <d:html>
     {{ @preload, ./preloads/preload2.tot }}
-    Nested components in different directories asdas
+    {{ @props[0] }}
+    Nested components in different directories {{ @props[1] }}
 </d:html>
 <d:js>
     console.log(add(8, 10));

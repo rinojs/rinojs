@@ -18,9 +18,41 @@ npm i rinojs
 
 ## 📢 Notice
 
-### 👍 For people who use version < v1.5.4
+### 👍 For people who use version < v1.5.5
 
-From version v1.5.4, fixed the bug from v1.5.2. Please use the latest version.
+From version v1.5.5, @props is back! But it is different from before it was removed. From this version @props is based on list. And you can only pass props to only one depth below. With this feature now you can build preprocessed UI kit for Rino.
+
+You can do something like this now:
+
+- From parent:
+
+```
+<d:html>
+some html...
+{ @component, ./file-path, button-component, color }
+some html...
+</d:html>
+<d:button-component>
+{{ @component, ./file-path/button.tot }}
+</d:button-component>
+<d:color>
+some color css or value
+</d:color>
+```
+
+- From child component:
+
+```
+<d:html>
+some html...
+{ @props[0] }
+</d:html>
+<d:css>
+{ @props[1] }
+</d:css>
+```
+
+Now the system will go through `@tot`, `@data` and `@props` first. Which means if you place `@component`, `@md`, `@preload` within `@tot`, `@data` and `@props`, they are going to be rendered. The build process can be slightly slower than before because of this. However there's an improvement as well. I removed some variable initialization from loop, which should be improving the speed of build.
 
 ## 📖 Documentation
 

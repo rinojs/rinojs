@@ -1,0 +1,18 @@
+<d:html>
+    <div>
+        TEST {{ @props[0] }} !!~
+        {{ @component, ./components/test/temp.tot, ah, ah, ah }} test!!
+        
+
+
+    </div>
+</d:html>
+<d:js>
+    console.log("test");
+    console.log(`{{ @props[1] }}`);
+</d:js>
+<d:css>
+</d:css>
+<d:ah>
+ahahah
+</d:ah>
