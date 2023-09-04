@@ -11,7 +11,7 @@
     </head>
     <body>
         <div class="test">
-            {{ @component, ./components/test.tot, test, test }}
+            {{ @component, ./components/test.tot, test, test2 }}
         </div>
         <div id="{{ @data.testid }}">
         </div>
@@ -19,13 +19,15 @@
             it is successfully built and showing the test results!!
         </div>
         <div id="test">asdasdass</div>
-        <button @click="addComponent();">Click me to add innerHTML</button>
         <div id="comptesting"></div>
                     <pre>
                         <code>
                         </code>
                     </pre>
                     <br />
+                    {{ //
+                        this is comment :)
+                    }}
                     {{ @tot.test, ./tot/data.tot }}2
                     {{ @data.tot.test.test }}
                     {{ @data.md.test }}
@@ -40,20 +42,16 @@
     </html>
 </d:html>
 <d:css>
+    {{// This is comment :) }}
     .test {
         font-size: 48px;
         color: #666;
     }
 </d:css>
 <d:js>
-
+    {{// This is comment :) }}
     preloaded();
     testCompPreload();
-    function addComponent()
-    {
-        document.getElementById('comptesting').innerHTML = document.getElementById('comptesting').innerHTML + componentHTML;
-    }
-
     function test() {
         document.getElementById("{{ @data.testid }}").innerHTML = "^ _ ^";
     }
@@ -67,3 +65,6 @@
 <d:test>
 안녕
 </d:test>
+<d:test2>
+ah
+</d:test2>
