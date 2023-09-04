@@ -10,6 +10,8 @@ const { buildInnerData } = require('./inner-data');
 const { buildTemplateData } = require('./pc-helper');
 const { removeComments } = require('./comment');
 const CleanCSS = require('clean-css');
+const { getValueFromObj } = require('./value-getter');
+
 
 /* 
 buildPage()
@@ -64,10 +66,15 @@ async function buildPage(filename, data = null)
         {
             continue;
         }
-        if (target.substring(0, 3) == "@md")
+        else if (target.substring(0, 3) == "@md")
         {
             targetArray = target.split(",");
             result.html = result.html + await loadMD(targetArray[1].trim());
+        }
+        else if (target.substring(0, 6) == "@data." && data)
+        {
+            if (target.substring(5, 9) == ".md.") result.html = result.html + await getValueFromObj(target.substring(6), data);
+            else result.html = result.html + `{{ ${ target } }}`;
         }
         else if (target.substring(0, 8) == "@preload")
         {
