@@ -1,7 +1,7 @@
 <d:html>
     <div>
         TEST {{ @props[0] }} !!~
-        {{ @component, ./components/test/temp.tot, ah, ah, ah }} test!!
+        {{ @component, ./components/test/temp.tot, < @props[1] > }} test!!
         
 
 

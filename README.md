@@ -18,41 +18,48 @@ npm i rinojs
 
 ## 📢 Notice
 
-### 👍 For people who use version < v1.5.5
+### 👍 For people who use version < v1.5.7
 
-From version v1.5.5, @props is back! But it is different from before it was removed. From this version @props is based on list. And you can only pass props to only one depth below. With this feature now you can build preprocessed UI kit for Rino.
+From version v1.5.7, inner-data is available now. `@data`, `@tot` and `@props` can be placed in the `{{ }}` for `@component`, `@preload` and `@md`. But you have to use `<>`.
 
-You can do something like this now:
+Example:
 
-- From parent:
-
-```
-<d:html>
-some html...
-{{ @component, ./file-path, button-component, color }}
-some html...
-</d:html>
-<d:button-component>
-{{ @component, ./file-path/button.tot }}
-</d:button-component>
-<d:color>
-some color css or value
-</d:color>
-```
-
-- From child component:
+- Parent component:
 
 ```
 <d:html>
-some html...
-{{ @props[0] }}
+{{ @component, ./file-path-to-child, parentprop }}
 </d:html>
-<d:css>
-{{ @props[1] }}
-</d:css>
+<d:parentprop>
+someprop1
+</d:parentprop>
 ```
 
-Now the system will go through `@tot`, `@data` and `@props` first. Which means if you place `@component`, `@md`, `@preload` within `@tot`, `@data` and `@props`, they are going to be rendered. The build process can be slightly slower than before because of this. However there's an improvement as well. I removed some variable initialization from loop, which should be improving the speed of build.
+- Child component:
+
+```
+<d:html>
+{{ @component, ./file-path-to-other-component, < @props[0] > }}
+</d:html>
+<d:someprop1>
+<button></button>
+</d:someprop1>
+<d:someprop2>
+<div></div>
+</d:someprop2>
+```
+
+In the example, depends on what you passed into component from parent, you can pass `someprop1` or `someprop2`.
+
+And now you can add comment with preprocessed way. So you don't have to use `html` comment. You can use this within JS and CSS as well.
+
+```
+{{ //
+    You can comment like this :)
+}}
+```
+
+For the last, we are minifying CSS from v1.5.7.
 
 ## 📖 Documentation
 

@@ -1,10 +1,12 @@
 const Tot = require('totjs');
 const { buildSingleData } = require('./data-handler');
 const { buildSingleProps } = require('./props');
-const { getValueFromObj, getValueFromList } = require('./value-getter');
 const { buildPreload } = require('./preload');
-const { getDataFromTot, buildSingleFromTot } = require('./tot-handler')
+const { buildSingleFromTot } = require('./tot-handler')
 const { loadMD } = require('./obj-handler');
+const { buildInnerData } = require('./inner-data');
+const { buildTemplateData } = require('./pc-helper');
+const { removeComments } = require('./comment');
 
 /* 
 buildComponent()
@@ -39,50 +41,14 @@ async function buildComponent(filename, data = null, props = [])
     if (!html) html = "";
     if (!js) js = "";
     if (!css) css = "";
-    if (css) css = await buildSingleFromTot(await buildSingleProps(await buildSingleData(css, data), props));
-    if (js) js = await buildSingleFromTot(await buildSingleProps(await buildSingleData(js, data), props));
+    if (css) css = await removeComments(await buildSingleFromTot(await buildSingleProps(await buildSingleData(css, data), props)));
+    if (js) js = await removeComments(await buildSingleFromTot(await buildSingleProps(await buildSingleData(js, data), props)));
 
-    let tempHTML = html;
-    html = "";
+    html = await buildTemplateData(html, data, props);
     let start = 0;
     let end = 0;
     let target = "";
     let targetArray = "";
-
-    while (tempHTML.length > 0)
-    {
-        start = tempHTML.indexOf("{{") + 2;
-        end = tempHTML.indexOf("}}", start);
-
-        if (start == 1 || end == -1)
-        {
-            html = html + tempHTML;
-            break;
-        }
-
-        html = html + tempHTML.substring(0, start - 2);
-        target = tempHTML.substring(start, end).trim();
-        tempHTML = tempHTML.substring(end + 2);
-
-        if (target.substring(0, 5) == "@tot.")
-        {
-            targetArray = target.split(",");
-            html = html + await getDataFromTot(targetArray[0].substring(5), targetArray[1].trim());
-        }
-        else if (target.substring(0, 6) == "@data." && data)
-        {
-            html = html + await getValueFromObj(target.substring(6), data)
-        }
-        else if (target.substring(0, 6) == "@props" && props)
-        {
-            html = html + await getValueFromList(target.substring(6), props);
-        }
-        else
-        {
-            html = html + `{{ ${ target } }}`;
-        }
-    }
-
     let result = {
         html: "",
         css: css,
@@ -93,8 +59,8 @@ async function buildComponent(filename, data = null, props = [])
 
     while (html.length > 0)
     {
-        let start = html.indexOf("{{") + 2;
-        let end = html.indexOf("}}", start);
+        start = html.indexOf("{{") + 2;
+        end = html.indexOf("}}", start);
 
         if (start == 1 || end == -1)
         {
@@ -105,8 +71,13 @@ async function buildComponent(filename, data = null, props = [])
         result.html = result.html + html.substring(0, start - 2);
         target = html.substring(start, end).trim();
         html = html.substring(end + 2);
+        target = await buildInnerData(target, data, props);
 
-        if (target.substring(0, 3) == "@md")
+        if (target.substring(0, 2) == "//")
+        {
+            continue;
+        }
+        else if (target.substring(0, 3) == "@md")
         {
             targetArray = target.split(",");
             result.html = result.html + await loadMD(targetArray[1].trim());
