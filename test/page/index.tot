@@ -30,13 +30,13 @@
                     }}
                     {{ @tot.test, ./tot/data.tot }}2
                     {{ @data.tot.test.test }}
-                    {{ @data.md.test }}
-                    {{ @md, ./md/test.md }}
+                    {{ @data.md.test }} 11
+                    {{ @md, ./md/test.md }} 22
                     {{ component }}
                     <h2 class="subtitle">
                         ./src/components/test.tot
                     </h2>
-                    1!
+                    1!!
         <script src="main.js"></script>
     </body>
     </html>

@@ -31,7 +31,8 @@ async function buildInnerData(content, data = null, props = null)
         }
         else if (target.substring(0, 6) == "@data." && data)
         {
-            result = result + (await getValueFromObj(target.substring(6), data)).trim()
+            if (target.substring(5, 9) == ".md.") result = result + `{{ ${ target } }}`;
+            else result = result + (await getValueFromObj(target.substring(6), data)).trim();
         }
         else if (target.substring(0, 6) == "@props" && props)
         {

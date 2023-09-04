@@ -3,3 +3,5 @@
 asdas
 
 asdasdasd
+
+{{ @component, ./es/def.md }}

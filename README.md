@@ -18,48 +18,9 @@ npm i rinojs
 
 ## 📢 Notice
 
-### 👍 For people who use version < v1.5.7
+### 👍 For people who use version < v1.5.9
 
-From version v1.5.7, inner-data is available now. `@data`, `@tot` and `@props` can be placed in the `{{ }}` for `@component`, `@preload` and `@md`. But you have to use `<>`.
-
-Example:
-
-- Parent component:
-
-```
-<d:html>
-{{ @component, ./file-path-to-child, parentprop }}
-</d:html>
-<d:parentprop>
-someprop1
-</d:parentprop>
-```
-
-- Child component:
-
-```
-<d:html>
-{{ @component, ./file-path-to-other-component, < @props[0] > }}
-</d:html>
-<d:someprop1>
-<button></button>
-</d:someprop1>
-<d:someprop2>
-<div></div>
-</d:someprop2>
-```
-
-In the example, depends on what you passed into component from parent, you can pass `someprop1` or `someprop2`.
-
-And now you can add comment with preprocessed way. So you don't have to use `html` comment. You can use this within JS and CSS as well.
-
-```
-{{ //
-    You can comment like this :)
-}}
-```
-
-For the last, we are minifying CSS from v1.5.7.
+From version v1.5.9, fixed a small bug from v1.5.7. Please use the latest version.
 
 ## 📖 Documentation
 
