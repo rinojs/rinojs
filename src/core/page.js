@@ -27,9 +27,45 @@ async function buildPage(filename, data = null)
     if (!html) html = "";
     if (!js) js = "";
     if (!css) css = "";
+    if (css) css = await buildSingleFromTot(await buildSingleData(css, data));
+    if (js) js = await buildSingleFromTot(await buildSingleData(js, data));
 
-    css = await buildSingleFromTot(await buildSingleData(css, data));
-    js = await buildSingleFromTot(await buildSingleData(js, data));
+    let tempHTML = html;
+    html = "";
+    let start = 0;
+    let end = 0;
+    let target = "";
+    let targetArray = "";
+
+    while (tempHTML.length > 0)
+    {
+        start = tempHTML.indexOf("{{") + 2;
+        end = tempHTML.indexOf("}}", start);
+
+        if (start == 1 || end == -1)
+        {
+            html = html + tempHTML;
+            break;
+        }
+
+        html = html + tempHTML.substring(0, start - 2);
+        target = tempHTML.substring(start, end).trim();
+        tempHTML = tempHTML.substring(end + 2);
+
+        if (target.substring(0, 5) == "@tot.")
+        {
+            targetArray = target.split(",");
+            html = html + await getDataFromTot(targetArray[0].substring(5), targetArray[1].trim());
+        }
+        else if (target.substring(0, 6) == "@data." && data)
+        {
+            html = html + await getValueFromObj(target.substring(6), data)
+        }
+        else
+        {
+            html = html + `{{ ${ target } }}`;
+        }
+    }
 
     let result = {
         html: "",
@@ -37,12 +73,10 @@ async function buildPage(filename, data = null)
         js: js
     };
 
-
-
     while (html.length > 0)
     {
-        let start = html.indexOf("{{") + 2;
-        let end = html.indexOf("}}", start);
+        start = html.indexOf("{{") + 2;
+        end = html.indexOf("}}", start);
 
         if (start == 1 || end == -1)
         {
@@ -51,30 +85,19 @@ async function buildPage(filename, data = null)
         }
 
         result.html = result.html + html.substring(0, start - 2);
-        let target = html.substring(start, end).trim();
+        target = html.substring(start, end).trim();
         html = html.substring(end + 2);
 
         if (target.substring(0, 3) == "@md")
         {
-            let targetArray = target.split(",");
+            targetArray = target.split(",");
             result.html = result.html + await loadMD(targetArray[1].trim());
-        }
-        else if (target.substring(0, 5) == "@tot.")
-        {
-            let targetArray = target.split(",");
-            result.html = result.html + await getDataFromTot(targetArray[0].substring(5), targetArray[1].trim());
-        }
-        else if (target.substring(0, 6) == "@data.")
-        {
-            result.html = result.html + await getValueFromObj(target.substring(6), data)
         }
         else if (target.substring(0, 8) == "@preload")
         {
-            let preloadResult;
-            let targetArray = target.split(",");
+            targetArray = target.split(",");
             let preloadFileName = targetArray[1].trim();
-
-            preloadResult = await buildPreload(preloadFileName, data);
+            let preloadResult = await buildPreload(preloadFileName, data);
 
             if (result.js.includes(`//rino.js js preload marker`)) result.js = result.js.replace(`//rino.js js preload marker`, preloadResult.js + `\n//rino.js js preload marker\n`);
             else result.js = `${ preloadResult.js }\n//rino.js js preload marker\n${ result.js }`;
@@ -83,9 +106,27 @@ async function buildPage(filename, data = null)
         }
         else if (target.substring(0, 10) == "@component")
         {
-            let targetArray = target.split(",");
+            let compResult = null;
+            targetArray = target.split(",");
             let componentFilename = targetArray[1].trim();
-            let compResult = await buildComponent(componentFilename, data);
+
+            if (targetArray.length > 2)
+            {
+                let newProps = [];
+
+                for (let i = 2; i < targetArray.length; i++) 
+                {
+                    let propName = targetArray[i].trim();
+                    let tempProp = await tot.getDataByName(propName);
+                    newProps.push(tempProp);
+                }
+
+                compResult = await buildComponent(componentFilename, data, newProps);
+            }
+            else
+            {
+                compResult = await buildComponent(componentFilename, data);
+            }
 
             if (compResult.prelaodJS)
             {
