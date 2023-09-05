@@ -18,9 +18,44 @@ npm i rinojs
 
 ## 📢 Notice
 
-### 👍 For people who use version < v1.5.9
+### 👍 For people who use version < v1.5.10
 
-From version v1.5.9, fixed a small bug from v1.5.7. Please use the latest version.
+From version v1.5.10, I've added a feature for inline properties.
+So from now you can do this:
+
+Parent component:
+
+```
+<d:html>
+{{ @component, filename, (#222), (<button></button>) }}
+</d:html>
+```
+
+Child component:
+
+```
+<d:html>
+{{ @props[1] }};
+</d:html>
+<d:css>
+button {
+    color: {{ @props[0] }};
+}
+</d:css>
+```
+
+Result:
+
+```
+html:
+<button></button>
+css:
+button {
+    color: #222;
+}
+```
+
+Please use the latest version.
 
 ## 📖 Documentation
 

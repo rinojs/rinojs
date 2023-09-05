@@ -109,7 +109,7 @@ async function buildComponent(filename, data = null, props = [])
                 prelaodJS: "",
                 preloadCSS: ""
             };
-            targetArray = target.split(",");
+            targetArray = await listComponentSyntax(target);
             let componentFilename = targetArray[1].trim();
 
             if (targetArray.length > 2)
@@ -118,9 +118,17 @@ async function buildComponent(filename, data = null, props = [])
 
                 for (let i = 2; i < targetArray.length; i++) 
                 {
-                    let propName = targetArray[i].trim();
-                    let tempProp = await tot.getDataByName(propName);
-                    newProps.push(tempProp);
+                    let prop = targetArray[i].trim();
+
+                    if (prop.startsWith("(") && prop.endsWith(")"))
+                    {
+                        newProps.push(prop.substring(1, prop.length - 1));
+                    }
+                    else
+                    {
+                        let tempProp = await tot.getDataByName(prop);
+                        newProps.push(tempProp);
+                    }
                 }
 
                 compResult = await buildComponent(componentFilename, data, newProps);
@@ -146,4 +154,50 @@ async function buildComponent(filename, data = null, props = [])
     return result;
 }
 
-module.exports = { buildComponent }
+async function listComponentSyntax(input)
+{
+    const result = [];
+    let currentSubstring = "";
+    let depth = 0;
+
+    for (let i = 0; i < input.length; i++)
+    {
+        const char = input[i];
+
+        if (char === ",")
+        {
+            if (depth === 0)
+            {
+                result.push(currentSubstring.trim());
+                currentSubstring = "";
+            }
+            else
+            {
+                currentSubstring += char;
+            }
+        }
+        else if (char === "(")
+        {
+            currentSubstring += char;
+            depth++;
+        }
+        else if (char === ")")
+        {
+            currentSubstring += char;
+            depth--;
+        }
+        else
+        {
+            currentSubstring += char;
+        }
+    }
+
+    if (currentSubstring.trim() !== "")
+    {
+        result.push(currentSubstring.trim());
+    }
+
+    return result;
+}
+
+module.exports = { buildComponent, listComponentSyntax }
