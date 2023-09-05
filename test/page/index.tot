@@ -11,7 +11,7 @@
     </head>
     <body>
         <div class="test">
-            {{ @component, ./components/test.tot, test, test2 }}
+            {{ @component, ./components/test.tot, (안녕하십니까?), test2 }}
         </div>
         <div id="{{ @data.testid }}">
         </div>

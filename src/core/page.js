@@ -1,5 +1,5 @@
 const Tot = require('totjs');
-const { buildComponent } = require('./component');
+const { buildComponent, listComponentSyntax } = require('./component');
 const { replaceEvents } = require('./event-syntax');
 const { buildSingleData } = require('./data-handler');
 const { bundlejs } = require('./bundle');
@@ -99,9 +99,17 @@ async function buildPage(filename, data = null)
 
                 for (let i = 2; i < targetArray.length; i++) 
                 {
-                    let propName = targetArray[i].trim();
-                    let tempProp = await tot.getDataByName(propName);
-                    newProps.push(tempProp);
+                    let prop = targetArray[i].trim();
+
+                    if (prop.startsWith("(") && prop.endsWith(")"))
+                    {
+                        newProps.push(prop.substring(1, prop.length - 1));
+                    }
+                    else
+                    {
+                        let tempProp = await tot.getDataByName(prop);
+                        newProps.push(tempProp);
+                    }
                 }
 
                 compResult = await buildComponent(componentFilename, data, newProps);
