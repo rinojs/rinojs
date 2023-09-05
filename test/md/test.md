@@ -4,4 +4,8 @@ asdas
 
 asdasdasd
 
+Markdown code:
+
+```
 {{ @component, ./es/def.md }}
+```

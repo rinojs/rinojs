@@ -1,5 +1,10 @@
 const Tot = require('totjs');
-const { buildComponent, listComponentSyntax } = require('./component');
+const { buildComponent } = require('./component');
+const {
+    buildTemplateData,
+    listComponentSyntax,
+    findEnd
+} = require('./parse-util');
 const { replaceEvents } = require('./event-syntax');
 const { buildSingleData } = require('./data-handler');
 const { bundlejs } = require('./bundle');
@@ -7,7 +12,6 @@ const { buildPreload } = require('./preload');
 const { buildSingleFromTot } = require('./tot-handler')
 const { loadMD } = require('./obj-handler');
 const { buildInnerData } = require('./inner-data');
-const { buildTemplateData } = require('./pc-helper');
 const { removeComments } = require('./comment');
 const CleanCSS = require('clean-css');
 const { getValueFromObj } = require('./value-getter');
@@ -49,7 +53,7 @@ async function buildPage(filename, data = null)
     while (html.length > 0)
     {
         start = html.indexOf("{{") + 2;
-        end = html.indexOf("}}", start);
+        end = await findEnd(html, start);
 
         if (start == 1 || end == -1)
         {
@@ -89,8 +93,15 @@ async function buildPage(filename, data = null)
         }
         else if (target.substring(0, 10) == "@component")
         {
-            let compResult = null;
-            targetArray = target.split(",");
+            let compResult =
+            {
+                html: "",
+                css: "",
+                js: "",
+                prelaodJS: "",
+                preloadCSS: ""
+            };
+            targetArray = await listComponentSyntax(target);
             let componentFilename = targetArray[1].trim();
 
             if (targetArray.length > 2)

@@ -3,6 +3,7 @@
     <html lang="en">
     <head>
         {{ @preload, ./preloads/preload.tot }}
+        {{ @preload, ./preloads/preload2.tot }}
         <link rel="stylesheet" href="style.css">
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,7 +12,7 @@
     </head>
     <body>
         <div class="test">
-            {{ @component, ./components/test.tot, (안녕하십니까?), test2 }}
+            {{ @component, ./components/test.tot, ({{ @component, ./components/test/temp.tot }}<button>o3o</button>안녕하십니까? {{ @data.tot.test.test }}), test2 }}
         </div>
         <div id="{{ @data.testid }}">
         </div>

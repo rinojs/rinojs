@@ -38,6 +38,10 @@ async function buildInnerData(content, data = null, props = null)
         {
             result = result + (await getValueFromList(target.substring(6), props)).trim();
         }
+        else
+        {
+            result = result + `<${ target } }}>`;
+        }
     }
 
     return result;

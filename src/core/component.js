@@ -5,9 +5,13 @@ const { buildPreload } = require('./preload');
 const { buildSingleFromTot } = require('./tot-handler')
 const { loadMD } = require('./obj-handler');
 const { buildInnerData } = require('./inner-data');
-const { buildTemplateData } = require('./pc-helper');
 const { removeComments } = require('./comment');
 const { getValueFromObj } = require('./value-getter');
+const {
+    buildTemplateData,
+    listComponentSyntax,
+    findEnd
+} = require('./parse-util');
 
 /* 
 buildComponent()
@@ -61,7 +65,7 @@ async function buildComponent(filename, data = null, props = [])
     while (html.length > 0)
     {
         start = html.indexOf("{{") + 2;
-        end = html.indexOf("}}", start);
+        end = await findEnd(html, start);
 
         if (start == 1 || end == -1)
         {
@@ -154,50 +158,4 @@ async function buildComponent(filename, data = null, props = [])
     return result;
 }
 
-async function listComponentSyntax(input)
-{
-    const result = [];
-    let currentSubstring = "";
-    let depth = 0;
-
-    for (let i = 0; i < input.length; i++)
-    {
-        const char = input[i];
-
-        if (char === ",")
-        {
-            if (depth === 0)
-            {
-                result.push(currentSubstring.trim());
-                currentSubstring = "";
-            }
-            else
-            {
-                currentSubstring += char;
-            }
-        }
-        else if (char === "(")
-        {
-            currentSubstring += char;
-            depth++;
-        }
-        else if (char === ")")
-        {
-            currentSubstring += char;
-            depth--;
-        }
-        else
-        {
-            currentSubstring += char;
-        }
-    }
-
-    if (currentSubstring.trim() !== "")
-    {
-        result.push(currentSubstring.trim());
-    }
-
-    return result;
-}
-
-module.exports = { buildComponent, listComponentSyntax }
+module.exports = { buildComponent }

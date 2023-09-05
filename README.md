@@ -18,6 +18,15 @@ npm i rinojs
 
 ## 📢 Notice
 
+### 👍 For people who use version < v1.5.11
+
+From version v1.5.11, I fixed a bug from v1.5.10 and I have fixed algorithm so now we can use syntax within inline props.
+Please use the latest version.
+
+```
+{{ @component, filename, ({{ @component, filename }}) }}
+```
+
 ### 👍 For people who use version < v1.5.10
 
 From version v1.5.10, I've added a feature for inline properties.
@@ -54,8 +63,6 @@ button {
     color: #222;
 }
 ```
-
-Please use the latest version.
 
 ## 📖 Documentation
 
