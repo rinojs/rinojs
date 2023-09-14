@@ -38,6 +38,11 @@
                         ./src/components/test.tot
                     </h2>
                     1!!
+                    {{(
+                        const path = require("path");
+
+                        result = 3 + 4;
+                    )}}
         <script src="main.js"></script>
     </body>
     </html>

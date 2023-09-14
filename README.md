@@ -18,50 +18,35 @@ npm i rinojs
 
 ## 📢 Notice
 
-### 👍 For people who use version < v1.5.11
+### 👍 For people who use version < v1.5.12
 
-From version v1.5.11, I fixed a bug from v1.5.10 and I have fixed algorithm so now we can use syntax within inline props.
-Please use the latest version.
+From version v1.5.12, I have added code preprocessed coding syntax.
+You can use javascript to generate very complex preprocessed component or html elements.
+It is only available for html.
+You must put anything that need to be displayed at the end to be in the `result`.
+`result` is available globally within the code syntax.
+From v1.6.0, you many need to pass `__dirname` to `dev()`, `build()` and other functions.
 
-```
-{{ @component, filename, ({{ @component, filename }}) }}
-```
-
-### 👍 For people who use version < v1.5.10
-
-From version v1.5.10, I've added a feature for inline properties.
-So from now you can do this:
-
-Parent component:
+Any some-page.tot or some-component.tot:
 
 ```
 <d:html>
-{{ @component, filename, (#222), (<button></button>) }}
-</d:html>
-```
+some html stuffs...
+{{(
+const path = require('path');
 
-Child component:
-
-```
-<d:html>
-{{ @props[1] }};
+result = 7;
+)}}
+some html stuffs...
 </d:html>
-<d:css>
-button {
-    color: {{ @props[0] }};
-}
-</d:css>
 ```
 
 Result:
 
 ```
-html:
-<button></button>
-css:
-button {
-    color: #222;
-}
+some html stuffs...
+7
+some html stuffs...
 ```
 
 ## 📖 Documentation

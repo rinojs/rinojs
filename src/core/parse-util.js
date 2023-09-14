@@ -1,6 +1,6 @@
 const { getValueFromObj, getValueFromList } = require('./value-getter');
 const { getDataFromTot } = require('./tot-handler');
-
+const { getResultFromCode } = require('./code-handler');
 
 async function buildTemplateData(content, data = null, props = null)
 {
@@ -23,7 +23,16 @@ async function buildTemplateData(content, data = null, props = null)
         target = temp.substring(start, end).trim();
         temp = temp.substring(end + 2);
 
-        if (target.substring(0, 5) == "@tot.")
+        if (target[0] == "(")
+        {
+            let code = target.substring(1, target.length - 1);
+            let codeResult = await getResultFromCode(code);
+            if (typeof codeResult !== "string") codeResult = codeResult + "";
+            codeResult = await buildTemplateData(codeResult, data, props);
+
+            if (codeResult) result = result + codeResult;
+        }
+        else if (target.substring(0, 5) == "@tot.")
         {
             let targetArray = target.split(",");
             let tempResult = await getDataFromTot(targetArray[0].substring(5), targetArray[1].trim());

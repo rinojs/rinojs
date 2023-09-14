@@ -1,13 +1,13 @@
 {
   "name": "rinojs",
-  "version": "1.5.11",
+  "version": "1.5.12",
   "description": "Fast learning, preprocessing, intuitive web framework",
   "main": "dist/index.js",
   "bin": {
     "rinojs": "dist/index.js"
   },
   "scripts": {
-    "test": "node test/test.js",
+    "test": "cd test && node test.js",
     "pack": "node pack/index.js",
     "build": "rollup -c"
   },
