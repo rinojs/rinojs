@@ -2,8 +2,9 @@
     <div>
         TEST {{ @props[0] }} !!~
         {{ @component, ./components/test/temp.tot, < @props[1] > }} test!!
-        
-
+        {{(
+            result = 4 + 5;
+        )}}
 
     </div>
 </d:html>
