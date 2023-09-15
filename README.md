@@ -18,6 +18,18 @@ npm i rinojs
 
 ## 📢 Notice
 
+### 👍 For people who use version < v1.5.13
+
+From version v1.5.13, i've added sitemap functions. It is up to you which one you use.
+
+```
+eg.
+rino.generateSitemap(list);
+
+async generateSitemap(list): return sitemap string
+async generateSitemapFile(list, filename): create a sitemap file.
+```
+
 ### 👍 For people who use version < v1.5.12
 
 From version v1.5.12, I have added code preprocessed coding syntax.
