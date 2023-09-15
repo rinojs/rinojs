@@ -95,7 +95,7 @@ module.exports = class Rino
     */
     async buildPage(args = { filename: "", data: null })
     {
-        await buildPage(args.filename, args.data);
+        return await buildPage(args.filename, args.data);
     }
 
 
@@ -110,7 +110,7 @@ module.exports = class Rino
     */
     async buildComponent(args = { filename: "", data: null, props: [] })
     {
-        await buildComponent(args.filename, args.data, args.props);
+        return await buildComponent(args.filename, args.data, args.props);
     }
 
     /*
