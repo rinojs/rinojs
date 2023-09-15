@@ -44,9 +44,14 @@ async function buildTemplateData(content, data = null, props = null)
             if (target.substring(5, 9) == ".md.") result = result + `{{ ${ target } }}`;
             else
             {
-                let tempResult = (await getValueFromObj(target.substring(6), data)).trim();
-                tempResult = await buildTemplateData(tempResult, data, props);
-                result = result + tempResult;
+                let tempResult = (await getValueFromObj(target.substring(6), data));
+
+                if (tempResult)
+                {
+                    tempResult = tempResult.trim();
+                    tempResult = await buildTemplateData(tempResult, data, props);
+                    result = result + tempResult;
+                }
             }
         }
         else if (target.substring(0, 6) == "@props" && props)

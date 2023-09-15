@@ -18,6 +18,10 @@ npm i rinojs
 
 ## 📢 Notice
 
+### 👍 For people who use version < v1.5.15
+
+In version v1.5.15, I've fixed some bugs.
+
 ### 👍 For people who use version < v1.5.14
 
 From version v1.5.14, now data and props are available from coding within template.
