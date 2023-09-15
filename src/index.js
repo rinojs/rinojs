@@ -6,7 +6,7 @@ const { buildComponent } = require('./core/component');
 const { writeFiles } = require('./core/write-files');
 const { findPort, isPortInUse } = require('./core/find-port');
 const { loadJSON, loadTot } = require('./core/obj-handler');
-
+const { generateSitemap, generateSitemapFile } = require('./core/sitemap');
 module.exports = class Rino
 {
     constructor()
@@ -159,5 +159,15 @@ module.exports = class Rino
     async loadTot(filename, encoding = "utf8")
     {
         return await loadTot(filename, encoding);
+    }
+
+    async generateSitemap(list)
+    {
+        return await generateSitemap(list);
+    }
+
+    async generateSitemapFile(list, filename)
+    {
+        return await generateSitemapFile(list, filename);
     }
 }
