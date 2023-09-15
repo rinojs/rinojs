@@ -1,6 +1,6 @@
 const vm = require('vm');
 
-function getResultFromCode(code)
+function getResultFromCode(code, data = null, props = null)
 {
     return new Promise((resolve, reject) =>
     {
@@ -10,7 +10,9 @@ function getResultFromCode(code)
             const context = vm.createContext({
                 console: console,
                 require: require,
-                result: ""
+                result: "",
+                data: data,
+                props: props
             });
 
             vm.runInContext(code, context);
