@@ -18,6 +18,11 @@ npm i rinojs
 
 ## 📢 Notice
 
+### 👍 For people who use version < v1.5.16
+
+In version v1.5.16, i've fixed a serious human error... not returning page data for buildPage() and buildComponent() functions.
+This does not affect people who use default development setting. However from this version, people who build something manually can use buildPage() and buildComponent() that is working properly.
+
 ### 👍 For people who use version < v1.5.15
 
 In version v1.5.15, I've fixed some bugs.
