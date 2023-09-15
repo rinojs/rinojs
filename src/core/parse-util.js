@@ -26,7 +26,7 @@ async function buildTemplateData(content, data = null, props = null)
         if (target[0] == "(")
         {
             let code = target.substring(1, target.length - 1);
-            let codeResult = await getResultFromCode(code);
+            let codeResult = await getResultFromCode(code, data, props);
             if (typeof codeResult !== "string") codeResult = codeResult + "";
             codeResult = await buildTemplateData(codeResult, data, props);
 

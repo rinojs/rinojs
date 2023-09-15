@@ -3,7 +3,7 @@
         TEST {{ @props[0] }} !!~
         {{ @component, ./components/test/temp.tot, < @props[1] > }} test!!
         {{(
-            result = 4 + 5;
+            result = '"' + props[0] + '" title: ' + data.title;
         )}}
 
     </div>
