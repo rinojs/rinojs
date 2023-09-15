@@ -20,13 +20,13 @@ async function createServer(root, port)
     {
         let filePath = path.join(root, req.url);
 
-        await fs.readFile(filePath, 'utf8', async (error, data) =>
+        fs.readFile(filePath, 'utf8', async (error, data) =>
         {
             if (error)
             {
                 filePath = path.join(filePath, 'index.html');
 
-                await fs.readFile(filePath, 'utf8', async (error, data) =>
+                fs.readFile(filePath, 'utf8', async (error, data) =>
                 {
                     if (error)
                     {

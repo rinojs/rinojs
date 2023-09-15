@@ -1,4 +1,4 @@
-const fs = require('fs').promises;
+const fs = require('fs');
 const Tot = require('totjs');
 const { marked } = require('marked');
 
@@ -8,7 +8,7 @@ async function loadJSON(filename, encoding = "utf8")
 
     try
     {
-        let data = await fs.readFile(filename, encoding, function (error, data) 
+        let data = await fs.promises.readFile(filename, encoding, function (error, data) 
         {
             if (error) throw error;
             else return data;
@@ -29,7 +29,7 @@ async function loadMD(filename, encoding = "utf8")
 
     try
     {
-        let data = await fs.readFile(filename, encoding, function (error, data) 
+        let data = await fs.promises.readFile(filename, encoding, function (error, data) 
         {
             if (error) throw error;
             else return data;
