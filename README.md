@@ -7,7 +7,7 @@ Fast learning, preprocessing, intuitive web framework. It is "rinojs" because th
 The recommended way to start your Rino project:
 
 ```
-npm create rino
+npm create rino@latest
 ```
 
 For manual setup:
@@ -60,6 +60,8 @@ async generateSitemapFile(list, filename): create a sitemap file.
 - [Rinokit Introduction](https://rinojs.org/documents/rinokit.html)
 - [Installation & Setup](https://rinojs.org/documents/installation.html)
 
+## 💪 Support Rino!
+
 ### 👼 Become a Sponsor
 
 - [Ko-fi](https://ko-fi.com/opdev1004)
@@ -87,8 +89,6 @@ async generateSitemapFile(list, filename): create a sitemap file.
 ### ☘ Guardian Supporter
 
 ### 🌱 Herald Supporter
-
-## 💪 Support Rino!
 
 ## 👨‍💻 Author
 
