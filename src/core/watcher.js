@@ -1,20 +1,13 @@
-const { buildMultiple } = require('./build-multiple');
 const chokidar = require('chokidar');
-const { copyAssets } = require('./assets');
-const { emptyDirectory } = require('./empty-directory');
 
-async function createWatcher(pages, distRoot, src, publicDirname, port, wss)
+async function createWatcher(src, publicDirname, port, wss, callback)
 {
     const watcher = chokidar.watch([src, publicDirname]).on('change', async (filepath) =>
     {
-        emptyDirectory(distRoot, publicDirname);
-
-        console.clear();
-        console.log(`Copying assets now...`);
-        await copyAssets(publicDirname, distRoot);
-        console.log(`Copying assets is done...`);
-
-        await buildMultiple(pages);
+        if (typeof callback == 'function')
+        {
+            await callback();
+        }
 
         console.log(`File ${ filepath } has been changed`);
         console.log("Rebuilding...");

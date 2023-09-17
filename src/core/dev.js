@@ -52,7 +52,17 @@ async function dev(pages = [{ pageFilename: "", distDirname: "", tots: [{ name: 
     const url = `http://localhost:${ port }`
 
     await openBrowser(url);
-    await createWatcher(pages, distRoot, src, publicDirname, port, wss);
+    await createWatcher(src, publicDirname, port, wss, async () =>
+    {
+        emptyDirectory(distRoot, publicDirname);
+
+        console.clear();
+        console.log(`Copying assets now...`);
+        await copyAssets(publicDirname, distRoot);
+        console.log(`Copying assets is done...`);
+
+        await buildMultiple(pages);
+    });
 }
 
 

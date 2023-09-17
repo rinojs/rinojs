@@ -6,7 +6,7 @@ async function generateSitemap(list)
     {
         if (!list || list.length == 0) return "";
 
-        let result = `<?xml version='1.0' encoding='UTF-8'?>< urlset xmlns = "http://www.sitemaps.org/schemas/sitemap/0.9" >`;
+        let result = `<?xml version='1.0' encoding='UTF-8'?><urlset xmlns = "http://www.sitemaps.org/schemas/sitemap/0.9">`;
         const currentDate = new Date();
         const year = currentDate.getFullYear();
         const month = String(currentDate.getMonth() + 1).padStart(2, '0');
@@ -35,7 +35,7 @@ async function generateSitemapFile(list, filename)
     {
         if (!list || !filename || list.length == 0) return false;
 
-        let result = `<?xml version='1.0' encoding='UTF-8'?>< urlset xmlns = "http://www.sitemaps.org/schemas/sitemap/0.9" >`;
+        let result = `<?xml version='1.0' encoding='UTF-8'?><urlset xmlns = "http://www.sitemaps.org/schemas/sitemap/0.9">`;
         const currentDate = new Date();
         const year = currentDate.getFullYear();
         const month = String(currentDate.getMonth() + 1).padStart(2, '0');
