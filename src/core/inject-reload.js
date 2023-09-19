@@ -2,9 +2,9 @@ async function injectReload(data, port)
 {
     const reloadScript = `
         <script type="text/javascript">
-            const ws = new WebSocket('ws://localhost:${ port }');
+            const rinows = new WebSocket('ws://localhost:${ port }');
 
-            ws.onmessage = (event) => {
+            rinows.onmessage = (event) => {
                 if (event.data === 'reload') {
                     location.reload();
                 }
