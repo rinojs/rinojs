@@ -18,9 +18,11 @@ npm i rinojs
 
 ## 📢 Notice
 
-### 👍 For people who use version < v1.5.18
+### 👍 For people who use version < v1.5.19
 
-In version v1.5.18, i've fixed a typo from sitemap generator.
+In version v1.5.19, i've fixed a reload websocket injection problem.
+It was causing an error when there's same name in other packages.
+Which is very normal but it would be a problem for dev() function.
 
 ## 📖 Documentation
 
