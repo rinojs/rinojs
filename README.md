@@ -44,22 +44,6 @@ Which is very normal but it would be a problem for dev() function.
 
 ## 👨‍👩‍👧‍👦 **Sponsors**
 
-### 🔥 **IMMORTAL SUPPORTER**
-
-### 👼 **DIVINE SUPPORTER**
-
-### 🎻 **ANCIENT SUPPORTER**
-
-### ⚔ **LEGEND SUPPORTER**
-
-### 🌲 **ARCHON SUPPORTER**
-
-### 🍀 Crusader Supporter
-
-### ☘ Guardian Supporter
-
-### 🌱 Herald Supporter
-
 ## 👨‍💻 Author
 
 [Victor Chanil Park](https://github.com/opdev1004)
