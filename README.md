@@ -1,6 +1,10 @@
 # Rino.js 🦏
 
-Fast learning, preprocessing, intuitive web framework. It is "rinojs" because the name rhino, rhinojs and rino are being used by others.
+```
+Fast learning, preprocessing, intuitive web framework.
+```
+
+Rino.js is created to fix the complexity matters of web framework.
 
 ## ▶️ Installation
 
@@ -18,17 +22,57 @@ npm i rinojs
 
 ## 📢 Notice
 
-### 👍 For people who use version < v1.5.19
+### 👍 Releasing Version 2
 
-In version v1.5.19, i've fixed a reload websocket injection problem.
-It was causing an error when there's same name in other packages.
-Which is very normal but it would be a problem for dev() function.
+New version, better development experience and totally different from version 1.
+
+Many syntax is simplified and following html, css and javascript standard. And many things are updated for automation.
+
+Development Build System is changed to the `server side rendering` with memory data management with individual IO update on change. I call this, `build on request`. This is so much faster than version 1.
+
+#### Example of Rino 2
+
+- ./pages/index.html
+
+```
+<!DOCTYPE html>
+<html>
+  <head></head>
+  <body>
+    <component
+      @name="button"
+      @type="button"
+      type="button"
+      onclick="alert('Hello world!')"
+    />
+    <component @name="footer" @type="footer" />
+
+    {{ result = "Hello World!"; }}
+
+    <md style="color: red"> ## Markdown </md>
+  </body>
+</html>
+
+```
+
+- ./dist/index.html
+
+```
+<!DOCTYPE html>
+<html>
+  <head></head>
+  <body>
+    <button type="button" onclick="alert('Hello world!')">message</button>
+    <footer>This is footer</footer>
+    Hello World!
+    <div style="color: red"><h2>Markdown</h2></div>
+  </body>
+</html>
+```
 
 ## 📖 Documentation
 
-- [Rino.js Introduction](https://rinojs.org/documents/introduction.html)
-- [Rinokit Introduction](https://rinojs.org/documents/rinokit.html)
-- [Installation & Setup](https://rinojs.org/documents/installation.html)
+- This is going to be reworked and updated later for version 2
 
 ## 💪 Support Rino!
 
@@ -37,12 +81,7 @@ Which is very normal but it would be a problem for dev() function.
 - [Ko-fi](https://ko-fi.com/opdev1004)
 - [Github sponsor page](https://github.com/sponsors/opdev1004)
 
-### 🎁 Shop
-
-- [RB Rino Shop](https://www.redbubble.com/shop/ap/149559711)
-- [RB Geargom Shop](https://www.redbubble.com/people/Geargom/shop)
-
-## 👨‍👩‍👧‍👦 **Sponsors**
+## 🐱‍🏍 **Sponsors**
 
 ## 👨‍💻 Author
 

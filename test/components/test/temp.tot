@@ -1,9 +1,0 @@
-<d:html>
-    {{ @props[0] }}
-    Nested components in different directories {{ @props[0] }}
-</d:html>
-<d:js>
-    console.log(add(8, 10));
-</d:js>
-<d:css>
-</d:css>

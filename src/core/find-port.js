@@ -1,7 +1,6 @@
+import net from 'net';
 
-const net = require('net');
-
-async function findPort(port)
+export async function findPort(port)
 {
     let result = await isPortInUse(port)
 
@@ -15,7 +14,7 @@ async function findPort(port)
     }
 }
 
-function isPortInUse(port)
+export function isPortInUse(port)
 {
     return new Promise((resolve, reject) =>
     {
@@ -33,5 +32,3 @@ function isPortInUse(port)
             .listen(port);
     });
 }
-
-module.exports = { findPort, isPortInUse }

@@ -1,7 +1,7 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
-function emptyDirectory(directoryPath)
+export function emptyDirectory(directoryPath)
 {
     const files = fs.readdirSync(directoryPath);
 
@@ -21,7 +21,3 @@ function emptyDirectory(directoryPath)
         }
     }
 }
-
-module.exports = {
-    emptyDirectory
-};

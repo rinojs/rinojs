@@ -1,7 +1,7 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
-function cloneDirectory(sourcePath, targetPath)
+export function cloneDirectory(sourcePath, targetPath)
 {
     if (!fs.existsSync(targetPath))
     {
@@ -24,9 +24,4 @@ function cloneDirectory(sourcePath, targetPath)
             fs.copyFileSync(sourceFilePath, targetFilePath);
         }
     }
-}
-
-module.exports =
-{
-    cloneDirectory
 }
