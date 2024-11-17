@@ -1,4 +1,4 @@
-async function injectReload(data, port)
+export async function injectReload(page, port)
 {
     const reloadScript = `
         <script type="text/javascript">
@@ -12,7 +12,5 @@ async function injectReload(data, port)
         </script>
         </head>
         `;
-    return data.replace("</head>", reloadScript);
+    return page.replace("</head>", reloadScript);
 }
-
-module.exports = { injectReload }

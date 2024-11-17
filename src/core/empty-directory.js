@@ -1,7 +1,7 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
-function emptyDirectory(directoryPath, targetDirectory = null, exceptionList = [])
+export function emptyDirectory(directoryPath, targetDirectory = null, exceptionList = [])
 {
     try
     {
@@ -51,7 +51,3 @@ function emptyDirectory(directoryPath, targetDirectory = null, exceptionList = [
         return false;
     }
 }
-
-module.exports = {
-    emptyDirectory
-};

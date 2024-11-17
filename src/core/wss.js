@@ -1,8 +1,8 @@
-const WebSocket = require('ws');
+import { WebSocketServer } from 'ws';
 
-async function createWSS(server)
+export async function createWSS(server)
 {
-    const wss = new WebSocket.Server({ server });
+    const wss = new WebSocketServer({ server });
 
     wss.on('connection', (ws) =>
     {
@@ -20,5 +20,3 @@ async function createWSS(server)
 
     return wss;
 }
-
-module.exports = { createWSS }

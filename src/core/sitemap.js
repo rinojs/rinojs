@@ -1,6 +1,6 @@
-const fs = require('fs');
+import fs from 'fs';
 
-async function generateSitemap(list)
+export async function generateSitemap(list)
 {
     try
     {
@@ -29,7 +29,7 @@ async function generateSitemap(list)
     }
 }
 
-async function generateSitemapFile(list, filename)
+export async function generateSitemapFile(list, filename)
 {
     try
     {
@@ -59,5 +59,3 @@ async function generateSitemapFile(list, filename)
         return false;
     }
 }
-
-module.exports = { generateSitemap, generateSitemapFile }
