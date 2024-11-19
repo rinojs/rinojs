@@ -26,7 +26,8 @@ async function resolveCSSImports(cssContent, baseDir)
             const importedCSS = fs.readFileSync(resolvedPath, "utf8");
             const resolvedImportedCSS = await resolveCSSImports(importedCSS, path.dirname(resolvedPath));
             resolvedContent = resolvedContent.replace(match[0], resolvedImportedCSS);
-        } else
+        }
+        else
         {
             console.warn(`Could not resolve import: ${ importPath }`);
             resolvedContent = resolvedContent.replace(match[0], `/* Could not resolve: ${ importPath } */`);
