@@ -3,7 +3,7 @@ import fse from 'fs-extra';
 import path from 'path';
 import chalk from 'chalk';
 
-export async function copyFiles(origin, destination, imageQuality = 75, sub = "")
+export async function copyFiles(origin, destination, sub = "")
 {
     try
     {
@@ -53,7 +53,7 @@ export async function copyFiles(origin, destination, imageQuality = 75, sub = ""
             }
             else if (sourceStats.isDirectory())
             {
-                await copyFiles(sourcePath, destPath, imageQuality, temp);
+                await copyFiles(sourcePath, destPath, temp);
             }
         }
 

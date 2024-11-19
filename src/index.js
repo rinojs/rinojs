@@ -18,6 +18,7 @@ import { buildComponent } from './core/component.js'
 import { generateSitemap, generateSitemapFile } from './core/sitemap.js';
 import { getFilesRecursively } from './core/fileGetter.js';
 import { copyFiles } from './core/copyFiles.js';
+import { generateProjectSitemap } from './core/projectSitemp.js';
 
 export class Rino
 {
@@ -45,6 +46,8 @@ ${ chalk.white('https://github.com/sponsors/opdev1004') }
         this.config = {};
         this.generateSitemap = generateSitemap;
         this.generateSitemapFile = generateSitemapFile;
+        this.generateProjectSitemap = generateProjectSitemap;
+        this.getFilesRecursively = getFilesRecursively;
     }
 
     async generate(projectPath)
@@ -76,7 +79,7 @@ ${ chalk.white('https://github.com/sponsors/opdev1004') }
             console.log(chalk.yellow(`Cleared ${ dirs.dist } \n`));
         }
 
-        await copyFiles(dirs.public, dirs.dist, this.config.imageQuality);
+        await copyFiles(dirs.public, dirs.dist);
         await this.loadFiles(dirs.components, ['.html'], 'components');
         await this.loadFiles(dirs.mds, ['.md'], 'mds');
 
@@ -154,7 +157,6 @@ ${ chalk.white('https://github.com/sponsors/opdev1004') }
                 this.config = { ...configModule.default };
                 if (!this.config.dist) this.config.dist = "./dist";
                 if (!this.config.port) this.config.port = 3000;
-                if (!this.config.imageQuality) this.config.imageQuality = 75;
 
                 this.port = this.config.port || 3000;
 
@@ -167,6 +169,9 @@ ${ chalk.white('https://github.com/sponsors/opdev1004') }
         }
         else
         {
+            if (!this.config.dist) this.config.dist = "./dist";
+            if (!this.config.port) this.config.port = 3000;
+
             console.log(chalk.yellowBright('No rino-config.js found. Using default configuration.'));
         }
     }
@@ -436,4 +441,6 @@ Development: ${ chalk.blueBright(`http://localhost:` + this.port) }
 
     static generateSitemap = generateSitemap;
     static generateSitemapFile = generateSitemapFile;
+    static generateProjectSitemap = generateProjectSitemap;
+    static getFilesRecursively = getFilesRecursively;
 };
