@@ -5,7 +5,7 @@ import { renderMD } from './mdRenderer.js'
 export function buildComponent(content, components, mds)
 {
     const componentRegex = /<component\s+([^>]+?)\s*\/?>/g;
-    const mdRegex = /<md\s+([^>]*?)\s*>(.*?)<\/md>/gs;
+    const mdRegex = /<md\s*([^>]*?)\s*>(.*?)<\/md>/gs;
     const attributeRegex = /(@?)([a-zA-Z]+)\s*=\s*(['"])(.*?)\3/g;
     const scriptRegex = /{{\s*(.*?)\s*}}/g;
 
