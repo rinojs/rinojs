@@ -5,7 +5,7 @@ import { renderMD } from './mdRenderer.js'
 export function buildComponent(content, components, mds)
 {
     const componentRegex = /<component\s+([^>]+?)\s*\/?>/g;
-    const mdRegex = /<md\s+([^>]*?)\s*>(.*?)<\/md>/gs;
+    const mdRegex = /<md\s*([^>]*?)\s*>(.*?)<\/md>/gs;
     const attributeRegex = /(@?)([a-zA-Z]+)\s*=\s*(['"])(.*?)\3/g;
     const scriptRegex = /{{\s*(.*?)\s*}}/g;
 
@@ -36,7 +36,7 @@ export function buildComponent(content, components, mds)
 function renderComponent(attributes, components)
 {
     const componentName = attributes.find(attr => attr.name === '@name')?.content;
-    const componentType = attributes.find(attr => attr.name === '@type')?.content || 'div';
+    const componentType = attributes.find(attr => attr.name === '@type')?.content || '';
 
     const componentContent = components.find(c =>
         path.normalize(c.path).includes(path.normalize(componentName + '.html'))
@@ -45,7 +45,7 @@ function renderComponent(attributes, components)
     if (!componentContent)
     {
         console.warn(`Warning: Component "${ componentName }" not found.`);
-        return `<${ componentType }></${ componentType }>`;
+        return ``;
     }
 
     const renderedContent = buildComponent(componentContent, components);
@@ -55,7 +55,14 @@ function renderComponent(attributes, components)
         .map(attr => `${ attr.name }="${ attr.content }"`)
         .join(' ');
 
-    return `<${ componentType } ${ otherAttributes }>${ renderedContent }</${ componentType }>`;
+    if (componentType)
+    {
+        return `<${ componentType } ${ otherAttributes }>${ renderedContent }</${ componentType }>`;
+    }
+    else
+    {
+        return renderedContent;
+    }
 }
 
 function parseAttributes(attributeString, regex)
