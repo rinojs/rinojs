@@ -22,9 +22,9 @@ npm i rinojs
 
 ## 📢 Notice
 
-### 🎉 Release version 2.0.8
+### 🎉 Release version 2.0.9
 
-Please use the latest version, fixed development server for responsing a right file.
+Please use the latest version, fixed sitemap code.
 
 ### 👍 Releasing Version 2
 
