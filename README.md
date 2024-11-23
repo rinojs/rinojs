@@ -22,6 +22,10 @@ npm i rinojs
 
 ## 📢 Notice
 
+### 🎉 Release version 2.0.6
+
+Please use the latest version, until 2.0.6 minor bugs are fixed.
+
 ### 👍 Releasing Version 2
 
 New version, better development experience and totally different from version 1.
