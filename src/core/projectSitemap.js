@@ -19,7 +19,10 @@ export async function generateProjectSitemap(projectPath, config)
 
     console.log(chalk.blueBright('Generating sitemap...'));
 
-    const siteUrl = config.site.url;
+    let siteUrl = config.site.url;
+
+    if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
+
     const sitemap = config.sitemap;
     const dist = config && config.dist ? config.dist : "./dist";
     const dirs = {
