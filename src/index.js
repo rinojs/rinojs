@@ -392,7 +392,8 @@ Development: ${ chalk.blueBright.underline(`http://localhost:` + this.port) }
                 requestPath += 'index.html';
             }
 
-            const page = structuredClone(this.data.pages.find(file =>
+
+            let page = structuredClone(this.data.pages.find(file =>
                 path.normalize(file.path) == path.join(projectPath, 'pages', path.normalize(requestPath)) ||
                 path.normalize(file.path) == path.join(projectPath, 'pages', path.normalize(`${ requestPath }.html`))
             ));
@@ -406,10 +407,24 @@ Development: ${ chalk.blueBright.underline(`http://localhost:` + this.port) }
             }
 
             const publicPath = path.join(projectPath, 'public', requestPath);
+
             if (fs.existsSync(publicPath) && fs.statSync(publicPath).isFile())
             {
                 res.sendFile(publicPath);
                 return;
+            }
+
+            const publicHTMLPath = path.join(projectPath, 'public', requestPath, ".html");
+
+            if (fs.existsSync(publicHTMLPath) && fs.statSync(publicHTMLPath).isFile())
+            {
+                res.sendFile(publicHTMLPath);
+                return;
+            }
+
+            if (!requestPath.endsWith('/') && !path.extname(requestPath))
+            {
+                return res.redirect(301, requestPath + '/');
             }
 
             res.status(404).send("Page not found");
