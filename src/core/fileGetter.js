@@ -10,7 +10,7 @@ export function getFilesRecursively(dir, extensions)
         const filePath = path.join(dir, file.name);
         if (file.isDirectory())
         {
-            results.push(...this.getFilesRecursively(filePath, extensions));
+            results.push(...getFilesRecursively(filePath, extensions));
         }
         else if (extensions.includes(path.extname(file.name)))
         {
