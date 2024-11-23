@@ -393,8 +393,8 @@ Development: ${ chalk.blueBright.underline(`http://localhost:` + this.port) }
             }
 
             const page = structuredClone(this.data.pages.find(file =>
-                path.normalize(file.path).endsWith(path.normalize(requestPath)) ||
-                path.normalize(file.path).endsWith(path.normalize(`${ requestPath }.html`))
+                path.normalize(file.path) == path.join(projectPath, 'pages', path.normalize(requestPath)) ||
+                path.normalize(file.path) == path.join(projectPath, 'pages', path.normalize(`${ requestPath }.html`))
             ));
 
             if (page)

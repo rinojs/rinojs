@@ -22,9 +22,9 @@ npm i rinojs
 
 ## 📢 Notice
 
-### 🎉 Release version 2.0.7
+### 🎉 Release version 2.0.8
 
-Please use the latest version, fixed index.html page not being loaded for page subdirectories that ends with `/`. And fixed sitemap and file loader.
+Please use the latest version, fixed development server for responsing a right file.
 
 ### 👍 Releasing Version 2
 
