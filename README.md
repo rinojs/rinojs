@@ -22,9 +22,9 @@ npm i rinojs
 
 ## 📢 Notice
 
-### 🎉 Release version 2.0.6
+### 🎉 Release version 2.0.7
 
-Please use the latest version, until 2.0.6 minor bugs are fixed.
+Please use the latest version, fixed index.html page not being loaded for page subdirectories that ends with `/`. And fixed sitemap and file loader.
 
 ### 👍 Releasing Version 2
 
@@ -76,7 +76,7 @@ Development Build System is changed to the `server side rendering` with memory d
 
 ## 📖 Documentation
 
-- This is going to be reworked and updated later for version 2
+[Official Website](https://rino.opdev1004.com/)
 
 ## 💪 Support Rino!
 

@@ -18,7 +18,7 @@ import { buildComponent } from './core/component.js'
 import { generateSitemap, generateSitemapFile } from './core/sitemap.js';
 import { getFilesRecursively } from './core/fileGetter.js';
 import { copyFiles } from './core/copyFiles.js';
-import { generateProjectSitemap } from './core/projectSitemp.js';
+import { generateProjectSitemap } from './core/projectSitemap.js';
 
 export class Rino
 {
@@ -320,22 +320,6 @@ Development: ${ chalk.blueBright.underline(`http://localhost:` + this.port) }
             maxAge: 86400,
         }));
 
-        app.get('/', async (req, res) =>
-        {
-            const indexPage = structuredClone(this.data.pages.find(file => path.normalize(file.path).endsWith(path.normalize('/pages/index.html'))));
-
-            if (indexPage)
-            {
-                indexPage.content = await injectReload(indexPage.content, this.port);
-                indexPage.content = buildComponent(indexPage.content, this.data.components, this.data.mds);
-                res.send(indexPage.content);
-            }
-            else
-            {
-                res.status(404).send("Page not found");
-            }
-        });
-
         app.get('/scripts/*.(js|mjs)', async (req, res) =>
         {
             const requestPath = req.path.replace('/scripts', '');
@@ -401,7 +385,12 @@ Development: ${ chalk.blueBright.underline(`http://localhost:` + this.port) }
 
         app.get('*', async (req, res) =>
         {
-            const requestPath = req.path;
+            let requestPath = req.path;
+
+            if (requestPath.endsWith('/'))
+            {
+                requestPath += 'index.html';
+            }
 
             const page = structuredClone(this.data.pages.find(file =>
                 path.normalize(file.path).endsWith(path.normalize(requestPath)) ||

@@ -4,9 +4,9 @@ export async function generateSitemap(list)
 {
     try
     {
-        if (!list || list.length == 0) return "";
+        if (!list || list.length === 0) return "";
 
-        let result = `<?xml version='1.0' encoding='UTF-8'?><urlset xmlns = "http://www.sitemaps.org/schemas/sitemap/0.9">`;
+        let result = `<?xml version='1.0' encoding='UTF-8'?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
         const currentDate = new Date();
         const year = currentDate.getFullYear();
         const month = String(currentDate.getMonth() + 1).padStart(2, '0');
@@ -15,14 +15,22 @@ export async function generateSitemap(list)
 
         for (let link of list)
         {
+            if (link.endsWith('/index.html'))
+            {
+                link = link.replace('/index.html', '/');
+            }
+            else if (link.endsWith('.html'))
+            {
+                link = link.replace('.html', '');
+            }
+
+
             result += `<url><loc>${ link }</loc><lastmod>${ formattedDate }</lastmod></url>`;
         }
 
         result += `</urlset>`;
-
         return result;
-    }
-    catch (error)
+    } catch (error)
     {
         console.error(error);
         return "";
@@ -33,9 +41,9 @@ export async function generateSitemapFile(list, filename)
 {
     try
     {
-        if (!list || !filename || list.length == 0) return false;
+        if (!list || !filename || list.length === 0) return false;
 
-        let result = `<?xml version='1.0' encoding='UTF-8'?><urlset xmlns = "http://www.sitemaps.org/schemas/sitemap/0.9">`;
+        let result = `<?xml version='1.0' encoding='UTF-8'?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
         const currentDate = new Date();
         const year = currentDate.getFullYear();
         const month = String(currentDate.getMonth() + 1).padStart(2, '0');
@@ -44,6 +52,15 @@ export async function generateSitemapFile(list, filename)
 
         for (let link of list)
         {
+            if (link.endsWith('/index.html'))
+            {
+                link = link.replace('/index.html', '/');
+            }
+            else if (link.endsWith('.html'))
+            {
+                link = link.replace('.html', '');
+            }
+
             result += `<url><loc>${ link }</loc><lastmod>${ formattedDate }</lastmod></url>`;
         }
 
@@ -52,8 +69,7 @@ export async function generateSitemapFile(list, filename)
         await fs.promises.writeFile(filename, result);
 
         return true;
-    }
-    catch (error)
+    } catch (error)
     {
         console.error(error);
         return false;
