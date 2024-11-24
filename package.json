@@ -1,6 +1,6 @@
 {
   "name": "rinojs",
-  "version": "2.0.9",
+  "version": "2.0.10",
   "description": "Fast learning, preprocessing, intuitive web framework",
   "main": "dist/index.js",
   "bin": {
