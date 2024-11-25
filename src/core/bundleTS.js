@@ -1,15 +1,21 @@
+import path from 'path';
 import { rollup } from "rollup";
 import terser from "@rollup/plugin-terser";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
+import typescript from '@rollup/plugin-typescript';
 
-export async function bundleJS(scriptPath, name = "jsbundle")
+
+export async function bundleTS(scriptPath, projectPath, name = "tsbundle")
 {
     const bundle = await rollup({
         input: scriptPath,
         treeshake: false,
         context: "window",
         plugins: [
+            typescript({
+                tsconfig: path.resolve(projectPath, "./tsconfig.json"),
+            }),
             terser({
                 compress: {
                     dead_code: false,
