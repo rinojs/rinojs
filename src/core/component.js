@@ -1,19 +1,47 @@
 import path from 'path';
 import { getResultFromCode } from './scriptRenderer.js';
 import { renderMD } from './mdRenderer.js'
+import typescript from 'typescript';
 
 export function buildComponent(content, components, mds)
 {
     const componentRegex = /<component\s+([^>]+?)\s*\/?>/g;
-    const mdRegex = /<md\s*([^>]*?)\s*>(.*?)<\/md>/gs;
+    const scriptRegex = /<script\s+([^>]+?)\s*(?:>\s*(.*?)\s*<\/script>|\/>)/gs;
+    //const scriptRegex = /<script\s+([^>]+?)\s*>\s*(.*?)\s*<\/script>/gs;
     const attributeRegex = /(@?)([a-zA-Z]+)\s*=\s*(['"])(.*?)\3/g;
-    const scriptRegex = /{{\s*(.*?)\s*}}/g;
 
     let result = content;
 
-    result = result.replace(scriptRegex, (_, code) =>
+    result = result.replace(scriptRegex, (_, attributesString, code) =>
     {
-        return getResultFromCode(code);
+        const attributes = parseAttributes(attributesString, attributeRegex);
+        const scriptType = attributes.find(attr => attr.name === '@type')?.content.toLowerCase();
+
+        if (!scriptType) return _;
+
+        if (scriptType == "markdown" || scriptType == "md")
+        {
+            return renderMD(code, attributes, mds);
+        }
+
+        if (scriptType == "javascript" || scriptType == "js")
+        {
+            return getResultFromCode(code);
+        }
+
+        if (scriptType == "typescript" || scriptType == "ts")
+        {
+            const compiledCode = typescript.transpile(code, {
+                compilerOptions: {
+                    module: typescript.ModuleKind.ESNext,
+                    target: typescript.ScriptTarget.ESNext,
+                },
+            });
+
+            return getResultFromCode(compiledCode);
+        }
+
+        return "";
     });
 
     result = result.replace(componentRegex, (_, attributesString) =>
@@ -23,41 +51,34 @@ export function buildComponent(content, components, mds)
         return renderComponent(attributes, components);
     });
 
-    result = result.replace(mdRegex, (_, attributesString, mdContent) =>
-    {
-        const attributes = parseAttributes(attributesString, attributeRegex);
-
-        return renderMD(mdContent, attributes, mds);
-    });
-
     return result;
 };
 
 function renderComponent(attributes, components)
 {
-    const componentName = attributes.find(attr => attr.name === '@name')?.content;
-    const componentType = attributes.find(attr => attr.name === '@type')?.content || '';
+    const componentPath = attributes.find(attr => attr.name === '@path')?.content;
+    const componentTag = attributes.find(attr => attr.name === '@tag')?.content || '';
 
     const componentContent = components.find(c =>
-        path.normalize(c.path).includes(path.normalize(componentName + '.html'))
+        path.normalize(c.path).includes(path.normalize(componentPath + '.html'))
     )?.content;
 
     if (!componentContent)
     {
-        console.warn(`Warning: Component "${ componentName }" not found.`);
+        console.warn(`Warning: Component "${ componentPath }" not found.`);
         return ``;
     }
 
     const renderedContent = buildComponent(componentContent, components);
 
     const otherAttributes = attributes
-        .filter(attr => !['@name', '@type'].includes(attr.name))
+        .filter(attr => !['@path', '@tag'].includes(attr.name))
         .map(attr => `${ attr.name }="${ attr.content }"`)
         .join(' ');
 
-    if (componentType)
+    if (componentTag)
     {
-        return `<${ componentType } ${ otherAttributes }>${ renderedContent }</${ componentType }>`;
+        return `<${ componentTag } ${ otherAttributes }>${ renderedContent }</${ componentTag }>`;
     }
     else
     {

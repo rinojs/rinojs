@@ -3,10 +3,10 @@ import markdownit from 'markdown-it'
 
 export function renderMD(content, attributes, mds)
 {
-    const mdName = attributes.find(attr => attr.name === '@name')?.content || '';
-    const mdType = attributes.find(attr => attr.name === '@type')?.content || 'div';
+    const mdPath = attributes.find(attr => attr.name === '@path')?.content || '';
+    const mdTag = attributes.find(attr => attr.name === '@tag')?.content || 'div';
     const otherAttributes = attributes
-        .filter(attr => !['@name', '@type'].includes(attr.name))
+        .filter(attr => !['@type', '@path', '@tag'].includes(attr.name))
         .map(attr => `${ attr.name }="${ attr.content }"`)
         .join(' ');
 
@@ -16,21 +16,21 @@ export function renderMD(content, attributes, mds)
         typographer: true
     });
 
-    if (mdName)
+    if (mdPath)
     {
         let result = mds.find(c =>
-            path.normalize(c.path).includes(path.normalize(mdName + '.html'))
+            path.normalize(c.path).includes(path.normalize(mdPath + '.md'))
         )?.content;
 
         if (!result)
         {
-            console.warn(`Warning: Component "${ mdName }" not found.`);
-            return `<${ mdType }></${ mdType }>`;
+            console.warn(`Warning: Markdown "${ mdPath }" not found.`);
+            return `<${ mdTag }></${ mdTag }>`;
         }
 
         result = mdit.render(result);
 
-        return `<${ mdType } ${ otherAttributes }>${ result }</${ mdType }>`;
+        return `<${ mdTag } ${ otherAttributes }>${ result }</${ mdTag }>`;
     }
     else
     {
@@ -38,11 +38,11 @@ export function renderMD(content, attributes, mds)
         {
             let result = mdit.render(content);
 
-            return `<${ mdType } ${ otherAttributes }>${ result }</${ mdType }>`;
+            return `<${ mdTag } ${ otherAttributes }>${ result }</${ mdTag }>`;
         }
         else
         {
-            return `<${ mdType } ${ otherAttributes }></${ mdType }>`;
+            return `<${ mdTag } ${ otherAttributes }></${ mdTag }>`;
         }
     }
 }
