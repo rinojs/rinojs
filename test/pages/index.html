@@ -6,15 +6,35 @@
   <body>
     test index!!
     <component
-      @name="button"
-      @type="button"
+      @path="button"
+      @tag="button"
       type="button"
       onclick="alert('Hello world!')"
     />
-    <component @name="button" type="button" onclick="alert('Hello world!')" />
-    <component @name="footer" @type="footer" />
-    {{ result = "Hello World!"; }}
-    <md style="color: red"> ## asdasd </md>
-    <md> test </md>
+    <component @path="footer" @tag="footer" />
+    <script
+      @path="test"
+      @tag="section"
+      @type="md"
+      type="text/markdown"
+    ></script>
+    <script @type="md" style="color: red" type="text/markdown">
+      ## asdasd
+
+      asdasd
+
+      - asdasd
+
+      This is working fine now!!!
+    </script>
+    <script @type="ts" type="text/typescript">
+      // This is for templating html content
+      let world: string = "Hello world! from typescript!";
+      result = world;
+    </script>
+    <script @type="js" type="text/javascript">
+      // This is for templating html content
+      result = "Hello world! from javascript!";
+    </script>
   </body>
 </html>

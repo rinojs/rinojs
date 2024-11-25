@@ -22,9 +22,55 @@ npm i rinojs
 
 ## 📢 Notice
 
-### 🎉 Release version 2.1.1
+### 🎉 Release version 2.2.0
 
-Please use the latest version, now typescript is available. Make sure place tsconfig.json in your project.
+Please use the latest version, now typescript is available for script and from templating code as well.
+
+Attribute names have changed to be more clear.
+
+```
+@name -> @path
+@type -> @tag
+```
+
+So for component, it would be like this:
+
+```
+<component @path="footer" @tag="footer" />
+```
+
+Bug from Markdown feature is fixed. And Markdown feature is moved into script tag.
+
+```
+<script @type="md" @tag="div" @path="test.md" type="text/markdown"></script>
+```
+
+Or
+
+```
+<script @type="md" type="text/markdown">
+# Some markdown title
+Some markdownn content
+</script>
+```
+
+Script templating syntax is changed from `{{}}` to:
+
+```
+<script @type="js" type="text/javascript">
+result="";
+</script>
+```
+
+Typescript:
+
+```
+<script @type="ts" type="text/typescript">
+result="";
+</script>
+```
+
+They all run in Node.js VM.
 
 ### 👍 Releasing Version 2
 
@@ -44,34 +90,31 @@ Development Build System is changed to the `server side rendering` with memory d
   <head></head>
   <body>
     <component
-      @name="button"
-      @type="button"
+      @path="button"
+      @tag="button"
       type="button"
       onclick="alert('Hello world!')"
     />
-    <component @name="footer" @type="footer" />
+    <component @path="footer" @tag="footer" />
+    <script @type="md" style="color: red" type="text/markdown">
+      ## test
 
-    {{ result = "Hello World!"; }}
+      test
 
-    <md style="color: red"> ## Markdown </md>
+      - test
+    </script>
+    <script @type="ts" type="text/typescript">
+      // This is for templating html content
+      let world: string = "Hello world! from typescript";
+      result = world;
+    </script>
+    <script @type="js" type="text/javascript">
+      // This is for templating html content
+      result = "Hello world! from javascript";
+    </script>
   </body>
 </html>
 
-```
-
-- ./dist/index.html
-
-```
-<!DOCTYPE html>
-<html>
-  <head></head>
-  <body>
-    <button type="button" onclick="alert('Hello world!')">message</button>
-    <footer>This is footer</footer>
-    Hello World!
-    <div style="color: red"><h2>Markdown</h2></div>
-  </body>
-</html>
 ```
 
 ## 📖 Documentation

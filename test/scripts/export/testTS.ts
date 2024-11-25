@@ -18,4 +18,4 @@ function getBrowserName(): string {
 
 // Example usage
 const browserName = getBrowserName();
-alert(`You are using: ${browserName}`);
+console.log(`You are using: ${browserName}`);
