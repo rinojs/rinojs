@@ -13,6 +13,7 @@ import { createWSS } from './core/wss.js';
 import { openBrowser } from './core/browser.js';
 import { injectReload } from './core/inject-reload.js';
 import { bundleJS } from './core/bundleJS.js';
+import { bundleTS } from './core/bundleTS.js';
 import { bundleCSS } from './core/bundleCSS.js';
 import { buildComponent } from './core/component.js'
 import { generateSitemap, generateSitemapFile } from './core/sitemap.js';
@@ -89,8 +90,8 @@ ${ chalk.white('https://github.com/sponsors/opdev1004') }
         {
             const relativePath = path.relative(dirs.pages, pagePath);
             const distPagePath = path.join(dirs.dist, relativePath);
-
             const distDir = path.dirname(distPagePath);
+
             if (!fs.existsSync(distDir))
             {
                 fs.mkdirSync(distDir, { recursive: true });
@@ -109,8 +110,8 @@ ${ chalk.white('https://github.com/sponsors/opdev1004') }
         {
             const relativePath = path.relative(dirs.scripts, scriptPath);
             const distScriptPath = path.join(dirs.dist, 'scripts', relativePath);
-
             const distDir = path.dirname(distScriptPath);
+
             if (!fs.existsSync(distDir))
             {
                 fs.mkdirSync(distDir, { recursive: true });
@@ -122,6 +123,25 @@ ${ chalk.white('https://github.com/sponsors/opdev1004') }
             console.log(chalk.greenBright(`Script generated: ${ distScriptPath }`));
         }
 
+        const tsScripts = getFilesRecursively(dirs.scripts, ['.ts']);
+
+        for (const scriptPath of tsScripts)
+        {
+            const relativePath = path.relative(dirs.scripts, scriptPath);
+            const distScriptPath = path.join(dirs.dist, 'scripts', relativePath);
+            const distDir = path.dirname(distScriptPath);
+
+            if (!fs.existsSync(distDir))
+            {
+                fs.mkdirSync(distDir, { recursive: true });
+            }
+
+            const scriptContent = await bundleTS(scriptPath, projectPath, path.basename(scriptPath, path.extname(scriptPath)));
+            fs.writeFileSync(distScriptPath.replace('.ts', '.js'), scriptContent);
+
+            console.log(chalk.greenBright(`Typescript compiled: ${ distScriptPath }`));
+        }
+
         const styles = getFilesRecursively(dirs.styles, ['.css']);
         const cccs = new CleanCSS();
 
@@ -129,8 +149,8 @@ ${ chalk.white('https://github.com/sponsors/opdev1004') }
         {
             const relativePath = path.relative(dirs.styles, stylePath);
             const distStylePath = path.join(dirs.dist, 'styles', relativePath);
-
             const distDir = path.dirname(distStylePath);
+
             if (!fs.existsSync(distDir))
             {
                 fs.mkdirSync(distDir, { recursive: true });
@@ -323,8 +343,8 @@ Development: ${ chalk.blueBright.underline(`http://localhost:` + this.port) }
         app.get('/scripts/*.(js|mjs)', async (req, res) =>
         {
             const requestPath = req.path.replace('/scripts', '');
-
             const scriptsPath = path.join(projectPath, 'scripts/export', requestPath);
+
             if (fs.existsSync(scriptsPath) && fs.statSync(scriptsPath).isFile())
             {
                 try
@@ -342,7 +362,27 @@ Development: ${ chalk.blueBright.underline(`http://localhost:` + this.port) }
                 }
             }
 
+            const tsPath = path.join(projectPath, 'scripts/export', requestPath.replace('.js', '.ts'));
+
+            if (fs.existsSync(tsPath) && fs.statSync(tsPath).isFile())
+            {
+                try
+                {
+                    const scriptContent = await bundleTS(tsPath, projectPath, path.basename(tsPath, path.extname(tsPath)));
+                    res.setHeader('Content-Type', 'application/javascript');
+                    res.send(scriptContent);
+                    return;
+                }
+                catch (err)
+                {
+                    console.error(`Error bundling script: ${ tsPath }`, err);
+                    res.status(500).send("Internal Server Error");
+                    return;
+                }
+            }
+
             const publicPath = path.join(projectPath, 'public', requestPath);
+
             if (fs.existsSync(publicPath) && fs.statSync(publicPath).isFile())
             {
                 res.sendFile(publicPath);

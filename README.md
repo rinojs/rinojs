@@ -22,9 +22,9 @@ npm i rinojs
 
 ## 📢 Notice
 
-### 🎉 Release version 2.0.10
+### 🎉 Release version 2.1.1
 
-Please use the latest version, development server is updated.
+Please use the latest version, now typescript is available. Make sure place tsconfig.json in your project.
 
 ### 👍 Releasing Version 2
 
