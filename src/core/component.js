@@ -7,7 +7,6 @@ export function buildComponent(content, components, mds)
 {
     const componentRegex = /<component\s+([^>]+?)\s*\/?>/g;
     const scriptRegex = /<script\s+([^>]+?)\s*(?:>\s*(.*?)\s*<\/script>|\/>)/gs;
-    //const scriptRegex = /<script\s+([^>]+?)\s*>\s*(.*?)\s*<\/script>/gs;
     const attributeRegex = /(@?)([a-zA-Z]+)\s*=\s*(['"])(.*?)\3/g;
 
     let result = content;

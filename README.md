@@ -22,6 +22,10 @@ npm i rinojs
 
 ## 📢 Notice
 
+### 🎉 Release version 2.2.1
+
+Please use the latest version, the markdown parsing bug is fixed by removing white space on the left side.
+
 ### 🎉 Release version 2.2.0
 
 Please use the latest version, now typescript is available for script and from templating code as well.
