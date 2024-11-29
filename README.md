@@ -22,9 +22,9 @@ npm i rinojs
 
 ## 📢 Notice
 
-### 🎉 Release version 2.2.2
+### 🎉 Release version 2.2.3
 
-Please use the latest version, escaping is added for using markdown in HTML. Because html entity would not work within `<code>`.
+Please use the latest version, another escaping is added for using markdown in HTML. Because html entity would not work within `<code>`.
 
 ````
 <script @type="md" type="text/markdown">
@@ -33,6 +33,8 @@ Please use the latest version, escaping is added for using markdown in HTML. Bec
     test
   <\/script>
   \``` without for in actual use...
+  v2.2.2 escaping <\/script> -> </script>
+  v2.2.3 escaping <\\/script> -> <\/script>
 </script>
 ````
 
