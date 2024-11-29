@@ -22,59 +22,19 @@ npm i rinojs
 
 ## 📢 Notice
 
-### 🎉 Release version 2.2.1
+### 🎉 Release version 2.2.2
 
-Please use the latest version, the markdown parsing bug is fixed by removing white space on the left side.
+Please use the latest version, escaping is added for using markdown in HTML. Because html entity would not work within `<code>`.
 
-### 🎉 Release version 2.2.0
-
-Please use the latest version, now typescript is available for script and from templating code as well.
-
-Attribute names have changed to be more clear.
-
-```
-@name -> @path
-@type -> @tag
-```
-
-So for component, it would be like this:
-
-```
-<component @path="footer" @tag="footer" />
-```
-
-Bug from Markdown feature is fixed. And Markdown feature is moved into script tag.
-
-```
-<script @type="md" @tag="div" @path="test.md" type="text/markdown"></script>
-```
-
-Or
-
-```
+````
 <script @type="md" type="text/markdown">
-# Some markdown title
-Some markdownn content
+  \``` without \ for actual use...
+  <script>
+    test
+  <\/script>
+  \``` without for in actual use...
 </script>
-```
-
-Script templating syntax is changed from `{{}}` to:
-
-```
-<script @type="js" type="text/javascript">
-result="";
-</script>
-```
-
-Typescript:
-
-```
-<script @type="ts" type="text/typescript">
-result="";
-</script>
-```
-
-They all run in Node.js VM.
+````
 
 ### 👍 Releasing Version 2
 
