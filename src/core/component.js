@@ -20,7 +20,9 @@ export function buildComponent(content, components, mds)
 
         if (scriptType == "markdown" || scriptType == "md")
         {
-            return renderMD(code, attributes, mds);
+            const mdPath = attributes.find(attr => attr.name === '@path')?.content || '';
+            const filteredCode = mdPath ? code : code.replace(/<\\\/script>/g, '</script>');
+            return renderMD(filteredCode, attributes, mds);
         }
 
         if (scriptType == "javascript" || scriptType == "js")
