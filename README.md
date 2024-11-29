@@ -85,7 +85,7 @@ Development Build System is changed to the `server side rendering` with memory d
 
 ## 📖 Documentation
 
-[Official Website](https://rino.opdev1004.com/)
+[Official Website](https://rinojs.org/)
 
 ## 💪 Support Rino!
 
