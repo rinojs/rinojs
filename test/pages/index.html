@@ -50,11 +50,13 @@
     <script @type="ts" type="text/typescript">
       // This is for templating html content
       let world: string = "Hello world! from typescript!";
-      result = world;
+      console.log(world);
     </script>
     <script @type="js" type="text/javascript">
+      import os from "os";
       // This is for templating html content
-      result = "Hello world! from javascript!";
+      console.log("Hello world! from javascript!");
+      console.log(os.type());
     </script>
   </body>
 </html>

@@ -1,33 +1,31 @@
-import vm from 'vm';
+import { spawn } from "child_process";
 
-export function getResultFromCode(code)
+export function getResultFromCode (code, dirname, args = [])
 {
-    try 
+  return new Promise((resolve, reject) =>
+  {
+    const child = spawn("node", ["-e", code, ...args], {
+      cwd: dirname,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+
+    let output = "";
+    let error = "";
+
+    child.stdout.on("data", (data) =>
     {
-        const context = vm.createContext({
-            console: console,
-            result: "",
-        });
+      output += data;
+    });
 
-        vm.runInContext(code, context);
-
-        if (context.result instanceof Promise)
-        {
-            return context.result
-                .then(resolved => resolved)
-                .catch((error) =>
-                {
-                    console.error(error);
-                    return "";
-                });
-        }
-
-        if (context.result) return context.result;
-        else return "";
-    }
-    catch (error)
+    child.stderr.on("data", (data) =>
     {
-        console.error(error);
-        return "";
-    }
+      error += data;
+    });
+
+    child.on("close", (closeCode) =>
+    {
+      if (closeCode === 0) resolve(output.trim());
+      else reject(error || `Script exited with code ${closeCode}`);
+    });
+  });
 }
