@@ -20,9 +20,12 @@ import { generateSitemap, generateSitemapFile } from "./core/sitemap.js";
 import { getFilesRecursively } from "./core/fileGetter.js";
 import { copyFiles } from "./core/copyFiles.js";
 import { generateProjectSitemap } from "./core/projectSitemap.js";
+import { buildSSRComponent } from "./core/ssr/ssrComponent.js";
 
-export class Rino {
-  constructor() {
+export class Rino
+{
+  constructor ()
+  {
     this.defaultMSG = `${chalk.redBright.bgBlack(`
 ██████╗ ██╗███╗   ██╗ ██████╗         ██╗███████╗
 ██╔══██╗██║████╗  ██║██╔═══██╗        ██║██╔════╝
@@ -48,8 +51,10 @@ ${chalk.white("https://github.com/sponsors/opdev1004")}
     this.getFilesRecursively = getFilesRecursively;
   }
 
-  async generate(projectPath) {
-    if (!projectPath) {
+  async generate (projectPath)
+  {
+    if (!projectPath)
+    {
       console.error(`Project path does not exist.`);
       return;
     }
@@ -69,7 +74,8 @@ ${chalk.white("https://github.com/sponsors/opdev1004")}
       dist: path.resolve(projectPath, this.config.dist),
     };
 
-    if (fs.existsSync(dirs.dist)) {
+    if (fs.existsSync(dirs.dist))
+    {
       await fse.emptyDir(dirs.dist);
       console.log(chalk.yellow(`Cleared ${dirs.dist} \n`));
     }
@@ -80,13 +86,15 @@ ${chalk.white("https://github.com/sponsors/opdev1004")}
 
     const pages = getFilesRecursively(dirs.pages, [".html"]);
 
-    for (const pagePath of pages) {
+    for (const pagePath of pages)
+    {
       const relativePath = path.relative(dirs.pages, pagePath);
       const distPagePath = path.join(dirs.dist, relativePath);
       const distDir = path.dirname(distPagePath);
       const pageDir = path.dirname(pagePath);
 
-      if (!fs.existsSync(distDir)) {
+      if (!fs.existsSync(distDir))
+      {
         fs.mkdirSync(distDir, { recursive: true });
       }
 
@@ -105,12 +113,14 @@ ${chalk.white("https://github.com/sponsors/opdev1004")}
 
     const scripts = getFilesRecursively(dirs.scripts, [".js", ".mjs"]);
 
-    for (const scriptPath of scripts) {
+    for (const scriptPath of scripts)
+    {
       const relativePath = path.relative(dirs.scripts, scriptPath);
       const distScriptPath = path.join(dirs.dist, "scripts", relativePath);
       const distDir = path.dirname(distScriptPath);
 
-      if (!fs.existsSync(distDir)) {
+      if (!fs.existsSync(distDir))
+      {
         fs.mkdirSync(distDir, { recursive: true });
       }
 
@@ -125,12 +135,14 @@ ${chalk.white("https://github.com/sponsors/opdev1004")}
 
     const tsScripts = getFilesRecursively(dirs.scripts, [".ts"]);
 
-    for (const scriptPath of tsScripts) {
+    for (const scriptPath of tsScripts)
+    {
       const relativePath = path.relative(dirs.scripts, scriptPath);
       const distScriptPath = path.join(dirs.dist, "scripts", relativePath);
       const distDir = path.dirname(distScriptPath);
 
-      if (!fs.existsSync(distDir)) {
+      if (!fs.existsSync(distDir))
+      {
         fs.mkdirSync(distDir, { recursive: true });
       }
 
@@ -147,12 +159,14 @@ ${chalk.white("https://github.com/sponsors/opdev1004")}
     const styles = getFilesRecursively(dirs.styles, [".css"]);
     const cccs = new CleanCSS();
 
-    for (const stylePath of styles) {
+    for (const stylePath of styles)
+    {
       const relativePath = path.relative(dirs.styles, stylePath);
       const distStylePath = path.join(dirs.dist, "styles", relativePath);
       const distDir = path.dirname(distStylePath);
 
-      if (!fs.existsSync(distDir)) {
+      if (!fs.existsSync(distDir))
+      {
         fs.mkdirSync(distDir, { recursive: true });
       }
 
@@ -169,10 +183,13 @@ ${chalk.white("https://github.com/sponsors/opdev1004")}
     console.log(chalk.blueBright("\nBuild process completed! \n"));
   }
 
-  async loadConfig(projectPath) {
+  async loadConfig (projectPath)
+  {
     const configPath = path.join(projectPath, "rino-config.js");
-    if (fs.existsSync(configPath)) {
-      try {
+    if (fs.existsSync(configPath))
+    {
+      try
+      {
         const configModule = await import(url.pathToFileURL(configPath));
         this.config = { ...configModule.default };
         if (!this.config.dist) this.config.dist = "./dist";
@@ -181,13 +198,15 @@ ${chalk.white("https://github.com/sponsors/opdev1004")}
         this.port = this.config.port || 3000;
 
         console.log(chalk.greenBright("Configuration loaded successfully! \n"));
-      } catch (error) {
+      } catch (error)
+      {
         console.error(
           chalk.redBright("Error loading configuration file:"),
           error
         );
       }
-    } else {
+    } else
+    {
       if (!this.config.dist) this.config.dist = "./dist";
       if (!this.config.port) this.config.port = 3000;
 
@@ -199,8 +218,10 @@ ${chalk.white("https://github.com/sponsors/opdev1004")}
     }
   }
 
-  async dev(projectPath) {
-    if (!projectPath) {
+  async dev (projectPath)
+  {
+    if (!projectPath)
+    {
       console.error(`Project path does not exist.`);
       return;
     }
@@ -239,20 +260,24 @@ ${chalk.white("https://github.com/sponsors/opdev1004")}
     await openBrowser(url);
   }
 
-  async loadFiles(dirPath, extensions, type) {
+  async loadFiles (dirPath, extensions, type)
+  {
     if (!fs.existsSync(dirPath)) return;
 
     const files = fs.readdirSync(dirPath, { withFileTypes: true });
 
-    for (const file of files) {
+    for (const file of files)
+    {
       const filePath = path.join(dirPath, file.name);
 
-      if (file.isDirectory()) {
+      if (file.isDirectory())
+      {
         await this.loadFiles(filePath, extensions, type);
       } else if (
         !extensions ||
         extensions.includes(path.extname(file.name).toLowerCase())
-      ) {
+      )
+      {
         const content = fs.readFileSync(filePath, "utf8");
         this.data[type].push({ path: filePath, content });
       }
@@ -261,7 +286,8 @@ ${chalk.white("https://github.com/sponsors/opdev1004")}
     console.log(chalk.cyanBright(`${type} files loaded!`));
   }
 
-  handleFileChange(filePath, event) {
+  handleFileChange (filePath, event)
+  {
     console.clear();
     console.log(this.defaultMSG);
     console.log(`
@@ -276,14 +302,16 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
     else if (event === "unlink")
       console.log(`${chalk.bgMagenta(filePath)} is ${chalk.red(`deleted`)}!`);
 
-    this.wss.clients.forEach((client) => {
+    this.wss.clients.forEach((client) =>
+    {
       client.send("reload");
     });
 
     return;
   }
 
-  handlePageChange(filePath, event) {
+  handlePageChange (filePath, event)
+  {
     const ext = path.extname(filePath).toLowerCase();
     const type = filePath.includes("pages") ? "pages" : "components";
 
@@ -299,36 +327,42 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
       )} \n`
     );
 
-    if (event === "add" || event === "change") {
+    if (event === "add" || event === "change")
+    {
       const content = fs.readFileSync(filePath, "utf8");
       const fileIndex = this.data[type].findIndex(
         (file) => path.normalize(file.path) === path.normalize(filePath)
       );
 
-      if (fileIndex > -1) {
+      if (fileIndex > -1)
+      {
         this.data[type][fileIndex].content = content;
-      } else {
+      } else
+      {
         this.data[type].push({ path: filePath, content });
       }
 
       console.log(
         `${chalk.bgMagenta(filePath)} is ${chalk.blue(`added/changed`)}!`
       );
-    } else if (event === "unlink") {
+    } else if (event === "unlink")
+    {
       this.data[type] = this.data[type].filter(
         (file) => path.normalize(file.path) !== path.normalize(filePath)
       );
       console.log(`${chalk.bgMagenta(filePath)} is ${chalk.red(`deleted`)}!`);
     }
 
-    this.wss.clients.forEach((client) => {
+    this.wss.clients.forEach((client) =>
+    {
       client.send("reload");
     });
 
     return;
   }
 
-  async startServer(projectPath) {
+  async startServer (projectPath)
+  {
     const app = express();
     this.port = await findPort(this.port);
 
@@ -342,12 +376,15 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
       })
     );
 
-    app.get("/scripts/*.(js|mjs)", async (req, res) => {
+    app.get("/scripts/*.(js|mjs)", async (req, res) =>
+    {
       const requestPath = req.path.replace("/scripts", "");
       const scriptsPath = path.join(projectPath, "scripts/export", requestPath);
 
-      if (fs.existsSync(scriptsPath) && fs.statSync(scriptsPath).isFile()) {
-        try {
+      if (fs.existsSync(scriptsPath) && fs.statSync(scriptsPath).isFile())
+      {
+        try
+        {
           const scriptContent = await bundleJS(
             scriptsPath,
             path.basename(scriptsPath, path.extname(scriptsPath))
@@ -355,7 +392,8 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
           res.setHeader("Content-Type", "application/javascript");
           res.send(scriptContent);
           return;
-        } catch (err) {
+        } catch (err)
+        {
           console.error(`Error bundling script: ${scriptsPath}`, err);
           res.status(500).send("Internal Server Error");
           return;
@@ -368,8 +406,10 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
         requestPath.replace(".js", ".ts")
       );
 
-      if (fs.existsSync(tsPath) && fs.statSync(tsPath).isFile()) {
-        try {
+      if (fs.existsSync(tsPath) && fs.statSync(tsPath).isFile())
+      {
+        try
+        {
           const scriptContent = await bundleTS(
             tsPath,
             projectPath,
@@ -378,7 +418,8 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
           res.setHeader("Content-Type", "application/javascript");
           res.send(scriptContent);
           return;
-        } catch (err) {
+        } catch (err)
+        {
           console.error(`Error bundling script: ${tsPath}`, err);
           res.status(500).send("Internal Server Error");
           return;
@@ -387,7 +428,8 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
 
       const publicPath = path.join(projectPath, "public", requestPath);
 
-      if (fs.existsSync(publicPath) && fs.statSync(publicPath).isFile()) {
+      if (fs.existsSync(publicPath) && fs.statSync(publicPath).isFile())
+      {
         res.sendFile(publicPath);
         return;
       }
@@ -395,12 +437,15 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
       res.status(404).send("File not found");
     });
 
-    app.get("/styles/*.css", async (req, res) => {
+    app.get("/styles/*.css", async (req, res) =>
+    {
       const requestPath = req.path.replace("/styles", "");
       const stylesPath = path.join(projectPath, "styles/export", requestPath);
 
-      if (fs.existsSync(stylesPath) && fs.statSync(stylesPath).isFile()) {
-        try {
+      if (fs.existsSync(stylesPath) && fs.statSync(stylesPath).isFile())
+      {
+        try
+        {
           const styleContent = await bundleCSS(
             await fs.promises.readFile(stylesPath, "utf8"),
             path.dirname(stylesPath)
@@ -408,7 +453,8 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
           res.setHeader("Content-Type", "text/css");
           res.send(styleContent);
           return;
-        } catch (err) {
+        } catch (err)
+        {
           console.error(`Error bundling style: ${stylesPath}`, err);
           res.status(500).send("Internal Server Error");
           return;
@@ -416,7 +462,8 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
       }
 
       const publicPath = path.join(projectPath, "public", requestPath);
-      if (fs.existsSync(publicPath) && fs.statSync(publicPath).isFile()) {
+      if (fs.existsSync(publicPath) && fs.statSync(publicPath).isFile())
+      {
         res.sendFile(publicPath);
         return;
       }
@@ -424,10 +471,12 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
       res.status(404).send("File not found");
     });
 
-    app.get("*", async (req, res) => {
+    app.get("*", async (req, res) =>
+    {
       let requestPath = req.path;
 
-      if (requestPath.endsWith("/")) {
+      if (requestPath.endsWith("/"))
+      {
         requestPath += "index.html";
       }
 
@@ -435,17 +484,18 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
         this.data.pages.find(
           (file) =>
             path.normalize(file.path) ==
-              path.join(projectPath, "pages", path.normalize(requestPath)) ||
+            path.join(projectPath, "pages", path.normalize(requestPath)) ||
             path.normalize(file.path) ==
-              path.join(
-                projectPath,
-                "pages",
-                path.normalize(`${requestPath}.html`)
-              )
+            path.join(
+              projectPath,
+              "pages",
+              path.normalize(`${requestPath}.html`)
+            )
         )
       );
 
-      if (page) {
+      if (page)
+      {
         page.content = await injectReload(page.content, this.port);
         const pageDir = path.dirname(page.path);
 
@@ -462,7 +512,8 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
 
       const publicPath = path.join(projectPath, "public", requestPath);
 
-      if (fs.existsSync(publicPath) && fs.statSync(publicPath).isFile()) {
+      if (fs.existsSync(publicPath) && fs.statSync(publicPath).isFile())
+      {
         res.sendFile(publicPath);
         return;
       }
@@ -477,12 +528,14 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
       if (
         fs.existsSync(publicHTMLPath) &&
         fs.statSync(publicHTMLPath).isFile()
-      ) {
+      )
+      {
         res.sendFile(publicHTMLPath);
         return;
       }
 
-      if (!requestPath.endsWith("/") && !path.extname(requestPath)) {
+      if (!requestPath.endsWith("/") && !path.extname(requestPath))
+      {
         return res.redirect(301, requestPath + "/");
       }
 
@@ -491,7 +544,8 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
 
     const server = http.createServer(app);
 
-    server.listen(this.port, () => {
+    server.listen(this.port, () =>
+    {
       console.log(`
 Server listening on port ${this.port}
 Development: ${chalk.blueBright(`http://localhost:` + this.port)}
@@ -505,4 +559,17 @@ Development: ${chalk.blueBright(`http://localhost:` + this.port)}
   static generateSitemapFile = generateSitemapFile;
   static generateProjectSitemap = generateProjectSitemap;
   static getFilesRecursively = getFilesRecursively;
+}
+
+export
+{
+  findPort,
+  buildSSRComponent,
+  bundleJS,
+  bundleTS,
+  bundleCSS,
+  generateSitemap,
+  generateSitemapFile,
+  generateProjectSitemap,
+  getFilesRecursively
 }
