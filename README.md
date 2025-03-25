@@ -21,10 +21,14 @@ npm i rinojs
 ```
 
 ## 📢 Notice
+### 😥 Release version 2.3.1
+Dropping support for javascript/typescript templating from server side rendering(SSR).
+Because it is not stable for server environment (Asynchronous request produces many child processes).
+Static site generation(SSG) still can javascript/typescript templating.
 
 ### 🎉 Release version 2.3.0
 
-Please use the latest version. There's a big update for templating script feature and server side rending (SSR) function from `version 2.3.0`.
+Please use the latest version. There's a big update for templating script feature and server side rendering (SSR) function from `version 2.3.0`.
 
 Now you can use javascript package from templating script from `version 2.3.0`. And if you want to add html content, you have to use `console.log()`. Anything that is printed out as `std.out` from the templating code process will be rendered. And for static site generation, path of page is given as a process argument. So you can perform page specific templating from shared component.
 

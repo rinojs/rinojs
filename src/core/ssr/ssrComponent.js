@@ -47,26 +47,6 @@ export async function buildSSRComponent (componentPath, componentsDir, mdDir, ar
 
           processedContent = await renderSSRMD(filteredCode, attributes, mdDir);
         }
-        else if (scriptType === "javascript" || scriptType === "js")
-        {
-          if (innerContent) processedContent = await getResultFromCode(innerContent, componentsDir, args);
-        }
-        else if (scriptType === "typescript" || scriptType === "ts")
-        {
-          if (innerContent)
-          {
-            const compiledCode = typescript.transpile(innerContent,
-              {
-                compilerOptions:
-                {
-                  module: typescript.ModuleKind.ESNext,
-                  target: typescript.ScriptTarget.ESNext,
-                },
-              });
-
-            processedContent = await getResultFromCode(compiledCode, componentsDir, args);
-          }
-        }
 
         result += processedContent;
       }
