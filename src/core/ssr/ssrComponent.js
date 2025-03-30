@@ -1,8 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
-import { getResultFromCode } from "../scriptRenderer.js";
 import { renderSSRMD } from "./ssrMDRenderer.js";
-import typescript from "typescript";
 
 export async function buildSSRComponent (componentPath, componentsDir, mdDir, args = [])
 {

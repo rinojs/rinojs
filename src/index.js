@@ -1,5 +1,6 @@
 import fs from "fs";
 import fse from "fs-extra";
+import fsp from "fs/promises";
 import path from "path";
 import url from "url";
 import chokidar from "chokidar";
@@ -37,11 +38,6 @@ export class Rino
 ${chalk.white.bold("Become a sponsor & support Rino.js!")}
 ${chalk.white("https://github.com/sponsors/opdev1004")}
         `;
-    this.data = {
-      pages: [],
-      components: [],
-      mds: [],
-    };
     this.port = 3000;
     this.wss = undefined;
     this.config = {};
@@ -71,7 +67,7 @@ ${chalk.white("https://github.com/sponsors/opdev1004")}
       scripts: path.join(projectPath, "scripts/export"),
       styles: path.join(projectPath, "styles/export"),
       mds: path.join(projectPath, "mds"),
-      dist: path.resolve(projectPath, this.config.dist),
+      dist: this.config.dist ? path.resolve(projectPath, this.config.dist) : path.resolve(projectPath, "./dist"),
     };
 
     if (fs.existsSync(dirs.dist))
@@ -81,8 +77,9 @@ ${chalk.white("https://github.com/sponsors/opdev1004")}
     }
 
     await copyFiles(dirs.public, dirs.dist);
-    await this.loadFiles(dirs.components, [".html"], "components");
-    await this.loadFiles(dirs.mds, [".md"], "mds");
+    console.log(chalk.blue(`
+Public files are copied to ${dirs.dist}
+    `));
 
     const pages = getFilesRecursively(dirs.pages, [".html"]);
 
@@ -91,19 +88,16 @@ ${chalk.white("https://github.com/sponsors/opdev1004")}
       const relativePath = path.relative(dirs.pages, pagePath);
       const distPagePath = path.join(dirs.dist, relativePath);
       const distDir = path.dirname(distPagePath);
-      const pageDir = path.dirname(pagePath);
 
       if (!fs.existsSync(distDir))
       {
         fs.mkdirSync(distDir, { recursive: true });
       }
 
-      let pageContent = fs.readFileSync(pagePath, "utf8");
-      pageContent = await buildComponent(
-        pageContent,
-        this.data.components,
-        this.data.mds,
-        pageDir,
+      const pageContent = await buildComponent(
+        pagePath,
+        dirs.components,
+        dirs.mds,
         [pagePath]
       );
       fs.writeFileSync(distPagePath, pageContent);
@@ -218,6 +212,19 @@ ${chalk.white("https://github.com/sponsors/opdev1004")}
     }
   }
 
+  async fileExists (filePath)
+  {
+    try
+    {
+      await fsp.access(filePath);
+      return true;
+    }
+    catch (error)
+    {
+      return false;
+    }
+  }
+
   async dev (projectPath)
   {
     if (!projectPath)
@@ -240,50 +247,15 @@ ${chalk.white("https://github.com/sponsors/opdev1004")}
       mds: path.join(projectPath, "mds"),
     };
 
-    await this.loadFiles(dirs.pages, [".html"], "pages");
-    await this.loadFiles(dirs.components, [".html"], "components");
-    await this.loadFiles(dirs.mds, [".md"], "mds");
-
     chokidar
-      .watch([dirs.public, dirs.scripts, dirs.styles], { ignoreInitial: true })
+      .watch([dirs.pages, dirs.components, dirs.mds, dirs.public, dirs.scripts, dirs.styles], { ignoreInitial: true })
       .on("add", (filePath) => this.handleFileChange(filePath, "add"))
       .on("change", (filePath) => this.handleFileChange(filePath, "change"))
       .on("unlink", (filePath) => this.handleFileChange(filePath, "unlink"));
 
-    chokidar
-      .watch([dirs.pages, dirs.components, dirs.mds], { ignoreInitial: true })
-      .on("add", (filePath) => this.handlePageChange(filePath, "add"))
-      .on("change", (filePath) => this.handlePageChange(filePath, "change"))
-      .on("unlink", (filePath) => this.handlePageChange(filePath, "unlink"));
     await this.startServer(projectPath);
     const url = `http://localhost:${this.port}`;
     await openBrowser(url);
-  }
-
-  async loadFiles (dirPath, extensions, type)
-  {
-    if (!fs.existsSync(dirPath)) return;
-
-    const files = fs.readdirSync(dirPath, { withFileTypes: true });
-
-    for (const file of files)
-    {
-      const filePath = path.join(dirPath, file.name);
-
-      if (file.isDirectory())
-      {
-        await this.loadFiles(filePath, extensions, type);
-      } else if (
-        !extensions ||
-        extensions.includes(path.extname(file.name).toLowerCase())
-      )
-      {
-        const content = fs.readFileSync(filePath, "utf8");
-        this.data[type].push({ path: filePath, content });
-      }
-    }
-
-    console.log(chalk.cyanBright(`${type} files loaded!`));
   }
 
   handleFileChange (filePath, event)
@@ -301,57 +273,6 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
       );
     else if (event === "unlink")
       console.log(`${chalk.bgMagenta(filePath)} is ${chalk.red(`deleted`)}!`);
-
-    this.wss.clients.forEach((client) =>
-    {
-      client.send("reload");
-    });
-
-    return;
-  }
-
-  handlePageChange (filePath, event)
-  {
-    const ext = path.extname(filePath).toLowerCase();
-    const type = filePath.includes("pages") ? "pages" : "components";
-
-    if ((type === "pages" || type === "components") && ext !== ".html") return;
-    else if (type === "pages" && ext !== ".html") return;
-
-    console.clear();
-    console.log(this.defaultMSG);
-    console.log(`Server listening on port ${this.port}`);
-    console.log(
-      `Development: ${chalk.blueBright.underline(
-        `http://localhost:` + this.port
-      )} \n`
-    );
-
-    if (event === "add" || event === "change")
-    {
-      const content = fs.readFileSync(filePath, "utf8");
-      const fileIndex = this.data[type].findIndex(
-        (file) => path.normalize(file.path) === path.normalize(filePath)
-      );
-
-      if (fileIndex > -1)
-      {
-        this.data[type][fileIndex].content = content;
-      } else
-      {
-        this.data[type].push({ path: filePath, content });
-      }
-
-      console.log(
-        `${chalk.bgMagenta(filePath)} is ${chalk.blue(`added/changed`)}!`
-      );
-    } else if (event === "unlink")
-    {
-      this.data[type] = this.data[type].filter(
-        (file) => path.normalize(file.path) !== path.normalize(filePath)
-      );
-      console.log(`${chalk.bgMagenta(filePath)} is ${chalk.red(`deleted`)}!`);
-    }
 
     this.wss.clients.forEach((client) =>
     {
@@ -480,39 +401,27 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
         requestPath += "index.html";
       }
 
-      let page = structuredClone(
-        this.data.pages.find(
-          (file) =>
-            path.normalize(file.path) ==
-            path.join(projectPath, "pages", path.normalize(requestPath)) ||
-            path.normalize(file.path) ==
-            path.join(
-              projectPath,
-              "pages",
-              path.normalize(`${requestPath}.html`)
-            )
-        )
-      );
+      let pageFilePath = requestPath.endsWith(".html") ? path.join(projectPath, "pages", path.normalize(requestPath)) : path.join(projectPath, "pages", path.normalize(requestPath) + ".html");
 
-      if (page)
+      if (await this.fileExists(pageFilePath))
       {
-        page.content = await injectReload(page.content, this.port);
-        const pageDir = path.dirname(page.path);
-
-        page.content = await buildComponent(
-          page.content,
-          this.data.components,
-          this.data.mds,
-          pageDir,
-          [page.path]
+        const componentsDir = path.join(projectPath, "components");
+        const mdsDir = path.join(projectPath, "mds");
+        let pageContent = await buildComponent(
+          pageFilePath,
+          componentsDir,
+          mdsDir,
+          [pageFilePath]
         );
-        res.send(page.content);
+        pageContent = await injectReload(pageContent, this.port);
+
+        res.send(pageContent);
         return;
       }
 
       const publicPath = path.join(projectPath, "public", requestPath);
 
-      if (fs.existsSync(publicPath) && fs.statSync(publicPath).isFile())
+      if (await this.fileExists(publicPath))
       {
         res.sendFile(publicPath);
         return;
@@ -521,16 +430,14 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
       const publicHTMLPath = path.join(
         projectPath,
         "public",
-        requestPath,
-        ".html"
+        requestPath + ".html"
       );
 
-      if (
-        fs.existsSync(publicHTMLPath) &&
-        fs.statSync(publicHTMLPath).isFile()
-      )
+      if (await this.fileExists(publicHTMLPath))
       {
-        res.sendFile(publicHTMLPath);
+        let htmlContent = await fsp.readFile(publicHTMLPath, "utf-8");
+        htmlContent = await injectReload(htmlContent, this.port);
+        res.send(htmlContent);
         return;
       }
 
@@ -539,7 +446,36 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
         return res.redirect(301, requestPath + "/");
       }
 
-      res.status(404).send("Page not found");
+      const pages404path = path.join(projectPath, "pages", "404.html");
+      const public404path = path.join(projectPath, "public", "404.html");
+
+      if (await this.fileExists(pages404path))
+      {
+        const componentsDir = path.join(projectPath, "components");
+        const mdsDir = path.join(projectPath, "mds");
+        let pageContent = await buildComponent(
+          pages404path,
+          componentsDir,
+          mdsDir,
+          [pages404path]
+        );
+        pageContent = await injectReload(pageContent, this.port);
+
+        res.send(pageContent);
+        return;
+      }
+      else if (await this.fileExists(public404path))
+      {
+        let pageContent = await fsp.readFile(public404path, "utf-8");
+        pageContent = await injectReload(pageContent, this.port);
+
+        res.send(pageContent);
+        return;
+      }
+      else
+      {
+        res.status(404).send("Page not found");
+      }
     });
 
     const server = http.createServer(app);

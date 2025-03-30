@@ -1,8 +1,7 @@
-import fs from "fs/promises";
-import path from "path";
+import path from 'path';
 import markdownit from 'markdown-it'
 
-export async function renderMD (content, attributes, mdDir)
+export function renderMD (content, attributes, mds)
 {
     const mdPath = attributes.find(attr => attr.name === '@path')?.content || '';
     const mdTag = attributes.find(attr => attr.name === '@tag')?.content || 'div';
@@ -21,16 +20,19 @@ export async function renderMD (content, attributes, mdDir)
 
     if (mdPath)
     {
-        try
+        let result = mds.find(c =>
+            path.normalize(c.path).includes(path.normalize(mdPath + '.md'))
+        )?.content;
+
+        if (!result)
         {
-            let result = await fs.readFile(path.join(mdDir, mdPath + ".md"), "utf-8");
-            result = mdit.render(removeCodeLWS(removeLWS(result)));
-            return `<${mdTag} ${otherAttributes}>${result}</${mdTag}>`;
+            console.warn(`Warning: Markdown "${mdPath}" not found.`);
+            return `<${mdTag}></${mdTag}>`;
         }
-        catch (error)
-        {
-            return `<${mdTag}>${error}</${mdTag}>`;
-        }
+
+        result = mdit.render(removeCodeLWS(removeLWS(result)));
+
+        return `<${mdTag} ${otherAttributes}>${result}</${mdTag}>`;
     }
     else
     {
