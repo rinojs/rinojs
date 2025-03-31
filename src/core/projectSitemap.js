@@ -1,9 +1,10 @@
 import path from 'path';
 import chalk from 'chalk';
+import fs from 'fs';
 import { generateSitemapFile } from './sitemap.js';
 import { getFilesRecursively } from './fileGetter.js';
 
-export async function generateProjectSitemap(projectPath, config)
+export async function generateProjectSitemap (projectPath, config)
 {
     if (!projectPath)
     {
@@ -11,7 +12,7 @@ export async function generateProjectSitemap(projectPath, config)
         return;
     }
 
-    if (!config || !config.site || !config.site.url || !config.sitemap)
+    if (!config || !config.site?.url || !config.sitemap)
     {
         console.error(chalk.redBright(`Config or needed Config data for sitemap does not exist.`));
         return;
@@ -23,24 +24,47 @@ export async function generateProjectSitemap(projectPath, config)
 
     if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
 
-    const sitemap = config.sitemap;
-    const dist = config && config.dist ? config.dist : "./dist";
-    const dirs = {
-        pages: path.join(projectPath, 'pages'),
-        dist: path.resolve(projectPath, dist),
-    };
-    const sitemapFilename = path.join(dirs.dist, 'sitemap.xml');
-    const htmlFiles = getFilesRecursively(dirs.pages, ['.html']);
+    const dist = config.dist ? path.resolve(projectPath, config.dist) : path.resolve(projectPath, './dist');
+    const pagesDir = path.join(projectPath, 'pages');
+    const contentsDir = path.join(projectPath, 'contents');
+    const sitemapFilename = path.join(dist, 'sitemap.xml');
+    const htmlFiles = getFilesRecursively(pagesDir, ['.html']);
     const htmlUrls = htmlFiles.map((file) =>
     {
-        const relativePath = path.relative(dirs.pages, file).replace(/\\/g, '/');
+        const relativePath = path.relative(pagesDir, file).replace(/\\/g, '/');
         return relativePath === 'index.html'
-            ? `${ siteUrl }/`
-            : `${ siteUrl }/${ relativePath }`;
+            ? `${siteUrl}/`
+            : `${siteUrl}/${relativePath}`;
     });
-    const sitemapList = [...new Set([...htmlUrls, ...sitemap])];
 
-    await generateSitemapFile(sitemapList, sitemapFilename);
+    const contentUrls = [];
+
+    if (fs.existsSync(contentsDir))
+    {
+        const categoryDirs = fs.readdirSync(contentsDir, { withFileTypes: true })
+            .filter(dirent => dirent.isDirectory())
+            .map(dirent => dirent.name);
+
+        for (const category of categoryDirs)
+        {
+            const categoryPath = path.join(contentsDir, category);
+            const mdFiles = fs.readdirSync(categoryPath).filter(f => f.endsWith('.md'));
+
+            for (const file of mdFiles)
+            {
+                const name = file.replace(/\.md$/, '');
+                const url = `${siteUrl}/contents/${category}/${encodeURIComponent(name)}`;
+                contentUrls.push(url);
+            }
+        }
+    } else
+    {
+        console.warn(chalk.yellow("Skipped adding content pages to sitemap: 'contents/' folder not found."));
+    }
+
+    const combinedUrls = [...new Set([...htmlUrls, ...contentUrls, ...config.sitemap])];
+
+    await generateSitemapFile(combinedUrls, sitemapFilename);
 
     console.log(chalk.greenBright('Sitemap is generated!'));
 }

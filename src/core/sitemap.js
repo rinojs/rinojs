@@ -1,17 +1,13 @@
 import fs from 'fs';
 
-export async function generateSitemap(list)
+export async function generateSitemap (list)
 {
     try
     {
         if (!list || list.length === 0) return "";
 
         let result = `<?xml version='1.0' encoding='UTF-8'?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
-        const currentDate = new Date();
-        const year = currentDate.getFullYear();
-        const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-        const day = String(currentDate.getDate()).padStart(2, '0');
-        const formattedDate = `${ year }-${ month }-${ day }`;
+        const formattedDate = new Date().toISOString();
 
         for (let link of list)
         {
@@ -25,7 +21,7 @@ export async function generateSitemap(list)
             }
 
 
-            result += `<url><loc>${ link }</loc><lastmod>${ formattedDate }</lastmod></url>`;
+            result += `<url><loc>${link}</loc><lastmod>${formattedDate}</lastmod></url>`;
         }
 
         result += `</urlset>`;
@@ -37,18 +33,14 @@ export async function generateSitemap(list)
     }
 }
 
-export async function generateSitemapFile(list, filename)
+export async function generateSitemapFile (list, filename)
 {
     try
     {
         if (!list || !filename || list.length === 0) return false;
 
         let result = `<?xml version='1.0' encoding='UTF-8'?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
-        const currentDate = new Date();
-        const year = currentDate.getFullYear();
-        const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-        const day = String(currentDate.getDate()).padStart(2, '0');
-        const formattedDate = `${ year }-${ month }-${ day }`;
+        const formattedDate = new Date().toISOString();
 
         for (let link of list)
         {
@@ -61,7 +53,7 @@ export async function generateSitemapFile(list, filename)
                 link = link.replace('.html', '');
             }
 
-            result += `<url><loc>${ link }</loc><lastmod>${ formattedDate }</lastmod></url>`;
+            result += `<url><loc>${link}</loc><lastmod>${formattedDate}</lastmod></url>`;
         }
 
         result += `</urlset>`;
