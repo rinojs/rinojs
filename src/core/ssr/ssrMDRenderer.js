@@ -1,8 +1,10 @@
-import fs from "fs/promises";
+import fsp from "fs/promises";
 import path from "path";
-import markdownit from 'markdown-it'
+import markdownit from 'markdown-it';
+import { fileExists } from "../fsHelper.js";
+import { removeLWS, removeCodeLWS } from "../mdFilter.js";
 
-export async function renderSSRMD (content, attributes, mdDir)
+export async function renderSSRMD (content, attributes, mdsDir)
 {
     const mdPath = attributes.find(attr => attr.name === '@path')?.content || '';
     const mdTag = attributes.find(attr => attr.name === '@tag')?.content || 'div';
@@ -23,7 +25,14 @@ export async function renderSSRMD (content, attributes, mdDir)
     {
         try
         {
-            let result = await fs.readFile(path.join(mdDir, mdPath + ".md"), "utf-8");
+            const mdFilePatn = path.join(mdsDir, mdPath + ".md");
+
+            if (!await fileExists(mdFilePatn))
+            {
+                return "Building markdown: Markdown file not found";
+            }
+
+            let result = await fsp.readFile(mdFilePatn, "utf-8");
             result = mdit.render(removeCodeLWS(removeLWS(result)));
             return `<${mdTag} ${otherAttributes}>${result}</${mdTag}>`;
         }
@@ -45,68 +54,4 @@ export async function renderSSRMD (content, attributes, mdDir)
             return `<${mdTag} ${otherAttributes}></${mdTag}>`;
         }
     }
-}
-
-function removeLWS (input)
-{
-    const lines = input.split('\n');
-    let inCodeBlock = false;
-
-    return lines
-        .map(line =>
-        {
-            if (line.trim().startsWith('```'))
-            {
-                inCodeBlock = !inCodeBlock;
-                return line.replace(/^\s*/, '');
-            }
-            if (inCodeBlock)
-            {
-                return line;
-            }
-            return line.replace(/^\s*/, '');
-        })
-        .join('\n');
-}
-
-function removeCodeLWS (input)
-{
-    const lines = input.split('\n');
-    let inCodeBlock = false;
-    let codeBlockLines = [];
-    const result = [];
-
-    for (const line of lines)
-    {
-        if (line.trim().startsWith('```'))
-        {
-            if (inCodeBlock)
-            {
-                const minIndent = Math.min(
-                    ...codeBlockLines
-                        .filter(l => l.trim() !== '')
-                        .map(l => l.match(/^\s*/)[0].length)
-                );
-
-                result.push(
-                    ...codeBlockLines.map(l => l.slice(minIndent))
-                );
-
-                codeBlockLines = [];
-            }
-
-            inCodeBlock = !inCodeBlock;
-            result.push(line);
-        }
-        else if (inCodeBlock)
-        {
-            codeBlockLines.push(line);
-        }
-        else
-        {
-            result.push(line);
-        }
-    }
-
-    return result.join('\n');
 }

@@ -1,14 +1,21 @@
-import fs from "fs/promises";
+import fsp from "fs/promises";
 import path from "path";
 import { getResultFromCode } from "./scriptRenderer.js";
 import { renderMD } from "./mdRenderer.js";
 import typescript from "typescript";
+import { fileExists } from "./fsHelper.js";
 
-export async function buildComponent (componentPath, componentsDir, mdDir, args = [])
+export async function buildComponent (componentPath, componentsDir, mdsDir, args = [])
 {
   try
   {
-    const content = await fs.readFile(componentPath, "utf-8");
+    if (!await fileExists(componentPath))
+    {
+      console.error("Budiling component: HTML file not found");
+      return "Budiling component: HTML file not found";
+    }
+
+    const content = await fsp.readFile(componentPath, "utf-8");
     const attributeRegex = /(@?)([a-zA-Z]+)\s*=\s*(['"])(.*?)\3/g;
     const tagRegex = /<(component|script)\s+([^>]+?)(?:\s*(?:>\s*(.*?)\s*<\/script>|\/>))/gs;
     let result = "";
@@ -45,7 +52,7 @@ export async function buildComponent (componentPath, componentsDir, mdDir, args 
             filteredCode = filteredCode.replace(/<\/script>/g, "</script>");
           }
 
-          processedContent = await renderMD(filteredCode, attributes, mdDir);
+          processedContent = await renderMD(filteredCode, attributes, mdsDir);
         }
         else if (scriptType === "javascript" || scriptType === "js")
         {
@@ -72,7 +79,7 @@ export async function buildComponent (componentPath, componentsDir, mdDir, args 
       }
       else if (tagType === "component")
       {
-        result += await renderComponent(attributes, componentsDir, mdDir, args);
+        result += await renderComponent(attributes, componentsDir, mdsDir, args);
       }
     }
 
@@ -85,13 +92,13 @@ export async function buildComponent (componentPath, componentsDir, mdDir, args 
   }
 }
 
-async function renderComponent (attributes, componentsDir, mdDir, args = [])
+async function renderComponent (attributes, componentsDir, mdsDir, args = [])
 {
   try
   {
     const componentPath = attributes.find((attr) => attr.name === "@path")?.content;
     const componentTag = attributes.find((attr) => attr.name === "@tag")?.content || "";
-    const renderedContent = await buildComponent(path.join(componentsDir, componentPath + ".html"), componentsDir, mdDir, args);
+    const renderedContent = await buildComponent(path.join(componentsDir, componentPath + ".html"), componentsDir, mdsDir, args);
 
     const otherAttributes = attributes
       .filter((attr) => !["@path", "@tag"].includes(attr.name))

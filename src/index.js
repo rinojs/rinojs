@@ -22,6 +22,10 @@ import { getFilesRecursively } from "./core/fileGetter.js";
 import { copyFiles } from "./core/copyFiles.js";
 import { generateProjectSitemap } from "./core/projectSitemap.js";
 import { buildSSRComponent } from "./core/ssr/ssrComponent.js";
+import { fileExists } from "./core/fsHelper.js";
+import { buildContent } from "./core/content.js";
+import { buildContentList } from "./core/contentList.js";
+
 
 export class Rino
 {
@@ -67,6 +71,7 @@ ${chalk.white("https://github.com/sponsors/opdev1004")}
       scripts: path.join(projectPath, "scripts/export"),
       styles: path.join(projectPath, "styles/export"),
       mds: path.join(projectPath, "mds"),
+      contents: path.join(projectPath, "contents"),
       dist: this.config.dist ? path.resolve(projectPath, this.config.dist) : path.resolve(projectPath, "./dist"),
     };
 
@@ -174,6 +179,67 @@ Public files are copied to ${dirs.dist}
       console.log(chalk.greenBright(`Style generated: ${distStylePath}`));
     }
 
+
+    const contentFiles = getFilesRecursively(dirs.contents, [".md"]);
+
+    for (const mdPath of contentFiles)
+    {
+      const relativePath = path.relative(dirs.contents, mdPath);
+      const category = relativePath.split(path.sep)[0];
+      const pagePath = path.join(dirs.pages, "content.html");
+
+      const html = await buildContent(mdPath, pagePath, dirs.components, dirs.mds, [pagePath]);
+
+      const outputPath = path.join(
+        dirs.dist,
+        "contents",
+        relativePath.replace(/\.md$/, ".html")
+      );
+
+      await fse.ensureDir(path.dirname(outputPath));
+      await fsp.writeFile(outputPath, html, "utf-8");
+
+      console.log(chalk.greenBright(`Content generated: ${outputPath}`));
+    }
+
+    const categoryDirs = (await fsp.readdir(dirs.contents, { withFileTypes: true }))
+      .filter(dirent => dirent.isDirectory())
+      .map(dirent => dirent.name);
+
+    for (const category of categoryDirs)
+    {
+      const categoryDir = path.join(dirs.contents, category);
+      const files = (await fsp.readdir(categoryDir)).filter(f => f.endsWith(".md"));
+      const pageCount = Math.ceil(files.length / 10);
+      const listTemplatePath = path.join(dirs.pages, "content-list.html");
+
+      for (let pageIndex = 1; pageIndex <= pageCount; pageIndex++)
+      {
+        const contentListPath = `${category}-${pageIndex}`;
+        const html = await buildContentList(
+          contentListPath,
+          dirs.contents,
+          listTemplatePath,
+          dirs.components,
+          dirs.mds,
+          10,
+          [listTemplatePath]
+        );
+
+        const outputPath = path.join(
+          dirs.dist,
+          "contents-list",
+          category,
+          `${contentListPath}.html`
+        );
+
+        await fse.ensureDir(path.dirname(outputPath));
+        await fsp.writeFile(outputPath, html, "utf-8");
+
+        console.log(chalk.greenBright(`Content list generated: ${outputPath}`));
+      }
+    }
+
     console.log(chalk.blueBright("\nBuild process completed! \n"));
   }
 
@@ -209,19 +275,6 @@ Public files are copied to ${dirs.dist}
           "No rino-config.js found. Using default configuration."
         )
       );
-    }
-  }
-
-  async fileExists (filePath)
-  {
-    try
-    {
-      await fsp.access(filePath);
-      return true;
-    }
-    catch (error)
-    {
-      return false;
     }
   }
 
@@ -392,6 +445,56 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
       res.status(404).send("File not found");
     });
 
+    app.get("/contents/*", async (req, res) =>
+    {
+      const slug = req.path.replace(/^\/contents\//, "");
+      const [category, ...rest] = slug.split("/");
+      const rawName = decodeURIComponent(rest.join("/"));
+      const fileName = rawName + ".md";
+      const mdPath = path.join(projectPath, "contents", category, fileName);
+
+      if (!await fileExists(mdPath))
+      {
+        res.status(404).send("Content not found");
+        return;
+      }
+
+      const pagePath = path.join(projectPath, "pages", "content.html");
+      const componentsDir = path.join(projectPath, "components");
+      const mdsDir = path.join(projectPath, "mds");
+
+      try
+      {
+        const html = await buildContent(mdPath, pagePath, componentsDir, mdsDir, [pagePath]);
+        res.send(html);
+      } catch (err)
+      {
+        console.error("Error rendering content:", err);
+        res.status(500).send("Internal Server Error");
+      }
+    });
+
+    app.get("/contents-list/*", async (req, res) =>
+    {
+      const slug = req.path.replace(/^\/contents-list\//, "");
+      const [category, categoryPage] = slug.split("/");
+      const contentListPath = categoryPage;
+      const contentsDir = path.join(projectPath, "contents");
+      const pagePath = path.join(projectPath, "pages", "content-list.html");
+      const componentsDir = path.join(projectPath, "components");
+      const mdsDir = path.join(projectPath, "mds");
+
+      try
+      {
+        const html = await buildContentList(contentListPath, contentsDir, pagePath, componentsDir, mdsDir, 10, [pagePath]);
+        res.send(html);
+      } catch (err)
+      {
+        console.error("Error rendering content list:", err);
+        res.status(500).send("Internal Server Error");
+      }
+    });
+
     app.get("*", async (req, res) =>
     {
       let requestPath = req.path;
@@ -403,7 +506,7 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
 
       let pageFilePath = requestPath.endsWith(".html") ? path.join(projectPath, "pages", path.normalize(requestPath)) : path.join(projectPath, "pages", path.normalize(requestPath) + ".html");
 
-      if (await this.fileExists(pageFilePath))
+      if (await fileExists(pageFilePath))
       {
         const componentsDir = path.join(projectPath, "components");
         const mdsDir = path.join(projectPath, "mds");
@@ -421,7 +524,7 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
 
       const publicPath = path.join(projectPath, "public", requestPath);
 
-      if (await this.fileExists(publicPath))
+      if (await fileExists(publicPath))
       {
         res.sendFile(publicPath);
         return;
@@ -433,7 +536,7 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
         requestPath + ".html"
       );
 
-      if (await this.fileExists(publicHTMLPath))
+      if (await fileExists(publicHTMLPath))
       {
         let htmlContent = await fsp.readFile(publicHTMLPath, "utf-8");
         htmlContent = await injectReload(htmlContent, this.port);
@@ -449,7 +552,7 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
       const pages404path = path.join(projectPath, "pages", "404.html");
       const public404path = path.join(projectPath, "public", "404.html");
 
-      if (await this.fileExists(pages404path))
+      if (await fileExists(pages404path))
       {
         const componentsDir = path.join(projectPath, "components");
         const mdsDir = path.join(projectPath, "mds");
@@ -464,7 +567,7 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + this.port)}
         res.send(pageContent);
         return;
       }
-      else if (await this.fileExists(public404path))
+      else if (await fileExists(public404path))
       {
         let pageContent = await fsp.readFile(public404path, "utf-8");
         pageContent = await injectReload(pageContent, this.port);
