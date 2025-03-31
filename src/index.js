@@ -78,7 +78,7 @@ ${chalk.white("https://github.com/sponsors/opdev1004")}
     if (fs.existsSync(dirs.dist))
     {
       await fse.emptyDir(dirs.dist);
-      console.log(chalk.yellow(`Cleared ${dirs.dist} \n`));
+      console.log(chalk.red(`Cleared ${dirs.dist} \n`));
     }
 
     await copyFiles(dirs.public, dirs.dist);
@@ -180,64 +180,89 @@ Public files are copied to ${dirs.dist}
     }
 
 
-    const contentFiles = getFilesRecursively(dirs.contents, [".md"]);
 
-    for (const mdPath of contentFiles)
+    if (fs.existsSync(dirs.contents))
     {
-      const relativePath = path.relative(dirs.contents, mdPath);
-      const category = relativePath.split(path.sep)[0];
-      const pagePath = path.join(dirs.pages, "content.html");
+      const contentTemplatePath = path.join(dirs.pages, "content.html");
+      const contentListTemplatePath = path.join(dirs.pages, "content-list.html");
 
-      const html = await buildContent(mdPath, pagePath, dirs.components, dirs.mds, [pagePath]);
-
-      const outputPath = path.join(
-        dirs.dist,
-        "contents",
-        relativePath.replace(/\.md$/, ".html")
-      );
-
-      await fse.ensureDir(path.dirname(outputPath));
-      await fsp.writeFile(outputPath, html, "utf-8");
-
-      console.log(chalk.greenBright(`Content generated: ${outputPath}`));
-    }
-
-    const categoryDirs = (await fsp.readdir(dirs.contents, { withFileTypes: true }))
-      .filter(dirent => dirent.isDirectory())
-      .map(dirent => dirent.name);
-
-    for (const category of categoryDirs)
-    {
-      const categoryDir = path.join(dirs.contents, category);
-      const files = (await fsp.readdir(categoryDir)).filter(f => f.endsWith(".md"));
-      const pageCount = Math.ceil(files.length / 10);
-      const listTemplatePath = path.join(dirs.pages, "content-list.html");
-
-      for (let pageIndex = 1; pageIndex <= pageCount; pageIndex++)
+      if (fs.existsSync(contentTemplatePath))
       {
-        const contentListPath = `${category}-${pageIndex}`;
-        const html = await buildContentList(
-          contentListPath,
-          dirs.contents,
-          listTemplatePath,
-          dirs.components,
-          dirs.mds,
-          10,
-          [listTemplatePath]
-        );
+        const contentFiles = getFilesRecursively(dirs.contents, [".md"]);
 
-        const outputPath = path.join(
-          dirs.dist,
-          "contents-list",
-          category,
-          `${contentListPath}.html`
-        );
+        for (const mdPath of contentFiles)
+        {
+          const relativePath = path.relative(dirs.contents, mdPath);
+          const category = relativePath.split(path.sep)[0];
+          const pagePath = path.join(dirs.pages, "content.html");
 
-        await fse.ensureDir(path.dirname(outputPath));
-        await fsp.writeFile(outputPath, html, "utf-8");
+          const html = await buildContent(mdPath, pagePath, dirs.components, dirs.mds, [pagePath]);
 
-        console.log(chalk.greenBright(`Content list generated: ${outputPath}`));
+          const outputPath = path.join(
+            dirs.dist,
+            "contents",
+            relativePath.replace(/\.md$/, ".html")
+          );
+
+          await fse.ensureDir(path.dirname(outputPath));
+          await fsp.writeFile(outputPath, html, "utf-8");
+
+          console.log(chalk.greenBright(`Content generated: ${outputPath}`));
+        }
       }
+      else
+      {
+        console.warn(chalk.yellow("Skipped content page generation: content.html not found."));
+      }
+
+      if (fs.existsSync(contentListTemplatePath))
+      {
+        const categoryDirs = (await fsp.readdir(dirs.contents, { withFileTypes: true }))
+          .filter(dirent => dirent.isDirectory())
+          .map(dirent => dirent.name);
+
+        for (const category of categoryDirs)
+        {
+          const categoryDir = path.join(dirs.contents, category);
+          const files = (await fsp.readdir(categoryDir)).filter(f => f.endsWith(".md"));
+          const pageCount = Math.ceil(files.length / 10);
+          const listTemplatePath = path.join(dirs.pages, "content-list.html");
+
+          for (let pageIndex = 1; pageIndex <= pageCount; pageIndex++)
+          {
+            const contentListPath = `${category}-${pageIndex}`;
+            const html = await buildContentList(
+              contentListPath,
+              dirs.contents,
+              listTemplatePath,
+              dirs.components,
+              dirs.mds,
+              10,
+              [listTemplatePath]
+            );
+
+            const outputPath = path.join(
+              dirs.dist,
+              "contents-list",
+              category,
+              `${contentListPath}.html`
+            );
+
+            await fse.ensureDir(path.dirname(outputPath));
+            await fsp.writeFile(outputPath, html, "utf-8");
+
+            console.log(chalk.greenBright(`Content list generated: ${outputPath}`));
+          }
+        }
+      }
+      else
+      {
+        console.warn(chalk.yellow("Skipped content list generation: content-list.html not found."));
+      }
+    }
+    else
+    {
+      console.warn(chalk.yellow("Skipped content and content list generation: contents/ folder not found."));
     }
 
     console.log(chalk.blueBright("\nBuild process completed! \n"));
