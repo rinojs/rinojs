@@ -1,6 +1,6 @@
 {
   "name": "rinojs",
-  "version": "2.3.4",
+  "version": "2.3.5",
   "description": "Fast learning, preprocessing, intuitive web framework",
   "main": "dist/index.js",
   "bin": {
@@ -11,6 +11,7 @@
     "test": "cd test && node test.js",
     "test-generate": "cd test && node generate.js",
     "test-sitemap": "cd test && node sitemap.js",
+    "test-feed": "cd test && node feed.js",
     "test-ssr": "cd test && node test-ssr.js",
     "pack": "node pack/index.js",
     "build": "rollup -c"

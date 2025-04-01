@@ -18,9 +18,12 @@ import { bundleTS } from "./core/bundleTS.js";
 import { bundleCSS } from "./core/bundleCSS.js";
 import { buildComponent } from "./core/component.js";
 import { generateSitemap, generateSitemapFile } from "./core/sitemap.js";
+import { generateProjectSitemap } from "./core/projectSitemap.js";
+import { generateRSSFeed, generateRSSFeedFile } from "./core/rssFeed.js";
+import { generateAtomFeed, generateAtomFeedFile } from "./core/atomFeed.js";
+import { generateContentFeeds } from './core/projectFeed.js';
 import { getFilesRecursively } from "./core/fileGetter.js";
 import { copyFiles } from "./core/copyFiles.js";
-import { generateProjectSitemap } from "./core/projectSitemap.js";
 import { buildSSRComponent } from "./core/ssr/ssrComponent.js";
 import { fileExists } from "./core/fsHelper.js";
 import { buildContent } from "./core/content.js";
@@ -45,10 +48,15 @@ ${chalk.white("https://github.com/sponsors/opdev1004")}
     this.port = 3000;
     this.wss = undefined;
     this.config = {};
+    this.getFilesRecursively = getFilesRecursively;
     this.generateSitemap = generateSitemap;
     this.generateSitemapFile = generateSitemapFile;
     this.generateProjectSitemap = generateProjectSitemap;
-    this.getFilesRecursively = getFilesRecursively;
+    this.generateRSSFeed = generateRSSFeed;
+    this.generateRSSFeedFile = generateRSSFeedFile;
+    this.generateAtomFeed = generateAtomFeed;
+    this.generateAtomFeedFile = generateAtomFeedFile;
+    this.generateContentFeeds = generateContentFeeds;
   }
 
   async generate (projectPath)
@@ -623,6 +631,11 @@ Development: ${chalk.blueBright(`http://localhost:` + this.port)}
   static generateSitemapFile = generateSitemapFile;
   static generateProjectSitemap = generateProjectSitemap;
   static getFilesRecursively = getFilesRecursively;
+  static generateRSSFeed = generateRSSFeed;
+  static generateRSSFeedFile = generateRSSFeedFile;
+  static generateAtomFeed = generateAtomFeed;
+  static generateAtomFeedFile = generateAtomFeedFile;
+  static generateContentFeeds = generateContentFeeds;
 }
 
 export
@@ -632,8 +645,13 @@ export
   bundleJS,
   bundleTS,
   bundleCSS,
+  getFilesRecursively,
   generateSitemap,
   generateSitemapFile,
   generateProjectSitemap,
-  getFilesRecursively
+  generateRSSFeed,
+  generateRSSFeedFile,
+  generateAtomFeed,
+  generateAtomFeedFile,
+  generateContentFeeds
 }
