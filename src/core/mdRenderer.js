@@ -1,7 +1,10 @@
-import path from 'path';
-import markdownit from 'markdown-it'
+import fsp from "fs/promises";
+import path from "path";
+import markdownit from 'markdown-it';
+import { fileExists } from "./fsHelper.js";
+import { removeLWS, removeCodeLWS } from "./mdFilter.js";
 
-export function renderMD (content, attributes, mds)
+export async function renderMD (content, attributes, mdsDir)
 {
     const mdPath = attributes.find(attr => attr.name === '@path')?.content || '';
     const mdTag = attributes.find(attr => attr.name === '@tag')?.content || 'div';
@@ -20,19 +23,24 @@ export function renderMD (content, attributes, mds)
 
     if (mdPath)
     {
-        let result = mds.find(c =>
-            path.normalize(c.path).includes(path.normalize(mdPath + '.md'))
-        )?.content;
-
-        if (!result)
+        try
         {
-            console.warn(`Warning: Markdown "${mdPath}" not found.`);
-            return `<${mdTag}></${mdTag}>`;
+            const mdFilePatn = path.join(mdsDir, mdPath + ".md");
+
+            if (!await fileExists(mdFilePatn))
+            {
+                console.error("Building markdown: Markdown file not found");
+                return "Building markdown: Markdown file not found";
+            }
+
+            let result = await fsp.readFile(mdFilePatn, "utf-8");
+            result = mdit.render(removeCodeLWS(removeLWS(result)));
+            return `<${mdTag} ${otherAttributes}>${result}</${mdTag}>`;
         }
-
-        result = mdit.render(removeCodeLWS(removeLWS(result)));
-
-        return `<${mdTag} ${otherAttributes}>${result}</${mdTag}>`;
+        catch (error)
+        {
+            return `<${mdTag}>${error}</${mdTag}>`;
+        }
     }
     else
     {
@@ -47,68 +55,4 @@ export function renderMD (content, attributes, mds)
             return `<${mdTag} ${otherAttributes}></${mdTag}>`;
         }
     }
-}
-
-function removeLWS (input)
-{
-    const lines = input.split('\n');
-    let inCodeBlock = false;
-
-    return lines
-        .map(line =>
-        {
-            if (line.trim().startsWith('```'))
-            {
-                inCodeBlock = !inCodeBlock;
-                return line.replace(/^\s*/, '');
-            }
-            if (inCodeBlock)
-            {
-                return line;
-            }
-            return line.replace(/^\s*/, '');
-        })
-        .join('\n');
-}
-
-function removeCodeLWS (input)
-{
-    const lines = input.split('\n');
-    let inCodeBlock = false;
-    let codeBlockLines = [];
-    const result = [];
-
-    for (const line of lines)
-    {
-        if (line.trim().startsWith('```'))
-        {
-            if (inCodeBlock)
-            {
-                const minIndent = Math.min(
-                    ...codeBlockLines
-                        .filter(l => l.trim() !== '')
-                        .map(l => l.match(/^\s*/)[0].length)
-                );
-
-                result.push(
-                    ...codeBlockLines.map(l => l.slice(minIndent))
-                );
-
-                codeBlockLines = [];
-            }
-
-            inCodeBlock = !inCodeBlock;
-            result.push(line);
-        }
-        else if (inCodeBlock)
-        {
-            codeBlockLines.push(line);
-        }
-        else
-        {
-            result.push(line);
-        }
-    }
-
-    return result.join('\n');
 }

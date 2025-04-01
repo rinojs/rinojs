@@ -21,40 +21,103 @@ npm i rinojs
 ```
 
 ## 📢 Notice
-### 😥 Release version 2.3.1
-Dropping support for javascript/typescript templating from server side rendering(SSR).
-Because it is not stable for server environment (Asynchronous request produces many child processes).
-Static site generation(SSG) still can javascript/typescript templating.
-
-### 🎉 Release version 2.3.0
-
-Please use the latest version. There's a big update for templating script feature and server side rendering (SSR) function from `version 2.3.0`.
-
-Now you can use javascript package from templating script from `version 2.3.0`. And if you want to add html content, you have to use `console.log()`. Anything that is printed out as `std.out` from the templating code process will be rendered. And for static site generation, path of page is given as a process argument. So you can perform page specific templating from shared component.
-
-````
-<script @type="js" type="text/javascript">
-  import os from "os";
-  // This is for templating html content
-  console.log(os.type());
-</script>
-````
-
-Now we support server side rendering(SSR) async function called `buildSSRComponent(componentPath, componentsDir, mdDir, args = [])` from `version 2.3.0` with helpful SSR functions: 
+### 🎉 Release version v2.5.0
+Please use the latest version. Recommended to upgrade version of Rino after at least a day/a week after the release. So you don't have to deal with huge bug with new version. Because it is going to be tested in production level by development team after release.
+- Restructured whole system
+  - Better performance
+  - Fixed development server problem
+- No longer need to create class
 
 ```
-async function findPort(port),
-async function bundleJS(scriptPath, name = "jsbundle"),
-async function bundleTS(scriptPath, projectPath, name = "tsbundle"),
-async function bundleCSS(cssContent, baseDir),
-async function generateSitemap(list),
-async function generateSitemapFile(list, filename),
-async function generateProjectSitemap(projectPath, config),
-function getFilesRecursively(dir, extensions)
+import { devStaticSite, buildStaticSite } from '../src/index.js';
+
 ```
 
-For `async function buildSSRComponent (componentPath, componentsDir, mdDir, args = [])`, `componentPath` is path of base page html or any html component. And it will grab components and markdown from `componentsDir` and `mdDir`.
+#### Including update from v2.4.0
 
+- Removed preloading files
+- Added contents feature to static site generation (SSG)
+- Updated sitemap to work with contents
+- Added RSS/ATOM feed feature
+
+The content feature requires the following:
+- /pages/content.html
+- /pages/content-list.html
+- /contents/category/content.md
+
+Top of Markdown content can contains data. It must be commented and JSON file format. I recommend to use frontend technology to take care when there's empty data.
+
+`./contents/category/content.md`:
+```
+<!--
+{
+  "title": "Title of content",
+  "description": "Description of content",
+  "published": "1/1/2025"
+}
+
+Content body
+-->
+```
+`./pages/content.html`:
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ content.title }}</title>
+</head>
+<body>
+  <main>
+    <h1>{{ content.title }}</h1>
+    <p><em>Published: {{ content.published }}</em></p>
+    <article>
+      {{ content.body }}
+    </article>
+    <nav>
+      <div>
+        <a href="{{ content.prevLink }}">{{ content.prevName }}</a>
+      </div>
+      <div>
+        <a href="{{ content.nextLink }}">{{ content.nextName }}</a>
+      </div>
+    </nav>
+  </main>
+</body>
+</html>
+```
+`./pages/content-list.html`:
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Content List</title>
+</head>
+<body>
+  <main>
+    <h1>Content List Page</h1>
+    <ol>
+      <li><a href="{{ contentList.link1 }}">{{ contentList.name1 }}</a></li>
+      <li><a href="{{ contentList.link2 }}">{{ contentList.name2 }}</a></li>
+      <li><a href="{{ contentList.link3 }}">{{ contentList.name3 }}</a></li>
+      <li><a href="{{ contentList.link4 }}">{{ contentList.name4 }}</a></li>
+      <li><a href="{{ contentList.link5 }}">{{ contentList.name5 }}</a></li>
+      <li><a href="{{ contentList.link6 }}">{{ contentList.name6 }}</a></li>
+      <li><a href="{{ contentList.link7 }}">{{ contentList.name7 }}</a></li>
+      <li><a href="{{ contentList.link8 }}">{{ contentList.name8 }}</a></li>
+      <li><a href="{{ contentList.link9 }}">{{ contentList.name9 }}</a></li>
+      <li><a href="{{ contentList.link10 }}">{{ contentList.name10 }}</a></li>
+    </ol>
+
+    <nav>
+      <a href="{{ contentList.prevLink }}">← Previous Page</a> |
+      <a href="{{ contentList.nextLink }}">Next Page →</a>
+    </nav>
+  </main>
+</body>
+</html>
+```
 
 ### 👍 Releasing Version 2
 

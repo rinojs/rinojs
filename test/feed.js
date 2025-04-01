@@ -1,13 +1,15 @@
-import { devStaticSite } from '../src/index.js';
+import { generateContentFeeds } from '../src/index.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import config from './rino-config.js';
 
-async function dev ()
+async function feed ()
 {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = dirname(__filename);
-    await devStaticSite(path.resolve(__dirname, "./"));
+
+    await generateContentFeeds(path.resolve(__dirname, "./"), config);
 }
 
-dev();
+feed();

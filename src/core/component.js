@@ -1,104 +1,116 @@
+import fsp from "fs/promises";
 import path from "path";
 import { getResultFromCode } from "./scriptRenderer.js";
 import { renderMD } from "./mdRenderer.js";
 import typescript from "typescript";
+import { fileExists } from "./fsHelper.js";
 
-export async function buildComponent (content, components, mds, componentsDir, args = [])
+export async function buildComponent (componentPath, componentsDir, mdsDir, args = [])
 {
-  const attributeRegex = /(@?)([a-zA-Z]+)\s*=\s*(['"])(.*?)\3/g;
-  const tagRegex = /<(component|script)\s+([^>]+?)(?:\s*(?:>\s*(.*?)\s*<\/script>|\/>))/gs;
-  let result = "";
-  let cursor = 0;
-  let match;
-
-  while ((match = tagRegex.exec(content)))
+  try
   {
-    result += content.slice(cursor, match.index);
-    cursor = tagRegex.lastIndex;
-
-    const [fullMatch, tagType, attributesString, innerContent] = match;
-    const attributes = parseAttributes(attributesString, attributeRegex);
-
-    if (tagType === "script")
+    if (!await fileExists(componentPath))
     {
-      const scriptType = attributes.find((attr) => attr.name === "@type")?.content.toLowerCase();
+      console.error("Budiling component: HTML file not found");
+      return "Budiling component: HTML file not found";
+    }
 
-      if (!scriptType)
+    const content = await fsp.readFile(componentPath, "utf-8");
+    const attributeRegex = /(@?)([a-zA-Z]+)\s*=\s*(['"])(.*?)\3/g;
+    const tagRegex = /<(component|script)\s+([^>]+?)(?:\s*(?:>\s*(.*?)\s*<\/script>|\/>))/gs;
+    let result = "";
+    let cursor = 0;
+    let match;
+
+    while ((match = tagRegex.exec(content)))
+    {
+      result += content.slice(cursor, match.index);
+      cursor = tagRegex.lastIndex;
+
+      const [fullMatch, tagType, attributesString, innerContent] = match;
+      const attributes = parseAttributes(attributesString, attributeRegex);
+
+      if (tagType === "script")
       {
-        result += fullMatch;
-        continue;
-      }
+        const scriptType = attributes.find((attr) => attr.name === "@type")?.content.toLowerCase();
 
-      let processedContent = "";
-
-      if (scriptType === "markdown" || scriptType === "md")
-      {
-        const mdPath = attributes.find((attr) => attr.name === "@path")?.content || "";
-        let filteredCode = innerContent;
-
-        if (!mdPath && innerContent)
+        if (!scriptType)
         {
-          filteredCode = filteredCode.replace(/<\/script>/g, "</script>");
+          result += fullMatch;
+          continue;
         }
 
-        processedContent = renderMD(filteredCode, attributes, mds);
-      }
-      else if (scriptType === "javascript" || scriptType === "js")
-      {
-        if (innerContent) processedContent = await getResultFromCode(innerContent, componentsDir, args);
-      }
-      else if (scriptType === "typescript" || scriptType === "ts")
-      {
-        if (innerContent)
+        let processedContent = "";
+
+        if (scriptType === "markdown" || scriptType === "md")
         {
-          const compiledCode = typescript.transpile(innerContent,
-            {
-              compilerOptions:
+          const mdPath = attributes.find((attr) => attr.name === "@path")?.content || "";
+          let filteredCode = innerContent;
+
+          if (!mdPath && innerContent)
+          {
+            filteredCode = filteredCode.replace(/<\/script>/g, "</script>");
+          }
+
+          processedContent = await renderMD(filteredCode, attributes, mdsDir);
+        }
+        else if (scriptType === "javascript" || scriptType === "js")
+        {
+          if (innerContent) processedContent = await getResultFromCode(innerContent, componentsDir, args);
+        }
+        else if (scriptType === "typescript" || scriptType === "ts")
+        {
+          if (innerContent)
+          {
+            const compiledCode = typescript.transpile(innerContent,
               {
-                module: typescript.ModuleKind.ESNext,
-                target: typescript.ScriptTarget.ESNext,
-              },
-            });
+                compilerOptions:
+                {
+                  module: typescript.ModuleKind.ESNext,
+                  target: typescript.ScriptTarget.ESNext,
+                },
+              });
 
-          processedContent = await getResultFromCode(compiledCode, componentsDir, args);
+            processedContent = await getResultFromCode(compiledCode, componentsDir, args);
+          }
         }
+
+        result += processedContent;
       }
+      else if (tagType === "component")
+      {
+        result += await renderComponent(attributes, componentsDir, mdsDir, args);
+      }
+    }
 
-      result += processedContent;
-    }
-    else if (tagType === "component")
-    {
-      result += await renderComponent(attributes, components, mds, componentsDir, args);
-    }
+    result += content.slice(cursor);
+    return result;
   }
-
-  result += content.slice(cursor);
-  return result;
+  catch (error)
+  {
+    return error;
+  }
 }
 
-async function renderComponent (attributes, components, mds, componentsDir, args = [])
+async function renderComponent (attributes, componentsDir, mdsDir, args = [])
 {
-  const componentPath = attributes.find((attr) => attr.name === "@path")?.content;
-  const componentTag = attributes.find((attr) => attr.name === "@tag")?.content || "";
-
-  const componentContent = components.find((c) =>
-    path.normalize(c.path).includes(path.normalize(componentPath + ".html"))
-  )?.content;
-
-  if (!componentContent)
+  try
   {
-    console.warn(`Warning: Component "${componentPath}" not found.`);
-    return ``;
+    const componentPath = attributes.find((attr) => attr.name === "@path")?.content;
+    const componentTag = attributes.find((attr) => attr.name === "@tag")?.content || "";
+    const renderedContent = await buildComponent(path.join(componentsDir, componentPath + ".html"), componentsDir, mdsDir, args);
+
+    const otherAttributes = attributes
+      .filter((attr) => !["@path", "@tag"].includes(attr.name))
+      .map((attr) => `${attr.name}="${attr.content}"`)
+      .join(" ");
+
+    return componentTag ? `<${componentTag} ${otherAttributes}>${renderedContent}</${componentTag}>` : renderedContent;
   }
-
-  const renderedContent = await buildComponent(componentContent, components, mds, componentsDir, args);
-
-  const otherAttributes = attributes
-    .filter((attr) => !["@path", "@tag"].includes(attr.name))
-    .map((attr) => `${attr.name}="${attr.content}"`)
-    .join(" ");
-
-  return componentTag ? `<${componentTag} ${otherAttributes}>${renderedContent}</${componentTag}>` : renderedContent;
+  catch (error)
+  {
+    return error;
+  }
 }
 
 function parseAttributes (attributeString, regex)

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ content.title }}</title>
+</head>
+<body>
+  <main>
+    <h1>{{ content.title }}</h1>
+    <p><em>Published: {{ content.published }}</em></p>
+    <article>
+      {{ content.body }}
+    </article>
+    <nav>
+      <div>
+        <a href="{{ content.prevLink }}">{{ content.prevName }}</a>
+      </div>
+      <div>
+        <a href="{{ content.nextLink }}">{{ content.nextName }}</a>
+      </div>
+    </nav>
+  </main>
+</body>
+</html>
