@@ -3,6 +3,7 @@ import path from 'path';
 import chalk from 'chalk';
 import { generateRSSFeedFile } from './rssFeed.js';
 import { generateAtomFeedFile } from './atomFeed.js';
+import { dirExists } from './fsHelper.js';
 
 export async function generateContentFeeds (projectPath, config)
 {
@@ -12,20 +13,26 @@ export async function generateContentFeeds (projectPath, config)
         return;
     }
 
-    if (!config || !config.site?.url || !config.dist)
+    if (!config || !config.site?.url)
     {
         console.error(chalk.redBright(`Missing site or dist config for feed generation.`));
         return;
     }
 
+    const dist = config.dist ? config.dist : "./dist";
     const siteUrl = config.site.url.endsWith('/') ? config.site.url.slice(0, -1) : config.site.url;
     const contentsDir = path.join(projectPath, 'contents');
-    const distDir = path.resolve(projectPath, config.dist);
+    const distDir = path.resolve(projectPath, dist);
 
     if (!fs.existsSync(contentsDir))
     {
         console.warn(chalk.yellow("Skipped feed generation: contents folder not found."));
         return;
+    }
+
+    if (!await dirExists(distDir))
+    {
+        await fsp.mkdir(distDir, { recursive: true });
     }
 
     const contentItems = [];
