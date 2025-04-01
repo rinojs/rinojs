@@ -41,6 +41,7 @@ export async function devStaticSite (projectPath)
         styles: path.join(projectPath, "styles"),
         mds: path.join(projectPath, "mds"),
         contents: path.join(projectPath, "contents"),
+        contentTheme: path.join(projectPath, "content-theme"),
     };
 
     chokidar
@@ -51,7 +52,8 @@ export async function devStaticSite (projectPath)
             dirs.public,
             dirs.scripts,
             dirs.styles,
-            dirs.contents
+            dirs.contents,
+            dirs.contentTheme
         ], { ignoreInitial: true })
         .on("all", (event, filePath) => handleFileChange(filePath, event, resolvedPort));
 
@@ -158,7 +160,7 @@ async function startServer (projectPath, port)
         const mdPath = path.join(projectPath, "contents", category, rawName + ".md");
         if (!await fileExists(mdPath)) return res.status(404).send("Content not found");
 
-        const pagePath = path.join(projectPath, "pages", "content.html");
+        const pagePath = path.join(projectPath, "content-theme", "content.html");
         let content = await buildContent(
             mdPath,
             pagePath,
@@ -174,7 +176,7 @@ async function startServer (projectPath, port)
     {
         const slug = req.path.replace(/^\/contents-list\//, "");
         const [category, categoryPage] = slug.split("/");
-        const pagePath = path.join(projectPath, "pages", "content-list.html");
+        const pagePath = path.join(projectPath, "content-theme", "content-list.html");
 
         let content = await buildContentList(
             categoryPage,

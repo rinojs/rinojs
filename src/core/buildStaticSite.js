@@ -35,6 +35,7 @@ export async function buildStaticSite (projectPath)
         styles: path.join(projectPath, "styles/export"),
         mds: path.join(projectPath, "mds"),
         contents: path.join(projectPath, "contents"),
+        contentTheme: path.join(projectPath, "content-theme"),
         dist: config.dist ? path.resolve(projectPath, config.dist) : path.resolve(projectPath, "./dist"),
     };
 
@@ -146,11 +147,10 @@ Public files are copied to ${dirs.dist}
         console.log(chalk.greenBright(`Style generated: ${distStylePath}`));
     }
 
-    // Build content pages
     if (await dirExists(dirs.contents))
     {
-        const contentTemplatePath = path.join(dirs.pages, "content.html");
-        const contentListTemplatePath = path.join(dirs.pages, "content-list.html");
+        const contentTemplatePath = path.join(dirs.contentTheme, "content.html");
+        const contentListTemplatePath = path.join(dirs.contentTheme, "content-list.html");
 
         if (await fileExists(contentTemplatePath))
         {
@@ -160,9 +160,7 @@ Public files are copied to ${dirs.dist}
             {
                 const relativePath = path.relative(dirs.contents, mdPath);
                 const category = relativePath.split(path.sep)[0];
-                const pagePath = path.join(dirs.pages, "content.html");
-
-                const html = await buildContent(mdPath, pagePath, dirs.components, dirs.mds, [pagePath]);
+                const html = await buildContent(mdPath, contentTemplatePath, dirs.components, dirs.mds, [contentTemplatePath]);
 
                 const outputPath = path.join(
                     dirs.dist,
@@ -192,7 +190,6 @@ Public files are copied to ${dirs.dist}
                 const categoryDir = path.join(dirs.contents, category);
                 const files = (await fsp.readdir(categoryDir)).filter(f => f.endsWith(".md"));
                 const pageCount = Math.ceil(files.length / 10);
-                const listTemplatePath = path.join(dirs.pages, "content-list.html");
 
                 for (let pageIndex = 1; pageIndex <= pageCount; pageIndex++)
                 {
@@ -200,11 +197,11 @@ Public files are copied to ${dirs.dist}
                     const html = await buildContentList(
                         contentListPath,
                         dirs.contents,
-                        listTemplatePath,
+                        contentListTemplatePath,
                         dirs.components,
                         dirs.mds,
                         10,
-                        [listTemplatePath]
+                        [contentListTemplatePath]
                     );
 
                     const outputPath = path.join(

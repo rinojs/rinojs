@@ -21,9 +21,14 @@ npm i rinojs
 ```
 
 ## 📢 Notice
-### 🎉 Release version v2.8.0
+### 🎉 Release version v2.9.0
 Please use the latest version. Recommended to upgrade version of Rino after at least a day/a week after the release. So you don't have to deal with huge bug with new version. Because it is going to be tested in production level by development team after release.
-- Fixed bug bug for sitemap and feed
+- Fixed bug for content system
+
+---
+#### v2.4.0 - current version changes
+
+- Fixed bug for sitemap and feed
 - Added our logo message
 - Fixed development server bug for script, styles and public directory system
 - Restructured whole system
@@ -39,8 +44,8 @@ import { devStaticSite, buildStaticSite } from '../src/index.js';
 - Added RSS/ATOM feed feature
 
 The content feature requires the following:
-- /pages/content.html
-- /pages/content-list.html
+- /content-theme/content.html
+- /content-theme/content-list.html
 - /contents/category/content.md
 
 Top of Markdown content can contains data. It must be commented and JSON file format. I recommend to use frontend technology to take care when there's empty data.
@@ -57,7 +62,7 @@ Top of Markdown content can contains data. It must be commented and JSON file fo
 Content body
 -->
 ```
-`./pages/content.html`:
+`./content-theme/content.html`:
 ```
 <!DOCTYPE html>
 <html lang="en">
@@ -84,7 +89,7 @@ Content body
 </body>
 </html>
 ```
-`./pages/content-list.html`:
+`./content-theme/content-list.html`:
 ```
 <!DOCTYPE html>
 <html lang="en">
