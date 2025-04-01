@@ -2,7 +2,7 @@ import path from 'path';
 import chalk from 'chalk';
 import fs from 'fs';
 import { generateSitemapFile } from './sitemap.js';
-import { getFilesRecursively } from './fileGetter.js';
+import { dirExists, getFilesRecursively } from './fsHelper.js';
 
 export async function generateProjectSitemap (projectPath, config)
 {
@@ -28,7 +28,7 @@ export async function generateProjectSitemap (projectPath, config)
     const pagesDir = path.join(projectPath, 'pages');
     const contentsDir = path.join(projectPath, 'contents');
     const sitemapFilename = path.join(dist, 'sitemap.xml');
-    const htmlFiles = getFilesRecursively(pagesDir, ['.html']);
+    const htmlFiles = await getFilesRecursively(pagesDir, ['.html']);
     const htmlUrls = htmlFiles.map((file) =>
     {
         const relativePath = path.relative(pagesDir, file).replace(/\\/g, '/');
@@ -38,6 +38,11 @@ export async function generateProjectSitemap (projectPath, config)
     });
 
     const contentUrls = [];
+
+    if (!await dirExists(dist))
+    {
+        await fsp.mkdir(dist, { recursive: true });
+    }
 
     if (fs.existsSync(contentsDir))
     {
@@ -57,7 +62,8 @@ export async function generateProjectSitemap (projectPath, config)
                 contentUrls.push(url);
             }
         }
-    } else
+    }
+    else
     {
         console.warn(chalk.yellow("Skipped adding content pages to sitemap: 'contents/' folder not found."));
     }
