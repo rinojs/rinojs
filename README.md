@@ -21,20 +21,19 @@ npm i rinojs
 ```
 
 ## 📢 Notice
-### 🎉 Release version v2.5.0
+### 🎉 Release version v2.6.0
 Please use the latest version. Recommended to upgrade version of Rino after at least a day/a week after the release. So you don't have to deal with huge bug with new version. Because it is going to be tested in production level by development team after release.
+
+- Fixed development server bug for script, styles and public directory system
+
+#### Including update from v2.4.0 & v2.5.0
 - Restructured whole system
   - Better performance
   - Fixed development server problem
 - No longer need to create class
-
 ```
 import { devStaticSite, buildStaticSite } from '../src/index.js';
-
 ```
-
-#### Including update from v2.4.0
-
 - Removed preloading files
 - Added contents feature to static site generation (SSG)
 - Updated sitemap to work with contents
