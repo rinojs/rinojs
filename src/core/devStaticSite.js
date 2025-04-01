@@ -85,46 +85,69 @@ async function startServer (projectPath, port)
 {
     const app = express();
     app.use(cors());
+    app.use(express.static(path.join(projectPath, "public")));
 
-    app.get("/scripts/*.(js|mjs)", async (req, res) =>
+    app.get("/scripts/*.js", async (req, res) =>
     {
         const requestPath = req.path.replace("/scripts", "");
-        const exportPath = path.join(projectPath, "scripts/export", requestPath);
+        const jsPath = path.join(projectPath, "scripts/export", requestPath);
+        const tsPath = path.join(
+            projectPath,
+            "scripts/export",
+            path.basename(requestPath, path.extname(requestPath)) + ".ts"
+        );
 
         try
         {
-            if (await fileExists(exportPath))
+            if (await fileExists(jsPath))
             {
-                const ext = path.extname(exportPath);
-                const bundleFn = ext === ".ts" ? bundleTS : bundleJS;
-                const script = await bundleFn(exportPath, projectPath, path.basename(exportPath, ext));
+                const script = await bundleJS(jsPath, path.basename(jsPath, path.extname(jsPath)));
                 res.setHeader("Content-Type", "application/javascript");
                 res.send(script);
                 return;
             }
+            else if (await fileExists(tsPath))
+            {
+                const script = await bundleTS(tsPath, projectPath, path.basename(tsPath, path.extname(tsPath)));
+                res.setHeader("Content-Type", "application/javascript");
+                res.send(script);
+                return;
+            }
+
         }
         catch (err)
         {
             console.error("Script bundling error:", err);
+            return;
         }
-        res.status(404).send("Script not found");
+
+
+        res.status(404).send("File not found");
     });
 
     app.get("/styles/*.css", async (req, res) =>
     {
         const requestPath = req.path.replace("/styles", "");
-        const exportPath = path.join(projectPath, "styles/export", requestPath);
+        const stylePath = path.join(projectPath, "styles/export", requestPath);
+
         try
         {
-            const raw = await fsp.readFile(exportPath, "utf8");
-            const compiled = await bundleCSS(raw, path.dirname(exportPath));
-            res.setHeader("Content-Type", "text/css");
-            res.send(compiled);
+            if (await fileExists(stylePath))
+            {
+                const raw = await fsp.readFile(stylePath, "utf8");
+                const compiled = await bundleCSS(raw, path.dirname(stylePath));
+                res.setHeader("Content-Type", "text/css");
+                res.send(compiled);
+                return;
+            }
         }
         catch (err)
         {
             res.status(404).send("Style not found");
+            return;
         }
+
+        res.status(404).send("File not found");
     });
 
     app.get("/contents/*", async (req, res) =>
@@ -176,7 +199,8 @@ async function startServer (projectPath, port)
             let content = await buildComponent(pagePath, path.join(projectPath, "components"), path.join(projectPath, "mds"), [pagePath]);
             content = await injectReload(content, port);
             res.send(content);
-        } else
+        }
+        else
         {
             res.status(404).send("Page not found");
         }
