@@ -1,9 +1,10 @@
-import fs from 'fs';
+import fs from "fs";
+import fsp from "fs/promises";
 import path from 'path';
 import chalk from 'chalk';
 import { generateRSSFeedFile } from './rssFeed.js';
 import { generateAtomFeedFile } from './atomFeed.js';
-import { dirExists } from './fsHelper.js';
+import { dirExists, fileExists } from './fsHelper.js';
 
 export async function generateContentFeeds (projectPath, config)
 {
@@ -24,7 +25,7 @@ export async function generateContentFeeds (projectPath, config)
     const contentsDir = path.join(projectPath, 'contents');
     const distDir = path.resolve(projectPath, dist);
 
-    if (!fs.existsSync(contentsDir))
+    if (!await fileExists(contentsDir))
     {
         console.warn(chalk.yellow("Skipped feed generation: contents folder not found."));
         return;

@@ -21,11 +21,9 @@ npm i rinojs
 ```
 
 ## 📢 Notice
-### 🎉 Release version v2.7.0
+### 🎉 Release version v2.8.0
 Please use the latest version. Recommended to upgrade version of Rino after at least a day/a week after the release. So you don't have to deal with huge bug with new version. Because it is going to be tested in production level by development team after release.
 - Fixed bug bug for sitemap and feed
-
-#### Including update from v2.4.0 & v2.5.0 & v2.6.0 & v2.7.0
 - Added our logo message
 - Fixed development server bug for script, styles and public directory system
 - Restructured whole system

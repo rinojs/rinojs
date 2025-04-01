@@ -1,6 +1,7 @@
+import fs from 'fs';
+import fsp from "fs/promises";
 import path from 'path';
 import chalk from 'chalk';
-import fs from 'fs';
 import { generateSitemapFile } from './sitemap.js';
 import { dirExists, getFilesRecursively } from './fsHelper.js';
 
