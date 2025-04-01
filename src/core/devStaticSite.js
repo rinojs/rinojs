@@ -210,6 +210,7 @@ async function startServer (projectPath, port)
 
     server.listen(port, () =>
     {
+        console.log(defaultMessage);
         console.log(`
 Server listening on port ${port}
 Development: ${chalk.blueBright(`http://localhost:` + port)}
