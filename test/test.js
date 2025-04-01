@@ -1,14 +1,13 @@
-import { Rino } from '../src/index.js';
+import { devStaticSite } from '../src/index.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
-async function dev()
+async function dev ()
 {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = dirname(__filename);
-    let rino = new Rino();
-    await rino.dev(path.resolve(__dirname, "./"));
+    await devStaticSite(path.resolve(__dirname, "./"));
 }
 
 dev();
