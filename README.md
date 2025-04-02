@@ -21,12 +21,11 @@ npm i rinojs
 ```
 
 ## 📢 Notice
-### 🎉 Release version v2.9.0
-Please use the latest version. Recommended to upgrade version of Rino after at least a day/a week after the release. So you don't have to deal with huge bug with new version. Because it is going to be tested in production level by development team after release.
-- Fixed bug for content system
+### 🎉 Release version v2.10.0
+Please use the latest version. Recommended to upgrade version of Rino after at least a day or a week after the release. So you don't have to deal with huge bug with new version. Because it is going to be tested in production level by development team after release.
+- Made content data available in the templating code. They are provided as string from process.argv. Check below code how the content data is used for content pagination.
 
 ---
-#### v2.4.0 - current version changes
 
 - Fixed bug for sitemap and feed
 - Added our logo message
@@ -78,12 +77,26 @@ Content body
       {{ content.body }}
     </article>
     <nav>
-      <div>
-        <a href="{{ content.prevLink }}">{{ content.prevName }}</a>
-      </div>
-      <div>
-        <a href="{{ content.nextLink }}">{{ content.nextName }}</a>
-      </div>
+    <script @type="js" type="text/javascript">
+      const args = process.argv;
+      const contentDataString = args[args.length - 1];
+      const contentData = JSON.parse(contentDataString);
+
+      if(contentData.prevLink) {
+        console.log(`
+          <div>
+            <a href="{{ content.prevLink }}">{{ content.prevName }}</a>
+          </div>
+        `);
+      }
+      if(contentData.nextLink) {
+        console.log(`
+          <div>
+            <a href="{{ content.nextLink }}">{{ content.nextName }}</a>
+          </div>
+        `);
+      }
+    </script>
     </nav>
   </main>
 </body>
@@ -101,21 +114,43 @@ Content body
   <main>
     <h1>Content List Page</h1>
     <ol>
-      <li><a href="{{ contentList.link1 }}">{{ contentList.name1 }}</a></li>
-      <li><a href="{{ contentList.link2 }}">{{ contentList.name2 }}</a></li>
-      <li><a href="{{ contentList.link3 }}">{{ contentList.name3 }}</a></li>
-      <li><a href="{{ contentList.link4 }}">{{ contentList.name4 }}</a></li>
-      <li><a href="{{ contentList.link5 }}">{{ contentList.name5 }}</a></li>
-      <li><a href="{{ contentList.link6 }}">{{ contentList.name6 }}</a></li>
-      <li><a href="{{ contentList.link7 }}">{{ contentList.name7 }}</a></li>
-      <li><a href="{{ contentList.link8 }}">{{ contentList.name8 }}</a></li>
-      <li><a href="{{ contentList.link9 }}">{{ contentList.name9 }}</a></li>
-      <li><a href="{{ contentList.link10 }}">{{ contentList.name10 }}</a></li>
+      <script @type="js" type="text/javascript">
+        var args = process.argv;
+        var contentListDataString = args[args.length - 1];
+        var contentListData = JSON.parse(contentListDataString);
+        var contentList = contentListData.contentList;
+
+        for (let i = 0; i < contentList.length; i++) {
+          const item = contentList[i];
+          if (item?.name && item?.link) {
+            console.log(`<li><a href="${item.link}">${item.name}</a></li>`);
+          }
+        }
+      </script>
     </ol>
 
     <nav>
-      <a href="{{ contentList.prevLink }}">← Previous Page</a> |
-      <a href="{{ contentList.nextLink }}">Next Page →</a>
+      <script @type="js" type="text/javascript">
+        var args = process.argv;
+        var contentListDataString = args[args.length - 1];
+        var contentListData = JSON.parse(contentListDataString);
+        var pagination = contentListData.pagination;
+
+        if(pagination.prevLink) {
+          console.log(`
+            <div>
+              <a href="{{ pagination.prevLink }}">Previous List</a>
+            </div>
+          `);
+        }
+        if(pagination.nextLink) {
+          console.log(`
+            <div>
+              <a href="{{ pagination.nextLink }}">Next List</a>
+            </div>
+          `);
+        }
+      </script>
     </nav>
   </main>
 </body>
