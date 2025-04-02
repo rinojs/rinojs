@@ -8,21 +8,43 @@
   <main>
     <h1>Content List Page</h1>
     <ol>
-      <li><a href="{{ contentList.link1 }}">{{ contentList.name1 }}</a></li>
-      <li><a href="{{ contentList.link2 }}">{{ contentList.name2 }}</a></li>
-      <li><a href="{{ contentList.link3 }}">{{ contentList.name3 }}</a></li>
-      <li><a href="{{ contentList.link4 }}">{{ contentList.name4 }}</a></li>
-      <li><a href="{{ contentList.link5 }}">{{ contentList.name5 }}</a></li>
-      <li><a href="{{ contentList.link6 }}">{{ contentList.name6 }}</a></li>
-      <li><a href="{{ contentList.link7 }}">{{ contentList.name7 }}</a></li>
-      <li><a href="{{ contentList.link8 }}">{{ contentList.name8 }}</a></li>
-      <li><a href="{{ contentList.link9 }}">{{ contentList.name9 }}</a></li>
-      <li><a href="{{ contentList.link10 }}">{{ contentList.name10 }}</a></li>
+      <script @type="js" type="text/javascript">
+        var args = process.argv;
+        var contentListDataString = args[args.length - 1];
+        var contentListData = JSON.parse(contentListDataString);
+        var contentList = contentListData.contentList;
+
+        for (let i = 0; i < contentList.length; i++) {
+          const item = contentList[i];
+          if (item?.name && item?.link) {
+            console.log(`<li><a href="${item.link}">${item.name}</a></li>`);
+          }
+        }
+      </script>
     </ol>
 
     <nav>
-      <a href="{{ contentList.prevLink }}">← Previous Page</a> |
-      <a href="{{ contentList.nextLink }}">Next Page →</a>
+      <script @type="js" type="text/javascript">
+        var args = process.argv;
+        var contentListDataString = args[args.length - 1];
+        var contentListData = JSON.parse(contentListDataString);
+        var pagination = contentListData.pagination;
+
+        if(pagination.prevLink) {
+          console.log(`
+            <div>
+              <a href="{{ pagination.prevLink }}">Previous List</a>
+            </div>
+          `);
+        }
+        if(pagination.nextLink) {
+          console.log(`
+            <div>
+              <a href="{{ pagination.nextLink }}">Next List</a>
+            </div>
+          `);
+        }
+      </script>
     </nav>
   </main>
 </body>

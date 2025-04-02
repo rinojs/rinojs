@@ -35,11 +35,16 @@ export async function buildContentList (contentListPath, contentsDir, pagePath, 
         prevLink: pageIndex > 1 ? `/contents-list/${category}/${category}-${pageIndex - 1}` : "",
         nextLink: pageIndex < totalPages ? `/contents-list/${category}/${category}-${pageIndex + 1}` : ""
     };
+    const contentListData = {
+        contentList: contentList,
+        pagination: pagination
+    }
+    const updatedArgs = [...args, JSON.stringify(contentListData)];
     const pageTemplate = await buildComponent(
         pagePath,
         componentsDir,
         mdsDir,
-        args
+        updatedArgs
     );
 
     return replaceContentListTags(pageTemplate, contentList, pagination);

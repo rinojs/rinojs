@@ -45,11 +45,12 @@ export async function buildContent (mdPath, pagePath, componentsDir, mdsDir, arg
             const htmlContent = mdit.render(removeCodeLWS(removeLWS(mdContent)));
             contentData.body = htmlContent;
             addPrevNextData(contentData, allFiles, currentFile, baseUrl);
+            const updatedArgs = [...args, JSON.stringify(contentData)];
             const pageTemplate = await buildComponent(
                 pagePath,
                 componentsDir,
                 mdsDir,
-                args
+                updatedArgs
             );
 
             return replaceContentTags(pageTemplate, contentData);
@@ -62,11 +63,12 @@ export async function buildContent (mdPath, pagePath, componentsDir, mdsDir, arg
             const contentData = {};
             contentData.body = htmlContent;
             addPrevNextData(contentData, allFiles, currentFile, baseUrl);
+            const updatedArgs = [...args, JSON.stringify(contentData)];
             const pageTemplate = await buildComponent(
                 pagePath,
                 componentsDir,
                 mdsDir,
-                args
+                updatedArgs
             );
 
             return replaceContentTags(pageTemplate, contentData);
@@ -78,11 +80,12 @@ export async function buildContent (mdPath, pagePath, componentsDir, mdsDir, arg
         const contentData = {};
         contentData.body = htmlContent;
         addPrevNextData(contentData, allFiles, currentFile, baseUrl);
+        const updatedArgs = [...args, JSON.stringify(contentData)];
         const pageTemplate = await buildComponent(
             pagePath,
             componentsDir,
             mdsDir,
-            args
+            updatedArgs
         );
 
         return replaceContentTags(pageTemplate, contentData);
