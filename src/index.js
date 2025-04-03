@@ -4,10 +4,10 @@ import { bundleJS } from "./core/bundleJS.js";
 import { bundleTS } from "./core/bundleTS.js";
 import { bundleCSS } from "./core/bundleCSS.js";
 import { generateSitemap, generateSitemapFile } from "./core/sitemap.js";
-import { generateProjectSitemap } from "./core/projectSitemap.js";
+import { generateProjectSitemap, generateProjectSitemapFile } from "./core/projectSitemap.js";
 import { generateRSSFeed, generateRSSFeedFile } from "./core/rssFeed.js";
 import { generateAtomFeed, generateAtomFeedFile } from "./core/atomFeed.js";
-import { generateContentFeeds } from './core/projectFeed.js';
+import { generateProjectFeedFiles, generateProjectRSSFeed, generateProjectAtomFeed } from './core/projectFeed.js';
 import { copyFiles } from "./core/copyFiles.js";
 import { buildSSRComponent } from "./core/ssr/ssrComponent.js";
 import { fileExists, dirExists, getFilesRecursively } from "./core/fsHelper.js"
@@ -31,11 +31,14 @@ export
   generateSitemap,
   generateSitemapFile,
   generateProjectSitemap,
+  generateProjectSitemapFile,
   generateRSSFeed,
   generateRSSFeedFile,
   generateAtomFeed,
   generateAtomFeedFile,
-  generateContentFeeds,
+  generateProjectFeedFiles,
+  generateProjectRSSFeed,
+  generateProjectAtomFeed,
   buildContent,
   buildContentList,
   devStaticSite,

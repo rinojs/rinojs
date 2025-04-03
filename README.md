@@ -21,23 +21,20 @@ npm i rinojs
 ```
 
 ## 📢 Notice
-### 🎉 Release version v2.10.0
+### 🎉 Release version v2.11.0
 Please use the latest version. Recommended to upgrade version of Rino after at least a day or a week after the release. So you don't have to deal with huge bug with new version. Because it is going to be tested in production level by development team after release.
-- Made content data available in the templating code. They are provided as string from process.argv. Check below code how the content data is used for content pagination.
+
+- Now content data is available from content list page
+- Added sitemap available from development server
+- Added atom feed available from development server
+- Added rss feed available from development server
+- Some function names changed. Update them manually or create new project and move your code manually.
 
 ---
-
-- Fixed bug for sitemap and feed
-- Added our logo message
-- Fixed development server bug for script, styles and public directory system
-- Restructured whole system
-  - Better performance
-  - Fixed development server problem
 - No longer need to create class
 ```
-import { devStaticSite, buildStaticSite } from '../src/index.js';
+import { devStaticSite, buildStaticSite } from 'rinojs';
 ```
-- Removed preloading files
 - Added contents feature to static site generation (SSG)
 - Updated sitemap to work with contents
 - Added RSS/ATOM feed feature
@@ -57,9 +54,8 @@ Top of Markdown content can contains data. It must be commented and JSON file fo
   "description": "Description of content",
   "published": "1/1/2025"
 }
-
-Content body
 -->
+Content body
 ```
 `./content-theme/content.html`:
 ```

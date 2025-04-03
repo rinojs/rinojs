@@ -18,9 +18,11 @@ import { buildContent } from "./content.js";
 import { buildContentList } from "./contentList.js";
 import { loadConfig } from "./configLoader.js";
 import { fileExists } from "./fsHelper.js"
-
+import { generateProjectSitemap } from './projectSitemap.js';
+import { generateProjectAtomFeed, generateProjectRSSFeed } from './projectFeed.js';
 
 let wss = null;
+let config = null;
 
 export async function devStaticSite (projectPath)
 {
@@ -30,7 +32,7 @@ export async function devStaticSite (projectPath)
         return;
     }
 
-    const config = await loadConfig(projectPath);
+    config = await loadConfig(projectPath);
     const port = config.port || 3000;
     const resolvedPort = await findPort(port);
     const dirs = {
@@ -189,6 +191,28 @@ async function startServer (projectPath, port)
         content = await injectReload(content, port);
         res.send(content);
     });
+
+    app.get("/sitemap.xml", async (req, res) =>
+    {
+        const content = await generateProjectSitemap(projectPath, config);
+        res.setHeader("Content-Type", "application/xml");
+        res.send(content);
+    });
+
+    app.get("/rss.xml", async (req, res) =>
+    {
+        const content = await generateProjectRSSFeed(projectPath, config);
+        res.setHeader("Content-Type", "application/xml");
+        res.send(content);
+    });
+
+    app.get("/atom.xml", async (req, res) =>
+    {
+        const content = await generateProjectAtomFeed(projectPath, config);
+        res.setHeader("Content-Type", "application/xml");
+        res.send(content);
+    });
+
 
     app.get("*", async (req, res) =>
     {
