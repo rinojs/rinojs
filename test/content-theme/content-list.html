@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Content List</title>
 </head>
+
 <body>
   <main>
     <h1>Content List Page</h1>
@@ -14,10 +16,12 @@
         var contentListData = JSON.parse(contentListDataString);
         var contentList = contentListData.contentList;
 
-        for (let i = 0; i < contentList.length; i++) {
+        for (let i = 0; i < contentList.length; i++)
+        {
           const item = contentList[i];
-          if (item?.name && item?.link) {
-            console.log(`<li><a href="${item.link}">${item.name}</a></li>`);
+          if (item?.title && item?.link)
+          {
+            console.log(`<li><a href="${item.link}">${item.title}</a></li>`);
           }
         }
       </script>
@@ -30,14 +34,16 @@
         var contentListData = JSON.parse(contentListDataString);
         var pagination = contentListData.pagination;
 
-        if(pagination.prevLink) {
+        if (pagination.prevLink)
+        {
           console.log(`
             <div>
               <a href="{{ pagination.prevLink }}">Previous List</a>
             </div>
           `);
         }
-        if(pagination.nextLink) {
+        if (pagination.nextLink)
+        {
           console.log(`
             <div>
               <a href="{{ pagination.nextLink }}">Next List</a>
@@ -48,4 +54,5 @@
     </nav>
   </main>
 </body>
+
 </html>

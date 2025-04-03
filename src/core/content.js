@@ -118,7 +118,8 @@ function addPrevNextData (contentData, allFiles, currentFile, baseUrl)
         const prevFile = allFiles[currentIndex - 1];
         contentData.prevLink = getLink(prevFile);
         contentData.prevName = getName(prevFile);
-    } else
+    }
+    else
     {
         contentData.prevLink = "";
         contentData.prevName = "";
@@ -129,7 +130,8 @@ function addPrevNextData (contentData, allFiles, currentFile, baseUrl)
         const nextFile = allFiles[currentIndex + 1];
         contentData.nextLink = getLink(nextFile);
         contentData.nextName = getName(nextFile);
-    } else
+    }
+    else
     {
         contentData.nextLink = "";
         contentData.nextName = "";
