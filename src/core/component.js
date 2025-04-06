@@ -17,7 +17,7 @@ export async function buildComponent (componentPath, componentsDir, mdsDir, args
 
     const content = await fsp.readFile(componentPath, "utf-8");
     const attributeRegex = /(@?)([a-zA-Z]+)\s*=\s*(['"])(.*?)\3/g;
-    const tagRegex = /<(component|script)\s+([^>]+?)(?:\s*(?:>\s*(.*?)\s*<\/script>|\/>))/gs;
+    const tagRegex = /<(component|script)\s+([^>]+?)(?:\s*\/>|>(.*?)<\/\1\s*>)/gs;
     let result = "";
     let cursor = 0;
     let match;
@@ -27,7 +27,7 @@ export async function buildComponent (componentPath, componentsDir, mdsDir, args
       result += content.slice(cursor, match.index);
       cursor = tagRegex.lastIndex;
 
-      const [fullMatch, tagType, attributesString, innerContent] = match;
+      const [fullMatch, tagType, attributesString, innerContent = ""] = match;
       const attributes = parseAttributes(attributesString, attributeRegex);
 
       if (tagType === "script")
