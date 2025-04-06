@@ -21,9 +21,11 @@ npm i rinojs
 ```
 
 ## 📢 Notice
-### 🎉 Release version v2.11.0
+### 🎉 Release version v2.11.1
 Please use the latest version. Recommended to upgrade version of Rino after at least a day or a week after the release. So you don't have to deal with huge bug with new version. Because it is going to be tested in production level by development team after release.
+- Added support for `<component></component>`, so it can work with many editors and formatters.
 
+### 🎉 Release version v2.11.0
 - Now content data is available from content list page
 - Added sitemap available from development server
 - Added atom feed available from development server

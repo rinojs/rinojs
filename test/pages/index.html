@@ -1,28 +1,20 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <script src="/scripts/testTS.js"></script>
-    <link rel="stylesheet" href="/styles/test.css">
-    <link rel="stylesheet" href="/bulma.min.css">
-  </head>
-  <body>
-    <img src="/images/f16g5sg.avif">
-    <button class="button">Button</button>
-    test index!!
-    <component
-      @path="button"
-      @tag="button"
-      type="button"
-      onclick="alert('Hello world!')"
-    />
-    <component @path="footer" @tag="footer" />
-    <script
-      @path="test"
-      @tag="section"
-      @type="md"
-      type="text/markdown"
-    ></script>
-    <script @type="md" style="color: red" type="text/markdown">
+
+<head>
+  <script src="/scripts/testTS.js"></script>
+  <link rel="stylesheet" href="/styles/test.css">
+  <link rel="stylesheet" href="/bulma.min.css">
+</head>
+
+<body>
+  <img src="/images/f16g5sg.avif">
+  <button class="button">Button</button>
+  test index!!
+  <component @path="button" @tag="button" type="button" onclick="alert('Hello world!')" />
+  <component @path="footer" @tag="footer"></component>
+  <script @path="test" @tag="section" @type="md" type="text/markdown"></script>
+  <script @type="md" style="color: red" type="text/markdown">
       ## asdasd
 
       asdasd
@@ -51,16 +43,17 @@
       <\\/script>
       ```
     </script>
-    <script @type="ts" type="text/typescript">
+  <script @type="ts" type="text/typescript">
       // This is for templating html content
       let world: string = "Hello world! from typescript!";
       console.log(world);
     </script>
-    <script @type="js" type="text/javascript">
-      import os from "os";
-      // This is for templating html content
-      console.log("Hello world! from javascript!");
-      console.log(os.type());
-    </script>
-  </body>
+  <script @type="js" type="text/javascript">
+    import os from "os";
+    // This is for templating html content
+    console.log("Hello world! from javascript!");
+    console.log(os.type());
+  </script>
+</body>
+
 </html>
