@@ -93,7 +93,7 @@ async function startServer (projectPath, port)
 
     app.get("/scripts/*.js", async (req, res) =>
     {
-        const requestPath = req.path.replace("/scripts", "");
+        const requestPath = decodeURIComponent(req.path).replace("/scripts", "");
         const jsPath = path.join(projectPath, "scripts/export", requestPath);
         const tsPath = path.join(
             projectPath,
@@ -131,7 +131,7 @@ async function startServer (projectPath, port)
 
     app.get("/styles/*.css", async (req, res) =>
     {
-        const requestPath = req.path.replace("/styles", "");
+        const requestPath = decodeURIComponent(req.path).replace("/styles", "");
         const stylePath = path.join(projectPath, "styles/export", requestPath);
 
         try
@@ -157,7 +157,8 @@ async function startServer (projectPath, port)
     app.get("/contents/*", async (req, res) =>
     {
         const slug = req.path.replace(/^\/contents\//, "");
-        const [category, ...rest] = slug.split("/");
+        const decodedSlug = decodeURIComponent(slug);
+        const [category, ...rest] = decodedSlug.split("/");
         const rawName = decodeURIComponent(rest.join("/"));
         const mdPath = path.join(projectPath, "contents", category, rawName + ".md");
         if (!await fileExists(mdPath)) return res.status(404).send("Content not found");
@@ -177,7 +178,8 @@ async function startServer (projectPath, port)
     app.get("/contents-list/*", async (req, res) =>
     {
         const slug = req.path.replace(/^\/contents-list\//, "");
-        const [category, categoryPage] = slug.split("/");
+        const decodedSlug = decodeURIComponent(slug);
+        const [category, categoryPage] = decodedSlug.split("/");
         const pagePath = path.join(projectPath, "content-theme", "content-list.html");
 
         let content = await buildContentList(
@@ -216,7 +218,8 @@ async function startServer (projectPath, port)
 
     app.get("*", async (req, res) =>
     {
-        let reqPath = req.path.endsWith("/") ? req.path + "index.html" : req.path;
+        let decodedPath = decodeURIComponent(req.path);
+        let reqPath = decodedPath.endsWith("/") ? decodedPath + "index.html" : decodedPath;
         let pagePath = path.join(projectPath, "pages", reqPath);
         if (!pagePath.endsWith(".html")) pagePath += ".html";
 

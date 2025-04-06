@@ -21,8 +21,11 @@ npm i rinojs
 ```
 
 ## 📢 Notice
-### 🎉 Release version v2.11.1
+### 🎉 Release version v2.11.2
 Please use the latest version. Recommended to upgrade version of Rino after at least a day or a week after the release. So you don't have to deal with huge bug with new version. Because it is going to be tested in production level by development team after release.
+- Updated development server to accept spaces for file and directory name in URL.
+
+### 🎉 Release version v2.11.1
 - Added support for `<component></component>`, so it can work with many editors and formatters.
 
 ### 🎉 Release version v2.11.0
