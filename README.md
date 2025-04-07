@@ -21,8 +21,15 @@ npm i rinojs
 ```
 
 ## 📢 Notice
-### 🎉 Release version v2.11.2
+### 🎉 Release version v2.12.0
 Please use the latest version. Recommended to upgrade version of Rino after at least a day or a week after the release. So you don't have to deal with huge bug with new version. Because it is going to be tested in production level by development team after release.
+- Now content system contains data of nearby posts. So it can be used for building content navigation from content page.
+- Now data from content and content list system can be accessible through syntax
+```
+content.someting[0].something
+```
+
+### 🎉 Release version v2.11.2
 - Updated development server to accept spaces for file and directory name in URL.
 
 ### 🎉 Release version v2.11.1

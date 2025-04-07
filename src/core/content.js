@@ -44,7 +44,10 @@ export async function buildContent (mdPath, pagePath, componentsDir, mdsDir, arg
             const mdContent = fileContent.slice(jsonMatch[0].length);
             const htmlContent = mdit.render(removeCodeLWS(removeLWS(mdContent)));
             contentData.body = htmlContent;
-            addPrevNextData(contentData, allFiles, currentFile, baseUrl);
+            contentData.urlPath = `/contents/${category}/${currentFile.replace(".md", "")}`;
+
+            await addNearbyContentData(contentData, allFiles, currentFile, baseUrl, contentDir);
+
             const updatedArgs = [...args, JSON.stringify(contentData)];
             const pageTemplate = await buildComponent(
                 pagePath,
@@ -62,7 +65,10 @@ export async function buildContent (mdPath, pagePath, componentsDir, mdsDir, arg
             const htmlContent = mdit.render(removeCodeLWS(removeLWS(fileContent)));
             const contentData = {};
             contentData.body = htmlContent;
-            addPrevNextData(contentData, allFiles, currentFile, baseUrl);
+            contentData.urlPath = `/contents/${category}/${currentFile.replace(".md", "")}`;
+
+            await addNearbyContentData(contentData, allFiles, currentFile, baseUrl, contentDir);
+
             const updatedArgs = [...args, JSON.stringify(contentData)];
             const pageTemplate = await buildComponent(
                 pagePath,
@@ -79,7 +85,10 @@ export async function buildContent (mdPath, pagePath, componentsDir, mdsDir, arg
         const htmlContent = mdit.render(removeCodeLWS(removeLWS(fileContent)));
         const contentData = {};
         contentData.body = htmlContent;
-        addPrevNextData(contentData, allFiles, currentFile, baseUrl);
+        contentData.urlPath = `/contents/${category}/${currentFile.replace(".md", "")}`;
+
+        await addNearbyContentData(contentData, allFiles, currentFile, baseUrl, contentDir);
+
         const updatedArgs = [...args, JSON.stringify(contentData)];
         const pageTemplate = await buildComponent(
             pagePath,
@@ -94,48 +103,75 @@ export async function buildContent (mdPath, pagePath, componentsDir, mdsDir, arg
 
 function replaceContentTags (template, contentData)
 {
-    return template.replace(/{{\s*content\.(\w+)\s*}}/g, (match, key) =>
+    return template.replace(/{{\s*content\.([\w.\[\]"]+)\s*}}/g, (match, pathStr) =>
     {
-        if (contentData.hasOwnProperty(key))
+        try
         {
-            return contentData[key];
+            const safePath = pathStr.replace(/\[(\d+)]/g, '.$1');
+            const pathParts = safePath.split('.');
+            let value = contentData;
+
+            for (const part of pathParts)
+            {
+                if (value && Object.prototype.hasOwnProperty.call(value, part))
+                {
+                    value = value[part];
+                }
+                else
+                {
+                    return match;
+                }
+            }
+
+            return (typeof value === 'string' || typeof value === 'number') ? value : match;
         }
-        else
+        catch (e)
         {
             return match;
         }
     });
 }
 
-function addPrevNextData (contentData, allFiles, currentFile, baseUrl)
+async function addNearbyContentData (contentData, allFiles, currentFile, baseUrl, contentDir)
 {
     const currentIndex = allFiles.indexOf(currentFile);
-    const getName = (file) => file.replace(/^\d+-/, "").replace(/\.md$/, "");
     const getLink = (file) => baseUrl + file.replace(/\.md$/, "");
+    const getMetaFromFile = async (file) =>
+    {
+        const filePath = path.join(contentDir, file);
+        const meta = {
+            link: getLink(file)
+        };
 
-    if (currentIndex > 0)
+        try
+        {
+            const content = await fsp.readFile(filePath, "utf-8");
+            const jsonMatch = content.match(/^<!--\s*([\s\S]*?)\s*-->/);
+            if (jsonMatch)
+            {
+                const jsonData = JSON.parse(jsonMatch[1]);
+                Object.assign(meta, jsonData);
+            }
+        }
+        catch (e)
+        {
+        }
+
+        return meta;
+    };
+
+    const nearby = [];
+
+    const start = Math.max(0, currentIndex - 4);
+    const end = Math.min(allFiles.length, currentIndex + 5);
+
+    for (let i = start; i < end; i++)
     {
-        const prevFile = allFiles[currentIndex - 1];
-        contentData.prevLink = getLink(prevFile);
-        contentData.prevName = getName(prevFile);
-    }
-    else
-    {
-        contentData.prevLink = "";
-        contentData.prevName = "";
+        const file = allFiles[i];
+        const meta = await getMetaFromFile(file);
+        nearby.push(meta);
     }
 
-    if (currentIndex < allFiles.length - 1)
-    {
-        const nextFile = allFiles[currentIndex + 1];
-        contentData.nextLink = getLink(nextFile);
-        contentData.nextName = getName(nextFile);
-    }
-    else
-    {
-        contentData.nextLink = "";
-        contentData.nextName = "";
-    }
-
+    contentData.nearby = nearby;
     return contentData;
 }
