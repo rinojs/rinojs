@@ -72,22 +72,33 @@ export async function buildContentList (contentListPath, contentsDir, pagePath, 
     return replaceContentListTags(pageTemplate, contentList, pagination);
 }
 
-function replaceContentListTags (template, contentList, pagination = {})
+function replaceContentListTags (template, contentListData)
 {
-    return template.replace(/{{\s*contentList\.([a-zA-Z0-9_]+)(\d+)\s*}}|{{\s*contentList\.(prevLink|nextLink)\s*}}/g,
-        (match, key, indexStr, paginationKey) =>
+    return template.replace(/{{\s*contentList\.([\w.\[\]"]+)\s*}}/g, (match, pathStr) =>
+    {
+        try
         {
-            if (key && indexStr)
+            const safePath = pathStr.replace(/\[(\d+)]/g, '.$1');
+            const pathParts = safePath.split('.');
+            let value = contentListData;
+
+            for (const part of pathParts)
             {
-                const index = parseInt(indexStr, 10) - 1;
-                const item = contentList[index];
-                if (!item) return "";
-                return item[key] !== undefined ? item[key] : "";
+                if (value && Object.prototype.hasOwnProperty.call(value, part))
+                {
+                    value = value[part];
+                }
+                else
+                {
+                    return match;
+                }
             }
-            else if (paginationKey)
-            {
-                return pagination[paginationKey] || "";
-            }
+
+            return typeof value === 'string' || typeof value === 'number' ? value : match;
+        }
+        catch (e)
+        {
             return match;
-        });
+        }
+    });
 }
