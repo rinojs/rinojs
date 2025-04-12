@@ -13,7 +13,7 @@ export async function buildContent (mdPath, pagePath, componentsDir, mdsDir, arg
         return "Building content: Markdown file not found";
     }
 
-    const fileContent = await fsp.readFile(mdPath, "utf-8");
+    const fileContent = await fsp.readFile(mdPath, "utf8");
     const contentDir = path.dirname(mdPath);
     const allFiles = (await fsp.readdir(contentDir))
         .filter(f => f.endsWith(".md"))
@@ -145,7 +145,7 @@ async function addNearbyContentData (contentData, allFiles, currentFile, baseUrl
 
         try
         {
-            const content = await fsp.readFile(filePath, "utf-8");
+            const content = await fsp.readFile(filePath, "utf8");
             const jsonMatch = content.match(/^<!--\s*([\s\S]*?)\s*-->/);
             if (jsonMatch)
             {

@@ -34,7 +34,7 @@ export async function buildContentList (contentListPath, contentsDir, pagePath, 
     for (const file of selectedFiles)
     {
         const filePath = path.join(contentDir, file);
-        const content = await fsp.readFile(filePath, "utf-8");
+        const content = await fsp.readFile(filePath, "utf8");
         const jsonCommentRegex = /^<!--\s*([\s\S]*?)\s*-->\s*/;
         const jsonMatch = content.match(jsonCommentRegex);
 

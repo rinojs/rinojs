@@ -15,6 +15,7 @@ import { buildContent } from "./core/content.js";
 import { buildContentList } from "./core/contentList.js";
 import { buildStaticSite } from "./core/buildStaticSite.js";
 import { devStaticSite } from "./core/devStaticSite.js";
+import { startBackofficeServer } from "./core/backoffice/backoffice.js"
 
 export
 {
@@ -42,5 +43,6 @@ export
   buildContent,
   buildContentList,
   devStaticSite,
-  buildStaticSite
+  buildStaticSite,
+  startBackofficeServer
 }

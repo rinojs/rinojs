@@ -1,6 +1,6 @@
 {
   "name": "rinojs",
-  "version": "2.12.0",
+  "version": "2.13.0",
   "description": "Fast learning, preprocessing, intuitive web framework",
   "main": "dist/index.js",
   "bin": {
@@ -13,8 +13,10 @@
     "test-sitemap": "cd test && node sitemap.js",
     "test-feed": "cd test && node feed.js",
     "test-ssr": "cd test && node test-ssr.js",
+    "test-backoffice": "cd test && node backoffice.js",
     "pack": "node pack/index.js",
-    "build": "rollup -c"
+    "bundle": "rollup -c",
+    "release": "npm run pack && npm publish"
   },
   "repository": {
     "type": "git",
@@ -50,6 +52,7 @@
     "express": "^4.21.2",
     "fs-extra": "^11.3.0",
     "markdown-it": "^14.1.0",
+    "multer": "^1.4.5-lts.2",
     "rollup": "^4.35.0",
     "sharp": "^0.33.5",
     "totjs": "^2.0.1",

@@ -1,0 +1,264 @@
+body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    background-color: #f7f9fc;
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 220px;
+    background: #002244;
+    color: white;
+    padding: 1rem;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.sidebar h2 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.sidebar nav a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    border-radius: 4px;
+}
+
+.sidebar nav a:hover {
+    background-color: #004488;
+}
+
+.content {
+    flex: 1;
+    padding: 2rem;
+}
+
+#drop-zone {
+    border: 2px dashed #007bff;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    color: #555;
+    margin: 10px 0;
+    background-color: #f8f9fa;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+#drop-zone.dragover {
+    border-color: #0056b3;
+    background: rgba(0, 123, 255, 0.1);
+    color: #0056b3;
+}
+
+.output {
+    margin-top: 20px;
+    padding: 10px;
+    background: #f7f9fc;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    max-width: 500px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* === Markdown file list === */
+.markdown-file-list-section {
+    flex: 1;
+    min-width: 250px;
+    max-width: 300px;
+    overflow-y: auto;
+    overflow-x: auto;
+    height: 100%;
+    max-height: 80vh;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 0.5rem;
+    background-color: #ffffff;
+}
+
+.markdown-file-list {
+    max-height: 100%;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.markdown-file-list ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.markdown-file-list li {
+    margin: 4px 0;
+    padding: 6px 10px;
+    background: #f3f3f3;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.markdown-file-list li:hover {
+    background-color: #e0e0e0;
+}
+
+
+.image-file-list {
+    margin: 10px 0;
+    padding: 10px;
+    background: #f1f1f1;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    list-style: none;
+}
+
+.image-file-list li {
+    margin: 5px 0;
+}
+
+.editor-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.editor-section {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.editor-section .input-full {
+    max-width: 600px;
+}
+
+.editor-section input[type="text"],
+.editor-section input[type="datetime-local"],
+.editor-section textarea {
+    margin-bottom: 0.25rem;
+}
+
+.input-label {
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.input-full {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.button-group button {
+    padding: 0.5rem 1rem;
+    background-color: #0056b3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.button-group button:hover {
+    background-color: #004494;
+}
+
+.editor-box {
+    min-height: 500px;
+}
+
+.input-label {
+    font-weight: bold;
+    margin-top: 0.75rem;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.input-full,
+textarea.input-full {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+.secondary-button {
+    background-color: #e0e0e0;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    max-width: fit-content;
+}
+
+.secondary-button:hover {
+    background-color: #d0d0d0;
+}
+
+.sidebar-actions {
+    margin-top: 2rem;
+}
+
+.sidebar-actions button {
+    width: 100%;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    font-weight: bold;
+    border: none;
+    background-color: #004488;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.sidebar-actions button:hover {
+    background-color: #0066cc;
+}
+
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        box-shadow: none;
+    }
+
+    .sidebar nav a {
+        padding: 1rem;
+        text-align: center;
+    }
+}

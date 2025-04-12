@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Compression</title>
+  <link rel="stylesheet" href="/backoffice/css/style.css" />
+</head>
+
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <h2>Backoffice</h2>
+      <nav>
+        <a href="/">Markdown Editor</a>
+        <a href="/image-compression.html">Image Compression</a>
+        <div class="sidebar-actions">
+          <button onclick="runScript('dev')">▶️ Dev Server</button>
+          <button onclick="runScript('generate-all')">✨ Generate all</button>
+          <button onclick="runScript('generate-sitemap')">🌐 Generate website with sitemap</button>
+          <button onclick="runScript('generate')">📦 Generate webiste</button>
+          <button onclick="runScript('sitemap')">🗺️ Generate sitemap</button>
+          <button onclick="runScript('feed')">📡 Generate feed</button>
+        </div>
+      </nav>
+    </aside>
+    <main class="content">
+      <h1>Image Compressor</h1>
+      <form id="converter-form">
+        <label for="output-dir">Output Directory:</label>
+        <input type="text" id="output-dir" value="./public/images/" required />
+
+        <label for="quality">Quality (0-100):</label>
+        <input type="number" id="quality" min="0" max="100" value="70" required />
+
+        <div id="drop-zone">Drag and drop images here or click to upload</div>
+        <ul id="file-list" class="image-file-list"></ul>
+        <input type="file" id="file-input" multiple accept="image/*" style="display: none" />
+
+        <button type="submit">Convert Images</button>
+      </form>
+
+      <div class="output" id="output"></div>
+    </main>
+  </div>
+
+  <script src="/backoffice/js/image-compression.js"></script>
+</body>
+
+</html>

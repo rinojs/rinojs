@@ -15,7 +15,7 @@ export async function buildComponent (componentPath, componentsDir, mdsDir, args
       return "Budiling component: HTML file not found";
     }
 
-    const content = await fsp.readFile(componentPath, "utf-8");
+    const content = await fsp.readFile(componentPath, "utf8");
     const attributeRegex = /(@?)([a-zA-Z]+)\s*=\s*(['"])(.*?)\3/g;
     const tagRegex = /<(component|script)\s+([^>]+?)(?:\s*\/>|>(.*?)<\/\1\s*>)/gs;
     let result = "";

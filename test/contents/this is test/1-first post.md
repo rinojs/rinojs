@@ -1,7 +1,8 @@
 <!--
 {
   "title": "Welcome to the Blog",
-  "published": "2025-01-01"
+  "time": "2025-04-12T10:28:00.000Z",
+  "description": "Hello World This is the first post on our blog! Stay tuned for more awesome content...."
 }
 -->
 

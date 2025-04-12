@@ -58,7 +58,7 @@ export async function generateSitemapFile (list, filename)
 
         result += `</urlset>`;
 
-        await fs.promises.writeFile(filename, result);
+        await fs.promises.writeFile(filename, result, "utf8");
 
         return true;
     } catch (error)
