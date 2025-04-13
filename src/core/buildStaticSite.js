@@ -50,6 +50,26 @@ export async function buildStaticSite (projectPath)
 Public files are copied to ${dirs.dist}
     `));
 
+    const categoryLinks = {};
+
+    if (await dirExists(dirs.contents))
+    {
+        const categoryDirs = (await fsp.readdir(dirs.contents, { withFileTypes: true }))
+            .filter(dirent => dirent.isDirectory())
+            .map(dirent => dirent.name);
+
+        for (const category of categoryDirs)
+        {
+            const categoryDir = path.join(dirs.contents, category);
+            const files = (await fsp.readdir(categoryDir)).filter(f => f.endsWith(".md"));
+            if (files.length > 0)
+            {
+                const path = `/contents-list/${category}/${category}-1`;
+                categoryLinks[category] = path;
+            }
+        }
+    }
+
     const pages = await getFilesRecursively(dirs.pages, [".html"]);
 
     for (const pagePath of pages)
@@ -63,11 +83,16 @@ Public files are copied to ${dirs.dist}
             await fsp.mkdir(distDir, { recursive: true });
         }
 
+        const pageArgs = {
+            pagePath: pagePath,
+            categoryLinks: categoryLinks
+        }
+
         const pageContent = await buildComponent(
             pagePath,
             dirs.components,
             dirs.mds,
-            [pagePath]
+            [JSON.stringify(pageArgs)]
         );
 
         await fsp.writeFile(distPagePath, pageContent, "utf8");
@@ -160,7 +185,11 @@ Public files are copied to ${dirs.dist}
             {
                 const relativePath = path.relative(dirs.contents, mdPath);
                 const category = relativePath.split(path.sep)[0];
-                const html = await buildContent(mdPath, contentTemplatePath, dirs.components, dirs.mds, [contentTemplatePath]);
+                const pageArgs = {
+                    pagePath: contentTemplatePath,
+                    categoryLinks: categoryLinks
+                }
+                const html = await buildContent(mdPath, contentTemplatePath, dirs.components, dirs.mds, [JSON.stringify(pageArgs)]);
 
                 const outputPath = path.join(
                     dirs.dist,
@@ -194,6 +223,10 @@ Public files are copied to ${dirs.dist}
                 for (let pageIndex = 1; pageIndex <= pageCount; pageIndex++)
                 {
                     const contentListPath = `${category}-${pageIndex}`;
+                    const pageArgs = {
+                        pagePath: contentListTemplatePath,
+                        categoryLinks: categoryLinks
+                    }
                     const html = await buildContentList(
                         contentListPath,
                         dirs.contents,
@@ -201,7 +234,7 @@ Public files are copied to ${dirs.dist}
                         dirs.components,
                         dirs.mds,
                         10,
-                        [contentListTemplatePath]
+                        [JSON.stringify(pageArgs)]
                     );
 
                     const outputPath = path.join(
