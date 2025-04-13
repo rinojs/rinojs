@@ -245,6 +245,17 @@ textarea.input-full {
 }
 
 
+.status-message {
+    display: none;
+    color: green;
+    font-weight: bold;
+    margin-top: 1rem;
+}
+
+.status-message.visible {
+    display: block;
+}
+
 @media (max-width: 768px) {
     .container {
         flex-direction: column;

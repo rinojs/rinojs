@@ -99,7 +99,10 @@ async function saveFile ()
     }
     else
     {
-        alert("Saved!");
+        const statusEl = document.getElementById("status-message");
+        statusEl.textContent = "Saved!";
+        statusEl.classList.add("visible");
+        setTimeout(() => statusEl.classList.remove("visible"), 3000);
         loadCategories();
     }
 }

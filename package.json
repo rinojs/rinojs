@@ -1,6 +1,6 @@
 {
   "name": "rinojs",
-  "version": "2.13.0",
+  "version": "2.13.1",
   "description": "Fast learning, preprocessing, intuitive web framework",
   "main": "dist/index.js",
   "bin": {
@@ -8,12 +8,14 @@
   },
   "type": "module",
   "scripts": {
-    "test": "cd test && node test.js",
-    "test-generate": "cd test && node generate.js",
-    "test-sitemap": "cd test && node sitemap.js",
-    "test-feed": "cd test && node feed.js",
-    "test-ssr": "cd test && node test-ssr.js",
-    "test-backoffice": "cd test && node backoffice.js",
+    "test-cp": "npx cypress open",
+    "test-pw": "npx playwright test",
+    "test-dev": "cd test-project && node dev.js",
+    "test-generate": "cd test-project && node generate.js",
+    "test-sitemap": "cd test-project && node sitemap.js",
+    "test-feed": "cd test-project && node feed.js",
+    "test-ssr": "cd test-project && node test-ssr.js",
+    "test-backoffice": "cd test-project && node backoffice.js",
     "pack": "node pack/index.js",
     "bundle": "rollup -c",
     "release": "npm run pack && npm publish"
@@ -59,5 +61,10 @@
     "tslib": "^2.8.1",
     "typescript": "^5.8.2",
     "ws": "^8.18.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.1",
+    "cypress": "^14.3.0",
+    "playwright": "^1.51.1"
   }
 }

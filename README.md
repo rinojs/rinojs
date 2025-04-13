@@ -21,8 +21,12 @@ npm i rinojs
 ```
 
 ## 📢 Notice
-### 🎉 Release version v2.13.0
+### 🎉 Release version v2.13.1
 Please use the latest version. Recommended to upgrade version of Rino after at least a day or a week after the release. So you don't have to deal with huge bug with new version. Because it is going to be tested in production level by development team after release.
+- Added error handling for content system
+- Added Cypress and Playwright testing for backoffice
+
+### 🎉 Release version v2.13.0
 - Added backoffice that works with contents.
 - Corrected encoding value for IO.
 - Fixed code to skip 404 page from sitemap
@@ -73,6 +77,24 @@ Development Build System is changed to the `server side rendering` with memory d
 
 ```
 
+## 🕵️ Test
+
+### E2E Test
+Right now end to end testing is implemented for test backoffice website with cypresss and playright.
+Both can be used to test backoffice website by:
+#### Cypress:
+```
+npm run test-cp
+```
+Which is `npx cypress open`
+#### Playwright
+```
+npm run test-pw
+```
+Which is `npx playwright test`
+
+### Unit Test
+I am thinking of using `jest`.
 ## 📖 Documentation
 
 [Official Website](https://rinojs.org/)

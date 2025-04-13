@@ -184,6 +184,12 @@ export async function startBackofficeServer (projectPath)
         try
         {
             const filePath = path.resolve(projectPath, "contents", req.query.path);
+
+            if (!filePath.endsWith('.md'))
+            {
+                return res.status(400).json({ error: "Only .md files can be deleted." });
+            }
+
             await fsp.unlink(filePath);
             res.json({ message: "Deleted successfully." });
         }
