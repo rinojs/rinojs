@@ -21,8 +21,11 @@ npm i rinojs
 ```
 
 ## 📢 Notice
-### 🎉 Release version v2.13.1
+### 🎉 Release version v2.13.2
 Please use the latest version. Recommended to upgrade version of Rino after at least a day or a week after the release. So you don't have to deal with huge bug with new version. Because it is going to be tested in production level by development team after release.
+- Fixed npmignore which removes cypress config from the package
+
+### 🎉 Release version v2.13.1
 - Added error handling for content system
 - Added Cypress and Playwright testing for backoffice
 

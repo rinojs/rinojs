@@ -4,7 +4,7 @@ tests/
 cypress/
 test-project/
 test-results/
-cypress.config.js/
+cypress.config.js
 src/
 .git/
 .editorconfig
