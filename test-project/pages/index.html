@@ -43,6 +43,24 @@
       <\\/script>
       ```
     </script>
+
+  <script @type="js" type="text/javascript">
+    const args = JSON.parse(process.argv[1]);
+    const categoryLinks = args.categoryLinks;
+
+    console.log("Category Links:");
+    for (const [category, link] of Object.entries(categoryLinks))
+    {
+      console.log(`${category}: ${link}`);
+    }
+
+    console.log("<nav><ul>");
+    for (const [category, link] of Object.entries(categoryLinks))
+    {
+      console.log(`<li><a href="${link}">${category}</a></li>`);
+    }
+    console.log("</ul></nav>");
+  </script>
   <script @type="ts" type="text/typescript">
       // This is for templating html content
       let world: string = "Hello world! from typescript!";

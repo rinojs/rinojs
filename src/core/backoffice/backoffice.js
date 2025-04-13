@@ -42,7 +42,11 @@ export async function startBackofficeServer (projectPath)
             await fsp.mkdir(outputDir, { recursive: true });
 
             const parsedName = path.parse(req.file.originalname);
-            const fileName = `${parsedName.name}.webp`;
+            const baseName = parsedName.name
+                .toLowerCase()
+                .replace(/\s+/g, "-")
+                .replace(/[^a-z0-9-_]/g, "");
+            const fileName = `${baseName}.webp`;
             const fullPath = path.join(outputDir, fileName);
 
             await sharp(req.file.buffer)

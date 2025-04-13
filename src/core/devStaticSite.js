@@ -17,7 +17,7 @@ import { bundleCSS } from "./bundleCSS.js";
 import { buildContent } from "./content.js";
 import { buildContentList } from "./contentList.js";
 import { loadConfig } from "./configLoader.js";
-import { fileExists } from "./fsHelper.js"
+import { fileExists, dirExists } from "./fsHelper.js"
 import { generateProjectSitemap } from './projectSitemap.js';
 import { generateProjectAtomFeed, generateProjectRSSFeed } from './projectFeed.js';
 
@@ -156,6 +156,27 @@ async function startServer (projectPath, port)
 
     app.get("/contents/*", async (req, res) =>
     {
+        const categoryLinks = {};
+        const contentDir = path.join(projectPath, "contents");
+
+        if (await dirExists(contentDir))
+        {
+            const categoryDirs = (await fsp.readdir(contentDir, { withFileTypes: true }))
+                .filter(dirent => dirent.isDirectory())
+                .map(dirent => dirent.name);
+
+            for (const category of categoryDirs)
+            {
+                const categoryDir = path.join(contentDir, category);
+                const files = (await fsp.readdir(categoryDir)).filter(f => f.endsWith(".md"));
+                if (files.length > 0)
+                {
+                    const path = `/contents-list/${category}/${category}-1`;
+                    categoryLinks[category] = path;
+                }
+            }
+        }
+
         const slug = req.path.replace(/^\/contents\//, "");
         const decodedSlug = decodeURIComponent(slug);
         const [category, ...rest] = decodedSlug.split("/");
@@ -164,12 +185,18 @@ async function startServer (projectPath, port)
         if (!await fileExists(mdPath)) return res.status(404).send("Content not found");
 
         const pagePath = path.join(projectPath, "content-theme", "content.html");
+
+        const pageArgs = {
+            pagePath: pagePath,
+            categoryLinks: categoryLinks
+        }
+
         let content = await buildContent(
             mdPath,
             pagePath,
             path.join(projectPath, "components"),
             path.join(projectPath, "mds"),
-            [pagePath]
+            [JSON.stringify(pageArgs)]
         );
         content = await injectReload(content, port);
         res.send(content);
@@ -177,10 +204,36 @@ async function startServer (projectPath, port)
 
     app.get("/contents-list/*", async (req, res) =>
     {
+        const categoryLinks = {};
+        const contentDir = path.join(projectPath, "contents");
+
+        if (await dirExists(contentDir))
+        {
+            const categoryDirs = (await fsp.readdir(contentDir, { withFileTypes: true }))
+                .filter(dirent => dirent.isDirectory())
+                .map(dirent => dirent.name);
+
+            for (const category of categoryDirs)
+            {
+                const categoryDir = path.join(contentDir, category);
+                const files = (await fsp.readdir(categoryDir)).filter(f => f.endsWith(".md"));
+                if (files.length > 0)
+                {
+                    const path = `/contents-list/${category}/${category}-1`;
+                    categoryLinks[category] = path;
+                }
+            }
+        }
+
         const slug = req.path.replace(/^\/contents-list\//, "");
         const decodedSlug = decodeURIComponent(slug);
         const [category, categoryPage] = decodedSlug.split("/");
         const pagePath = path.join(projectPath, "content-theme", "content-list.html");
+
+        const pageArgs = {
+            pagePath: pagePath,
+            categoryLinks: categoryLinks
+        }
 
         let content = await buildContentList(
             categoryPage,
@@ -188,7 +241,8 @@ async function startServer (projectPath, port)
             pagePath,
             path.join(projectPath, "components"),
             path.join(projectPath, "mds"),
-            10, [pagePath]
+            10,
+            [JSON.stringify(pageArgs)]
         );
         content = await injectReload(content, port);
         res.send(content);
@@ -218,14 +272,39 @@ async function startServer (projectPath, port)
 
     app.get("*", async (req, res) =>
     {
+        const categoryLinks = {};
+        const contentDir = path.join(projectPath, "contents");
+        if (await dirExists(contentDir))
+        {
+            const categoryDirs = (await fsp.readdir(contentDir, { withFileTypes: true }))
+                .filter(dirent => dirent.isDirectory())
+                .map(dirent => dirent.name);
+
+            for (const category of categoryDirs)
+            {
+                const categoryDir = path.join(contentDir, category);
+                const files = (await fsp.readdir(categoryDir)).filter(f => f.endsWith(".md"));
+                if (files.length > 0)
+                {
+                    const path = `/contents-list/${category}/${category}-1`;
+                    categoryLinks[category] = path;
+                }
+            }
+        }
+
         let decodedPath = decodeURIComponent(req.path);
         let reqPath = decodedPath.endsWith("/") ? decodedPath + "index.html" : decodedPath;
         let pagePath = path.join(projectPath, "pages", reqPath);
         if (!pagePath.endsWith(".html")) pagePath += ".html";
 
+        const pageArgs = {
+            pagePath: pagePath,
+            categoryLinks: categoryLinks
+        }
+
         if (await fileExists(pagePath))
         {
-            let content = await buildComponent(pagePath, path.join(projectPath, "components"), path.join(projectPath, "mds"), [pagePath]);
+            let content = await buildComponent(pagePath, path.join(projectPath, "components"), path.join(projectPath, "mds"), [JSON.stringify(pageArgs)]);
             content = await injectReload(content, port);
             res.send(content);
         }

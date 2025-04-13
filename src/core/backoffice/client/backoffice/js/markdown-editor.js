@@ -8,7 +8,18 @@ let editor = new toastui.Editor({
         {
             const outputDir = document.getElementById("upload-dir").value;
             const formData = new FormData();
-            formData.append("image", blob);
+
+            const now = new Date();
+            const timestamp = now.toISOString().replace(/[:.]/g, "-");
+            const originalName = blob.name || "image";
+            const baseName = originalName
+                .replace(/\.[^/.]+$/, "")
+                .toLowerCase()
+                .replace(/\s+/g, "-")
+                .replace(/[^a-z0-9-_]/g, "");
+            const safeName = `${baseName}-${timestamp}.webp`;
+
+            formData.append("image", blob, safeName);
             formData.append("outputDir", outputDir);
             formData.append("quality", "100");
 
@@ -21,16 +32,16 @@ let editor = new toastui.Editor({
                 const data = await res.json();
                 if (res.ok)
                 {
-                    const parsedName = blob.name.replace(/\.[^/.]+$/, "");
-                    callback(data.url, `${parsedName}.webp`);
+                    callback(data.url, safeName);
                 }
                 else
                 {
                     alert("Image upload failed: " + data.error);
                 }
-            } catch (err)
+            }
+            catch (error)
             {
-                console.error("Upload error:", err);
+                console.error("Upload error:", error);
                 alert("Upload failed");
             }
         },
@@ -102,7 +113,7 @@ async function saveFile ()
         const statusEl = document.getElementById("status-message");
         statusEl.textContent = "Saved!";
         statusEl.classList.add("visible");
-        setTimeout(() => statusEl.classList.remove("visible"), 3000);
+        setTimeout(() => statusEl.classList.remove("visible"), 5000);
         loadCategories();
     }
 }
@@ -139,6 +150,7 @@ const fileListEl = document.getElementById("file-list");
 
 async function loadCategories ()
 {
+    const prevSelected = document.getElementById("category-select").value;
     const res = await fetch("/api/list-categories");
     const categories = await res.json();
     const select = document.getElementById("category-select");
@@ -151,11 +163,16 @@ async function loadCategories ()
         select.appendChild(opt);
     });
 
-    if (categories.length > 0)
+    if (categories.includes(prevSelected))
+    {
+        select.value = prevSelected;
+    }
+    else if (categories.length > 0)
     {
         select.value = categories[0];
-        await loadFilesInCategory();
     }
+
+    await loadFilesInCategory();
 }
 
 async function loadFilesInCategory ()
