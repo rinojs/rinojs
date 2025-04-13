@@ -70,7 +70,7 @@ Public files are copied to ${dirs.dist}
             [pagePath]
         );
 
-        await fsp.writeFile(distPagePath, pageContent);
+        await fsp.writeFile(distPagePath, pageContent, "utf8");
 
         console.log(chalk.greenBright(`Page generated: ${distPagePath}`));
     }
@@ -93,7 +93,7 @@ Public files are copied to ${dirs.dist}
             path.basename(scriptPath, path.extname(scriptPath))
         );
 
-        await fsp.writeFile(distScriptPath, scriptContent);
+        await fsp.writeFile(distScriptPath, scriptContent, "utf8");
 
         console.log(chalk.greenBright(`Script generated: ${distScriptPath}`));
     }
@@ -117,7 +117,7 @@ Public files are copied to ${dirs.dist}
             path.basename(scriptPath, path.extname(scriptPath))
         );
 
-        await fsp.writeFile(distScriptPath.replace(".ts", ".js"), scriptContent);
+        await fsp.writeFile(distScriptPath.replace(".ts", ".js"), scriptContent, "utf8");
 
         console.log(chalk.greenBright(`Typescript compiled: ${distScriptPath}`));
     }
@@ -142,7 +142,7 @@ Public files are copied to ${dirs.dist}
         );
 
         styleContent = cccs.minify(styleContent).styles;
-        await fsp.writeFile(distStylePath, styleContent);
+        await fsp.writeFile(distStylePath, styleContent, "utf8");
 
         console.log(chalk.greenBright(`Style generated: ${distStylePath}`));
     }
@@ -169,7 +169,7 @@ Public files are copied to ${dirs.dist}
                 );
 
                 await fse.ensureDir(path.dirname(outputPath));
-                await fsp.writeFile(outputPath, html, "utf-8");
+                await fsp.writeFile(outputPath, html, "utf8");
 
                 console.log(chalk.greenBright(`Content generated: ${outputPath}`));
             }
@@ -212,7 +212,7 @@ Public files are copied to ${dirs.dist}
                     );
 
                     await fse.ensureDir(path.dirname(outputPath));
-                    await fsp.writeFile(outputPath, html, "utf-8");
+                    await fsp.writeFile(outputPath, html, "utf8");
 
                     console.log(chalk.greenBright(`Content list generated: ${outputPath}`));
                 }

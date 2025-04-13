@@ -32,7 +32,7 @@ export async function renderSSRMD (content, attributes, mdsDir)
                 return "Building markdown: Markdown file not found";
             }
 
-            let result = await fsp.readFile(mdFilePatn, "utf-8");
+            let result = await fsp.readFile(mdFilePatn, "utf8");
             result = mdit.render(removeCodeLWS(removeLWS(result)));
             return `<${mdTag} ${otherAttributes}>${result}</${mdTag}>`;
         }

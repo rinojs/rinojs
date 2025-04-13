@@ -7,61 +7,83 @@ import { removeLWS, removeCodeLWS } from "./mdFilter.js";
 
 export async function buildContent (mdPath, pagePath, componentsDir, mdsDir, args = [])
 {
-    if (!await fileExists(mdPath))
+    try
     {
-        console.error("Building content: Markdown file not found");
-        return "Building content: Markdown file not found";
-    }
-
-    const fileContent = await fsp.readFile(mdPath, "utf-8");
-    const contentDir = path.dirname(mdPath);
-    const allFiles = (await fsp.readdir(contentDir))
-        .filter(f => f.endsWith(".md"))
-        .sort((a, b) =>
+        if (!await fileExists(mdPath))
         {
-            const aNum = parseInt(a.split("-")[0]);
-            const bNum = parseInt(b.split("-")[0]);
-            return aNum - bNum;
-        });
-    const currentFile = path.basename(mdPath);
-    const category = path.basename(contentDir);
-    const baseUrl = `/contents/${category}/`;
-    const jsonCommentRegex = /^<!--\s*([\s\S]*?)\s*-->\s*/;
-    const jsonMatch = fileContent.match(jsonCommentRegex);
-    const mdit = markdownit({
-        html: true,
-        linkify: true,
-        typographer: true
-    });
-
-    mdit.enable(['newline']);
-
-    if (jsonMatch)
-    {
-        try
-        {
-            const contentData = JSON.parse(jsonMatch[1]);
-            const mdContent = fileContent.slice(jsonMatch[0].length);
-            const htmlContent = mdit.render(removeCodeLWS(removeLWS(mdContent)));
-            contentData.body = htmlContent;
-            contentData.urlPath = `/contents/${category}/${currentFile.replace(".md", "")}`;
-
-            await addNearbyContentData(contentData, allFiles, currentFile, baseUrl, contentDir);
-
-            const updatedArgs = [...args, JSON.stringify(contentData)];
-            const pageTemplate = await buildComponent(
-                pagePath,
-                componentsDir,
-                mdsDir,
-                updatedArgs
-            );
-
-            return replaceContentTags(pageTemplate, contentData);
+            console.error("Building content: Markdown file not found");
+            return "Building content: Markdown file not found";
         }
-        catch (error)
-        {
-            console.error("Building content: Failed to parse content data in JSON, ", error.message);
 
+        const fileContent = await fsp.readFile(mdPath, "utf8");
+        const contentDir = path.dirname(mdPath);
+        const allFiles = (await fsp.readdir(contentDir))
+            .filter(f => f.endsWith(".md"))
+            .sort((a, b) =>
+            {
+                const aNum = parseInt(a.split("-")[0]);
+                const bNum = parseInt(b.split("-")[0]);
+                return aNum - bNum;
+            });
+        const currentFile = path.basename(mdPath);
+        const category = path.basename(contentDir);
+        const baseUrl = `/contents/${category}/`;
+        const jsonCommentRegex = /^<!--\s*([\s\S]*?)\s*-->\s*/;
+        const jsonMatch = fileContent.match(jsonCommentRegex);
+        const mdit = markdownit({
+            html: true,
+            linkify: true,
+            typographer: true
+        });
+
+        mdit.enable(['newline']);
+
+        if (jsonMatch)
+        {
+            try
+            {
+                const contentData = JSON.parse(jsonMatch[1]);
+                const mdContent = fileContent.slice(jsonMatch[0].length);
+                const htmlContent = mdit.render(removeCodeLWS(removeLWS(mdContent)));
+                contentData.body = htmlContent;
+                contentData.urlPath = `/contents/${category}/${currentFile.replace(".md", "")}`;
+
+                await addNearbyContentData(contentData, allFiles, currentFile, baseUrl, contentDir);
+
+                const updatedArgs = [...args, JSON.stringify(contentData)];
+                const pageTemplate = await buildComponent(
+                    pagePath,
+                    componentsDir,
+                    mdsDir,
+                    updatedArgs
+                );
+
+                return replaceContentTags(pageTemplate, contentData);
+            }
+            catch (error)
+            {
+                console.error("Building content: Failed to parse content data in JSON, ", error.message);
+
+                const htmlContent = mdit.render(removeCodeLWS(removeLWS(fileContent)));
+                const contentData = {};
+                contentData.body = htmlContent;
+                contentData.urlPath = `/contents/${category}/${currentFile.replace(".md", "")}`;
+
+                await addNearbyContentData(contentData, allFiles, currentFile, baseUrl, contentDir);
+
+                const updatedArgs = [...args, JSON.stringify(contentData)];
+                const pageTemplate = await buildComponent(
+                    pagePath,
+                    componentsDir,
+                    mdsDir,
+                    updatedArgs
+                );
+
+                return replaceContentTags(pageTemplate, contentData);
+            }
+        }
+        else
+        {
             const htmlContent = mdit.render(removeCodeLWS(removeLWS(fileContent)));
             const contentData = {};
             contentData.body = htmlContent;
@@ -80,24 +102,10 @@ export async function buildContent (mdPath, pagePath, componentsDir, mdsDir, arg
             return replaceContentTags(pageTemplate, contentData);
         }
     }
-    else
+    catch (error)
     {
-        const htmlContent = mdit.render(removeCodeLWS(removeLWS(fileContent)));
-        const contentData = {};
-        contentData.body = htmlContent;
-        contentData.urlPath = `/contents/${category}/${currentFile.replace(".md", "")}`;
-
-        await addNearbyContentData(contentData, allFiles, currentFile, baseUrl, contentDir);
-
-        const updatedArgs = [...args, JSON.stringify(contentData)];
-        const pageTemplate = await buildComponent(
-            pagePath,
-            componentsDir,
-            mdsDir,
-            updatedArgs
-        );
-
-        return replaceContentTags(pageTemplate, contentData);
+        console.error("Error in buildContent:", error.message);
+        return `Error building content: ${error.message}`;
     }
 }
 
@@ -145,7 +153,7 @@ async function addNearbyContentData (contentData, allFiles, currentFile, baseUrl
 
         try
         {
-            const content = await fsp.readFile(filePath, "utf-8");
+            const content = await fsp.readFile(filePath, "utf8");
             const jsonMatch = content.match(/^<!--\s*([\s\S]*?)\s*-->/);
             if (jsonMatch)
             {

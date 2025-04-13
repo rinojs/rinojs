@@ -1,5 +1,10 @@
 testdist/
 test/
+tests/
+cypress/
+test-project/
+test-results/
+cypress.config.js
 src/
 .git/
 .editorconfig

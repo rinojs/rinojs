@@ -51,7 +51,7 @@ export async function generateAtomFeedFile (contentItems, filename, siteUrl)
       ${atomEntries}
     </feed>`;
 
-    await fsp.writeFile(filename, atom);
+    await fsp.writeFile(filename, atom, "utf8");
     return true;
   }
   catch (error)

@@ -29,7 +29,8 @@ export async function generateProjectSitemapFile (projectPath, config)
     const pagesDir = path.join(projectPath, 'pages');
     const contentsDir = path.join(projectPath, 'contents');
     const sitemapFilename = path.join(dist, 'sitemap.xml');
-    const htmlFiles = await getFilesRecursively(pagesDir, ['.html']);
+    const htmlFiles = (await getFilesRecursively(pagesDir, ['.html']))
+        .filter(file => path.basename(file) !== '404.html');
     const htmlUrls = htmlFiles.map((file) =>
     {
         const relativePath = path.relative(pagesDir, file).replace(/\\/g, '/');
@@ -96,7 +97,8 @@ export async function generateProjectSitemap (projectPath, config)
 
     const pagesDir = path.join(projectPath, 'pages');
     const contentsDir = path.join(projectPath, 'contents');
-    const htmlFiles = await getFilesRecursively(pagesDir, ['.html']);
+    const htmlFiles = (await getFilesRecursively(pagesDir, ['.html']))
+        .filter(file => path.basename(file) !== '404.html');
     const htmlUrls = htmlFiles.map((file) =>
     {
         const relativePath = path.relative(pagesDir, file).replace(/\\/g, '/');

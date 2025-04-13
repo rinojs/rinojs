@@ -12,7 +12,7 @@ export async function buildSSRComponent (componentPath, componentsDir, mdDir, ar
       return "Budiling SSR component: HTML file not found";
     }
 
-    const content = await fs.readFile(componentPath, "utf-8");
+    const content = await fs.readFile(componentPath, "utf8");
     const attributeRegex = /(@?)([a-zA-Z]+)\s*=\s*(['"])(.*?)\3/g;
     const tagRegex = /<(component|script)\s+([^>]+?)(?:\s*\/>|>(.*?)<\/\1\s*>)/gs;
     let result = "";

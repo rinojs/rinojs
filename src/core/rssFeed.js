@@ -55,7 +55,7 @@ export async function generateRSSFeedFile (contentItems, filename, siteUrl)
       </channel>
     </rss>`;
 
-    await fsp.writeFile(filename, rss);
+    await fsp.writeFile(filename, rss, "utf8");
     return true;
   }
   catch (error)

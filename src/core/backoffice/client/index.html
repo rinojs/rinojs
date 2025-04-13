@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Markdown Editor</title>
+  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+  <link rel="stylesheet" href="/backoffice/css/style.css" />
+</head>
+
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <h2>Backoffice</h2>
+      <nav>
+        <a href="/">Markdown Editor</a>
+        <a href="/image-compression.html">Image Compression</a>
+        <div class="sidebar-actions">
+          <button onclick="runScript('dev')">▶️ Dev Server</button>
+          <button onclick="runScript('generate-all')">✨ Generate all</button>
+          <button onclick="runScript('generate-sitemap')">🌐 Generate website with sitemap</button>
+          <button onclick="runScript('generate')">📦 Generate webiste</button>
+          <button onclick="runScript('sitemap')">🗺️ Generate sitemap</button>
+          <button onclick="runScript('feed')">📡 Generate feed</button>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <h1>Markdown Editor</h1>
+      <div id="status-message" class="status-message"></div>
+      <div class="editor-layout">
+        <div class="markdown-file-list-section">
+          <h3>📁 Files in /contents</h3>
+          <label for="category-select" class="input-label">Category:</label>
+          <select id="category-select" class="input-full" onchange="loadFilesInCategory()"></select>
+          <ul id="file-list" class="markdown-file-list"></ul>
+        </div>
+
+        <div class="editor-section">
+          <div class="button-group">
+            <button onclick="saveFile()">Save</button>
+            <button onclick="deleteFile()">Delete</button>
+            <button onclick="newEntry()">New Entry</button>
+          </div>
+
+          <label for="markdown-path" class="input-label">File path:</label>
+          <input type="text" id="markdown-path" placeholder="category/content.md" class="input-full" />
+          <button type="button" onclick="generateFilePath()" class="secondary-button">🛠️ Generate File Path</button>
+          <label for="title" class="input-label">Title:</label>
+          <input type="text" id="title" placeholder="Enter title..." class="input-full" />
+          <label for="time" class="input-label">Time:</label>
+          <input type="datetime-local" id="time" class="input-full" />
+          <label for="description" class="input-label">Description:</label>
+          <textarea id="description" rows="4" placeholder="Enter description..." class="input-full"></textarea>
+          <button type="button" onclick="generateDescription()" class="secondary-button">✨ Generate Description</button>
+          <label for="upload-dir" class="input-label">Image Output Directory:</label>
+          <input type="text" id="upload-dir" placeholder="./public/images/uploads/" value="./public/images/uploads/"
+            class="input-full" />
+          <div id="editor" class="editor-box"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+  <script src="/backoffice/js/markdown-editor.js"></script>
+</body>
+
+</html>
