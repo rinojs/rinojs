@@ -21,8 +21,11 @@ npm i rinojs
 ```
 
 ## 📢 Notice
-### 🎉 Release version v2.15.0
+### 🎉 Release version v2.16.0
 Please use the latest version. Recommended to upgrade version of Rino after at least a day or a week after the release. So you don't have to deal with huge bug with new version. Because it is going to be tested in production level by development team after release.
+- Fixed sitemap and feed to work with content system.
+
+### 🎉 Release version v2.15.0
 - Updated content and content list page system. This should support multilingual or multi sub website. See `test-project/content-theme` and `test-project/contents` as an example.
 - Updated backoffice for the changes of content system
 

@@ -1,4 +1,4 @@
-import { generateProjectSitemap } from '../src/index.js';
+import { generateProjectSitemapFile } from '../src/index.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -9,7 +9,7 @@ async function sitemap ()
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = dirname(__filename);
 
-    await generateProjectSitemap(path.resolve(__dirname, "./"), config);
+    await generateProjectSitemapFile(path.resolve(__dirname, "./"), config);
 }
 
 sitemap();
