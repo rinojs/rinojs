@@ -5,6 +5,42 @@ import chalk from 'chalk';
 import { generateSitemap, generateSitemapFile } from './sitemap.js';
 import { dirExists, getFilesRecursively } from './fsHelper.js';
 
+function normalizeUrlPath (...parts)
+{
+    return parts.map(p => encodeURIComponent(p)).join('/');
+}
+
+async function getContentUrls (contentsDir, siteUrl)
+{
+    const urls = [];
+    const themeDirs = fs.readdirSync(contentsDir, { withFileTypes: true })
+        .filter(dirent => dirent.isDirectory())
+        .map(dirent => dirent.name);
+
+    for (const theme of themeDirs)
+    {
+        const themePath = path.join(contentsDir, theme);
+        const categoryDirs = fs.readdirSync(themePath, { withFileTypes: true })
+            .filter(dirent => dirent.isDirectory())
+            .map(dirent => dirent.name);
+
+        for (const category of categoryDirs)
+        {
+            const categoryPath = path.join(themePath, category);
+            const mdFiles = fs.readdirSync(categoryPath).filter(f => f.endsWith('.md'));
+
+            for (const file of mdFiles)
+            {
+                const name = file.replace(/\.md$/, '');
+                const url = `${siteUrl}/contents/${normalizeUrlPath(theme, category, name)}`;
+                urls.push(url);
+            }
+        }
+    }
+
+    return urls;
+}
+
 export async function generateProjectSitemapFile (projectPath, config)
 {
     if (!projectPath)
@@ -21,16 +57,20 @@ export async function generateProjectSitemapFile (projectPath, config)
 
     console.log(chalk.blueBright('Generating sitemap...'));
 
-    let siteUrl = config.site.url;
-
-    if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
-
+    let siteUrl = config.site.url.replace(/\/$/, '');
     const dist = config.dist ? path.resolve(projectPath, config.dist) : path.resolve(projectPath, './dist');
     const pagesDir = path.join(projectPath, 'pages');
     const contentsDir = path.join(projectPath, 'contents');
     const sitemapFilename = path.join(dist, 'sitemap.xml');
+
+    if (!await dirExists(dist))
+    {
+        await fsp.mkdir(dist, { recursive: true });
+    }
+
     const htmlFiles = (await getFilesRecursively(pagesDir, ['.html']))
         .filter(file => path.basename(file) !== '404.html');
+
     const htmlUrls = htmlFiles.map((file) =>
     {
         const relativePath = path.relative(pagesDir, file).replace(/\\/g, '/');
@@ -39,41 +79,18 @@ export async function generateProjectSitemapFile (projectPath, config)
             : `${siteUrl}/${relativePath}`;
     });
 
-    const contentUrls = [];
+    const contentUrls = fs.existsSync(contentsDir)
+        ? await getContentUrls(contentsDir, siteUrl)
+        : [];
 
-    if (!await dirExists(dist))
+    if (!contentUrls.length)
     {
-        await fsp.mkdir(dist, { recursive: true });
-    }
-
-    if (fs.existsSync(contentsDir))
-    {
-        const categoryDirs = fs.readdirSync(contentsDir, { withFileTypes: true })
-            .filter(dirent => dirent.isDirectory())
-            .map(dirent => dirent.name);
-
-        for (const category of categoryDirs)
-        {
-            const categoryPath = path.join(contentsDir, category);
-            const mdFiles = fs.readdirSync(categoryPath).filter(f => f.endsWith('.md'));
-
-            for (const file of mdFiles)
-            {
-                const name = file.replace(/\.md$/, '');
-                const url = `${siteUrl}/contents/${category}/${encodeURIComponent(name)}`;
-                contentUrls.push(url);
-            }
-        }
-    }
-    else
-    {
-        console.warn(chalk.yellow("Skipped adding content pages to sitemap: 'contents/' folder not found."));
+        console.warn(chalk.yellow("Skipped adding content pages to sitemap: 'contents/' folder not found or empty."));
     }
 
     const combinedUrls = [...new Set([...htmlUrls, ...contentUrls, ...config.sitemap])];
 
     await generateSitemapFile(combinedUrls, sitemapFilename);
-
     console.log(chalk.greenBright('Sitemap is generated!'));
 }
 
@@ -91,14 +108,13 @@ export async function generateProjectSitemap (projectPath, config)
         return;
     }
 
-    let siteUrl = config.site.url;
-
-    if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
-
+    let siteUrl = config.site.url.replace(/\/$/, '');
     const pagesDir = path.join(projectPath, 'pages');
     const contentsDir = path.join(projectPath, 'contents');
+
     const htmlFiles = (await getFilesRecursively(pagesDir, ['.html']))
         .filter(file => path.basename(file) !== '404.html');
+
     const htmlUrls = htmlFiles.map((file) =>
     {
         const relativePath = path.relative(pagesDir, file).replace(/\\/g, '/');
@@ -107,33 +123,15 @@ export async function generateProjectSitemap (projectPath, config)
             : `${siteUrl}/${relativePath}`;
     });
 
-    const contentUrls = [];
+    const contentUrls = fs.existsSync(contentsDir)
+        ? await getContentUrls(contentsDir, siteUrl)
+        : [];
 
-    if (fs.existsSync(contentsDir))
+    if (!contentUrls.length)
     {
-        const categoryDirs = fs.readdirSync(contentsDir, { withFileTypes: true })
-            .filter(dirent => dirent.isDirectory())
-            .map(dirent => dirent.name);
-
-        for (const category of categoryDirs)
-        {
-            const categoryPath = path.join(contentsDir, category);
-            const mdFiles = fs.readdirSync(categoryPath).filter(f => f.endsWith('.md'));
-
-            for (const file of mdFiles)
-            {
-                const name = file.replace(/\.md$/, '');
-                const url = `${siteUrl}/contents/${category}/${encodeURIComponent(name)}`;
-                contentUrls.push(url);
-            }
-        }
-    }
-    else
-    {
-        console.warn(chalk.yellow("Skipped adding content pages to sitemap: 'contents/' folder not found."));
+        console.warn(chalk.yellow("Skipped adding content pages to sitemap: 'contents/' folder not found or empty."));
     }
 
     const combinedUrls = [...new Set([...htmlUrls, ...contentUrls, ...config.sitemap])];
-
     return await generateSitemap(combinedUrls);
 }

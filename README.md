@@ -21,46 +21,9 @@ npm i rinojs
 ```
 
 ## 📢 Notice
-### 🎉 Release version v2.14.0
+### 🎉 Release version v2.17.0
 Please use the latest version. Recommended to upgrade version of Rino after at least a day or a week after the release. So you don't have to deal with huge bug with new version. Because it is going to be tested in production level by development team after release.
-- Now list of category path data is available from pages, contents and contents list.
-```
-  <script @type="js" type="text/javascript">
-    const args = JSON.parse(process.argv[1]);
-    const categoryLinks = args.categoryLinks;
-
-    console.log("Category Links:");
-    for (const [category, link] of Object.entries(categoryLinks))
-    {
-      console.log(`${category}: ${link}`);
-    }
-
-    console.log("<nav><ul>");
-    for (const [category, link] of Object.entries(categoryLinks))
-    {
-      console.log(`<li><a href="${link}">${category}</a></li>`);
-    }
-    console.log("</ul></nav>");
-  </script>
-```
-
-### 🎉 Release version v2.13.3
-Please use the latest version. Recommended to upgrade version of Rino after at least a day or a week after the release. So you don't have to deal with huge bug with new version. Because it is going to be tested in production level by development team after release.
-- Fixed backoffice markdown editor category refereshing
-- Fixed uploaded image naming and preventing image overwriting
-
-### 🎉 Release version v2.13.2
-- Fixed npmignore which removes cypress config from the package
-
-### 🎉 Release version v2.13.1
-- Added error handling for content system
-- Added Cypress and Playwright testing for backoffice
-
-### 🎉 Release version v2.13.0
-- Added backoffice that works with contents.
-- Corrected encoding value for IO.
-- Fixed code to skip 404 page from sitemap
-
+- Fixed bug that occurs when contents directory is missing
 
 ### 👍 Releasing Version 2
 
