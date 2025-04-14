@@ -51,25 +51,29 @@ Public files are copied to ${dirs.dist}
     `));
 
     const categoryLinks = {};
-    const themeDirs = (await fsp.readdir(dirs.contents, { withFileTypes: true }))
-        .filter(dirent => dirent.isDirectory())
-        .map(dirent => dirent.name);
 
-    for (const theme of themeDirs)
+    if (await dirExists(dirs.contents))
     {
-        const themeDir = path.join(dirs.contents, theme);
-        const categoryDirs = (await fsp.readdir(themeDir, { withFileTypes: true }))
+        const themeDirs = (await fsp.readdir(dirs.contents, { withFileTypes: true }))
             .filter(dirent => dirent.isDirectory())
             .map(dirent => dirent.name);
 
-        for (const category of categoryDirs)
+        for (const theme of themeDirs)
         {
-            const categoryDir = path.join(themeDir, category);
-            const files = (await fsp.readdir(categoryDir)).filter(f => f.endsWith(".md"));
-            if (files.length > 0)
+            const themeDir = path.join(dirs.contents, theme);
+            const categoryDirs = (await fsp.readdir(themeDir, { withFileTypes: true }))
+                .filter(dirent => dirent.isDirectory())
+                .map(dirent => dirent.name);
+
+            for (const category of categoryDirs)
             {
-                const path = `/contents-list/${theme}/${category}/${category}-1`;
-                categoryLinks[`${theme}/${category}`] = path;
+                const categoryDir = path.join(themeDir, category);
+                const files = (await fsp.readdir(categoryDir)).filter(f => f.endsWith(".md"));
+                if (files.length > 0)
+                {
+                    const path = `/contents-list/${theme}/${category}/${category}-1`;
+                    categoryLinks[`${theme}/${category}`] = path;
+                }
             }
         }
     }
