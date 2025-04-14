@@ -151,11 +151,25 @@ export async function startBackofficeServer (projectPath)
         try
         {
             const contentsDir = path.join(projectPath, "contents");
-            const entries = await fsp.readdir(contentsDir, { withFileTypes: true });
-            const categories = entries
-                .filter(e => e.isDirectory())
-                .map(e => e.name);
-            res.json(categories);
+            const themes = await fsp.readdir(contentsDir, { withFileTypes: true });
+            const result = [];
+
+            for (const themeDir of themes)
+            {
+                if (!themeDir.isDirectory()) continue;
+                const themePath = path.join(contentsDir, themeDir.name);
+                const categories = await fsp.readdir(themePath, { withFileTypes: true });
+
+                for (const catDir of categories)
+                {
+                    if (catDir.isDirectory())
+                    {
+                        result.push(`${themeDir.name}/${catDir.name}`);
+                    }
+                }
+            }
+
+            res.json(result);
         }
         catch (error)
         {
@@ -181,7 +195,6 @@ export async function startBackofficeServer (projectPath)
             res.status(500).json({ error: "Failed to list markdown files." });
         }
     });
-
 
     app.delete("/api/delete-markdown", async (req, res) =>
     {

@@ -23,29 +23,13 @@ npm i rinojs
 ## 📢 Notice
 ### 🎉 Release version v2.14.0
 Please use the latest version. Recommended to upgrade version of Rino after at least a day or a week after the release. So you don't have to deal with huge bug with new version. Because it is going to be tested in production level by development team after release.
+- Updated content and content list page system. This should support multilingual or multi sub website. See `test-project/content-theme` and `test-project/contents` as an example.
+- Updated backoffice for the changes of content system
+
+### 🎉 Release version v2.14.0
 - Now list of category path data is available from pages, contents and contents list.
-```
-  <script @type="js" type="text/javascript">
-    const args = JSON.parse(process.argv[1]);
-    const categoryLinks = args.categoryLinks;
-
-    console.log("Category Links:");
-    for (const [category, link] of Object.entries(categoryLinks))
-    {
-      console.log(`${category}: ${link}`);
-    }
-
-    console.log("<nav><ul>");
-    for (const [category, link] of Object.entries(categoryLinks))
-    {
-      console.log(`<li><a href="${link}">${category}</a></li>`);
-    }
-    console.log("</ul></nav>");
-  </script>
-```
 
 ### 🎉 Release version v2.13.3
-Please use the latest version. Recommended to upgrade version of Rino after at least a day or a week after the release. So you don't have to deal with huge bug with new version. Because it is going to be tested in production level by development team after release.
 - Fixed backoffice markdown editor category refereshing
 - Fixed uploaded image naming and preventing image overwriting
 

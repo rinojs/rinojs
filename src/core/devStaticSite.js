@@ -158,42 +158,47 @@ async function startServer (projectPath, port)
     {
         const categoryLinks = {};
         const contentDir = path.join(projectPath, "contents");
+        const themeDirs = (await fsp.readdir(contentDir, { withFileTypes: true }))
+            .filter(dirent => dirent.isDirectory())
+            .map(dirent => dirent.name);
 
-        if (await dirExists(contentDir))
+        for (const theme of themeDirs)
         {
-            const categoryDirs = (await fsp.readdir(contentDir, { withFileTypes: true }))
+            const themeDir = path.join(contentDir, theme);
+            const categoryDirs = (await fsp.readdir(themeDir, { withFileTypes: true }))
                 .filter(dirent => dirent.isDirectory())
                 .map(dirent => dirent.name);
 
             for (const category of categoryDirs)
             {
-                const categoryDir = path.join(contentDir, category);
+                const categoryDir = path.join(themeDir, category);
                 const files = (await fsp.readdir(categoryDir)).filter(f => f.endsWith(".md"));
                 if (files.length > 0)
                 {
-                    const path = `/contents-list/${category}/${category}-1`;
-                    categoryLinks[category] = path;
+                    const path = `/contents-list/${theme}/${category}/${category}-1`;
+                    categoryLinks[`${theme}/${category}`] = path;
                 }
             }
         }
 
         const slug = req.path.replace(/^\/contents\//, "");
         const decodedSlug = decodeURIComponent(slug);
-        const [category, ...rest] = decodedSlug.split("/");
-        const rawName = decodeURIComponent(rest.join("/"));
-        const mdPath = path.join(projectPath, "contents", category, rawName + ".md");
+        const mdPath = path.join(projectPath, "contents", decodedSlug + ".md");
+
         if (!await fileExists(mdPath)) return res.status(404).send("Content not found");
 
-        const pagePath = path.join(projectPath, "content-theme", "content.html");
-
+        const parts = decodedSlug.split("/");
+        const theme = parts[0];
+        const category = parts[1];
+        const templatePath = path.join(projectPath, "content-theme", theme, "content.html");
         const pageArgs = {
-            pagePath: pagePath,
-            categoryLinks: categoryLinks
-        }
+            pagePath: templatePath,
+            categoryLinks
+        };
 
         let content = await buildContent(
             mdPath,
-            pagePath,
+            templatePath,
             path.join(projectPath, "components"),
             path.join(projectPath, "mds"),
             [JSON.stringify(pageArgs)]
@@ -206,39 +211,42 @@ async function startServer (projectPath, port)
     {
         const categoryLinks = {};
         const contentDir = path.join(projectPath, "contents");
+        const themeDirs = (await fsp.readdir(contentDir, { withFileTypes: true }))
+            .filter(dirent => dirent.isDirectory())
+            .map(dirent => dirent.name);
 
-        if (await dirExists(contentDir))
+        for (const theme of themeDirs)
         {
-            const categoryDirs = (await fsp.readdir(contentDir, { withFileTypes: true }))
+            const themeDir = path.join(contentDir, theme);
+            const categoryDirs = (await fsp.readdir(themeDir, { withFileTypes: true }))
                 .filter(dirent => dirent.isDirectory())
                 .map(dirent => dirent.name);
 
             for (const category of categoryDirs)
             {
-                const categoryDir = path.join(contentDir, category);
+                const categoryDir = path.join(themeDir, category);
                 const files = (await fsp.readdir(categoryDir)).filter(f => f.endsWith(".md"));
                 if (files.length > 0)
                 {
-                    const path = `/contents-list/${category}/${category}-1`;
-                    categoryLinks[category] = path;
+                    const path = `/contents-list/${theme}/${category}/${category}-1`;
+                    categoryLinks[`${theme}/${category}`] = path;
                 }
             }
         }
 
         const slug = req.path.replace(/^\/contents-list\//, "");
         const decodedSlug = decodeURIComponent(slug);
-        const [category, categoryPage] = decodedSlug.split("/");
-        const pagePath = path.join(projectPath, "content-theme", "content-list.html");
-
+        const [theme, category, pageName] = decodedSlug.split("/");
+        const templatePath = path.join(projectPath, "content-theme", theme, "content-list.html");
         const pageArgs = {
-            pagePath: pagePath,
-            categoryLinks: categoryLinks
-        }
+            pagePath: templatePath,
+            categoryLinks
+        };
 
         let content = await buildContentList(
-            categoryPage,
+            `${theme}/${category}/${pageName}`,
             path.join(projectPath, "contents"),
-            pagePath,
+            templatePath,
             path.join(projectPath, "components"),
             path.join(projectPath, "mds"),
             10,
@@ -274,20 +282,25 @@ async function startServer (projectPath, port)
     {
         const categoryLinks = {};
         const contentDir = path.join(projectPath, "contents");
-        if (await dirExists(contentDir))
+        const themeDirs = (await fsp.readdir(contentDir, { withFileTypes: true }))
+            .filter(dirent => dirent.isDirectory())
+            .map(dirent => dirent.name);
+
+        for (const theme of themeDirs)
         {
-            const categoryDirs = (await fsp.readdir(contentDir, { withFileTypes: true }))
+            const themeDir = path.join(contentDir, theme);
+            const categoryDirs = (await fsp.readdir(themeDir, { withFileTypes: true }))
                 .filter(dirent => dirent.isDirectory())
                 .map(dirent => dirent.name);
 
             for (const category of categoryDirs)
             {
-                const categoryDir = path.join(contentDir, category);
+                const categoryDir = path.join(themeDir, category);
                 const files = (await fsp.readdir(categoryDir)).filter(f => f.endsWith(".md"));
                 if (files.length > 0)
                 {
-                    const path = `/contents-list/${category}/${category}-1`;
-                    categoryLinks[category] = path;
+                    const path = `/contents-list/${theme}/${category}/${category}-1`;
+                    categoryLinks[`${theme}/${category}`] = path;
                 }
             }
         }

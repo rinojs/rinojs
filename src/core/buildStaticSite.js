@@ -51,21 +51,25 @@ Public files are copied to ${dirs.dist}
     `));
 
     const categoryLinks = {};
+    const themeDirs = (await fsp.readdir(dirs.contents, { withFileTypes: true }))
+        .filter(dirent => dirent.isDirectory())
+        .map(dirent => dirent.name);
 
-    if (await dirExists(dirs.contents))
+    for (const theme of themeDirs)
     {
-        const categoryDirs = (await fsp.readdir(dirs.contents, { withFileTypes: true }))
+        const themeDir = path.join(dirs.contents, theme);
+        const categoryDirs = (await fsp.readdir(themeDir, { withFileTypes: true }))
             .filter(dirent => dirent.isDirectory())
             .map(dirent => dirent.name);
 
         for (const category of categoryDirs)
         {
-            const categoryDir = path.join(dirs.contents, category);
+            const categoryDir = path.join(themeDir, category);
             const files = (await fsp.readdir(categoryDir)).filter(f => f.endsWith(".md"));
             if (files.length > 0)
             {
-                const path = `/contents-list/${category}/${category}-1`;
-                categoryLinks[category] = path;
+                const path = `/contents-list/${theme}/${category}/${category}-1`;
+                categoryLinks[`${theme}/${category}`] = path;
             }
         }
     }
@@ -172,63 +176,71 @@ Public files are copied to ${dirs.dist}
         console.log(chalk.greenBright(`Style generated: ${distStylePath}`));
     }
 
-    if (await dirExists(dirs.contents))
-    {
-        const contentTemplatePath = path.join(dirs.contentTheme, "content.html");
-        const contentListTemplatePath = path.join(dirs.contentTheme, "content-list.html");
 
-        if (await fileExists(contentTemplatePath))
+    if (await dirExists(dirs.contentTheme))
+    {
+        const themeDirs = (await fsp.readdir(dirs.contentTheme, { withFileTypes: true }))
+            .filter(dirent => dirent.isDirectory())
+            .map(dirent => dirent.name);
+
+        for (const theme of themeDirs)
         {
-            const contentFiles = await getFilesRecursively(dirs.contents, [".md"]);
+            const themeContentPath = path.join(dirs.contents, theme);
+            const themeTemplateDir = path.join(dirs.contentTheme, theme);
+            const contentTemplatePath = path.join(themeTemplateDir, "content.html");
+            const contentListTemplatePath = path.join(themeTemplateDir, "content-list.html");
+            const themeExists = await dirExists(themeContentPath);
+            const templateExists = await fileExists(contentTemplatePath) && await fileExists(contentListTemplatePath);
+
+            if (!themeExists || !templateExists) continue;
+
+            const contentFiles = await getFilesRecursively(themeContentPath, [".md"]);
+
+            let pageArgs = {
+                pagePath: contentTemplatePath,
+                categoryLinks: categoryLinks
+            }
 
             for (const mdPath of contentFiles)
             {
-                const relativePath = path.relative(dirs.contents, mdPath);
-                const category = relativePath.split(path.sep)[0];
-                const pageArgs = {
-                    pagePath: contentTemplatePath,
-                    categoryLinks: categoryLinks
-                }
-                const html = await buildContent(mdPath, contentTemplatePath, dirs.components, dirs.mds, [JSON.stringify(pageArgs)]);
+                const html = await buildContent(
+                    mdPath,
+                    contentTemplatePath,
+                    dirs.components,
+                    dirs.mds,
+                    [JSON.stringify(pageArgs)]
+                );
 
                 const outputPath = path.join(
                     dirs.dist,
                     "contents",
-                    relativePath.replace(/\.md$/, ".html")
+                    path.relative(dirs.contents, mdPath).replace(/\.md$/, ".html")
                 );
 
                 await fse.ensureDir(path.dirname(outputPath));
                 await fsp.writeFile(outputPath, html, "utf8");
-
                 console.log(chalk.greenBright(`Content generated: ${outputPath}`));
             }
-        }
-        else
-        {
-            console.warn(chalk.yellow("Skipped content page generation: content.html not found."));
-        }
 
-        if (await fileExists(contentListTemplatePath))
-        {
-            const categoryDirs = (await fsp.readdir(dirs.contents, { withFileTypes: true }))
+            const categoryDirs = (await fsp.readdir(themeContentPath, { withFileTypes: true }))
                 .filter(dirent => dirent.isDirectory())
                 .map(dirent => dirent.name);
+            pageArgs = {
+                pagePath: contentListTemplatePath,
+                categoryLinks: categoryLinks
+            }
 
             for (const category of categoryDirs)
             {
-                const categoryDir = path.join(dirs.contents, category);
-                const files = (await fsp.readdir(categoryDir)).filter(f => f.endsWith(".md"));
+                const categoryPath = path.join(themeContentPath, category);
+                const files = (await fsp.readdir(categoryPath)).filter(f => f.endsWith(".md"));
                 const pageCount = Math.ceil(files.length / 10);
 
-                for (let pageIndex = 1; pageIndex <= pageCount; pageIndex++)
+                for (let i = 1; i <= pageCount; i++)
                 {
-                    const contentListPath = `${category}-${pageIndex}`;
-                    const pageArgs = {
-                        pagePath: contentListTemplatePath,
-                        categoryLinks: categoryLinks
-                    }
+                    const pageName = `${category}-${i}`;
                     const html = await buildContentList(
-                        contentListPath,
+                        `${theme}/${category}/${pageName}`,
                         dirs.contents,
                         contentListTemplatePath,
                         dirs.components,
@@ -240,8 +252,9 @@ Public files are copied to ${dirs.dist}
                     const outputPath = path.join(
                         dirs.dist,
                         "contents-list",
+                        theme,
                         category,
-                        `${contentListPath}.html`
+                        `${pageName}.html`
                     );
 
                     await fse.ensureDir(path.dirname(outputPath));
@@ -251,15 +264,8 @@ Public files are copied to ${dirs.dist}
                 }
             }
         }
-        else
-        {
-            console.warn(chalk.yellow("Skipped content list generation: content-list.html not found."));
-        }
     }
-    else
-    {
-        console.warn(chalk.yellow("Skipped content and content list generation: contents/ folder not found."));
-    }
+
 
     console.log(chalk.blueBright("\nBuild process completed! \n"));
 } 

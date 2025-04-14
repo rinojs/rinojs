@@ -6,19 +6,19 @@ export async function buildContentList (contentListPath, contentsDir, pagePath, 
 {
     try
     {
-        const match = contentListPath.match(/^(.+)-(\d+)$/);
+        const match = contentListPath.match(/^(.+?)\/(.+?)\/(.+)-(\d+)$/);
 
         if (!match)
         {
-            console.error("Building content list page: Invalid content list path format.");
-            return "Building content list page: Invalid content list path format.";
+            console.error(`Building content list page: Invalid contentListPath - ${contentListPath}`);
+            return `Building content list page: Invalid contentListPath - ${contentListPath}`;
         }
 
-        const category = match[1];
-        const pageIndex = parseInt(match[2], 10);
-        const contentDir = path.join(contentsDir, category);
+        const [_, theme, category, baseName, pageIndexStr] = match;
+        const pageIndex = parseInt(pageIndexStr, 10);
+        const categoryDir = path.join(contentsDir, theme, category);
 
-        const files = (await fsp.readdir(contentDir))
+        const files = (await fsp.readdir(categoryDir))
             .filter(f => f.endsWith(".md"))
             .sort((a, b) =>
             {
@@ -29,13 +29,13 @@ export async function buildContentList (contentListPath, contentsDir, pagePath, 
 
         const startIndex = (pageIndex - 1) * pageSize;
         const selectedFiles = files.slice(startIndex, startIndex + pageSize);
-        const baseUrl = `/contents/${category}/`;
+        const baseUrl = `/contents/${theme}/${category}/`;
 
         const contentList = [];
 
         for (const file of selectedFiles)
         {
-            const filePath = path.join(contentDir, file);
+            const filePath = path.join(categoryDir, file);
             const content = await fsp.readFile(filePath, "utf8");
             const jsonCommentRegex = /^<!--\s*([\s\S]*?)\s*-->\s*/;
             const jsonMatch = content.match(jsonCommentRegex);
@@ -53,15 +53,15 @@ export async function buildContentList (contentListPath, contentsDir, pagePath, 
                 }
             }
 
-            contentData.filename = file.toString();
+            contentData.filename = file;
             contentData.link = baseUrl + file.replace(/\.md$/, "");
             contentList.push(contentData);
         }
 
         const totalPages = Math.ceil(files.length / pageSize);
         const pagination = {
-            prevLink: pageIndex > 1 ? `/contents-list/${category}/${category}-${pageIndex - 1}` : "",
-            nextLink: pageIndex < totalPages ? `/contents-list/${category}/${category}-${pageIndex + 1}` : ""
+            prevLink: pageIndex > 1 ? `/contents-list/${theme}/${category}/${category}-${pageIndex - 1}` : "",
+            nextLink: pageIndex < totalPages ? `/contents-list/${theme}/${category}/${category}-${pageIndex + 1}` : ""
         };
 
         const contentListData = {

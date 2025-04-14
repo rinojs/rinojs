@@ -11,13 +11,13 @@ export async function buildContent (mdPath, pagePath, componentsDir, mdsDir, arg
     {
         if (!await fileExists(mdPath))
         {
-            console.error("Building content: Markdown file not found");
-            return "Building content: Markdown file not found";
+            console.error(`Building content: Markdown file not found - ${mdPath}`);
+            return `Building content: Markdown file not found - ${mdPath}`;
         }
 
         const fileContent = await fsp.readFile(mdPath, "utf8");
-        const contentDir = path.dirname(mdPath);
-        const allFiles = (await fsp.readdir(contentDir))
+        const categoryDir = path.dirname(mdPath);
+        const allFiles = (await fsp.readdir(categoryDir))
             .filter(f => f.endsWith(".md"))
             .sort((a, b) =>
             {
@@ -26,8 +26,10 @@ export async function buildContent (mdPath, pagePath, componentsDir, mdsDir, arg
                 return aNum - bNum;
             });
         const currentFile = path.basename(mdPath);
-        const category = path.basename(contentDir);
-        const baseUrl = `/contents/${category}/`;
+        const parts = categoryDir.split(path.sep);
+        const contentsIndex = parts.indexOf("contents");
+        const subpath = parts.slice(contentsIndex + 1).join("/");
+        const baseUrl = `/contents/${subpath}/`;
         const jsonCommentRegex = /^<!--\s*([\s\S]*?)\s*-->\s*/;
         const jsonMatch = fileContent.match(jsonCommentRegex);
         const mdit = markdownit({
@@ -46,9 +48,9 @@ export async function buildContent (mdPath, pagePath, componentsDir, mdsDir, arg
                 const mdContent = fileContent.slice(jsonMatch[0].length);
                 const htmlContent = mdit.render(removeCodeLWS(removeLWS(mdContent)));
                 contentData.body = htmlContent;
-                contentData.urlPath = `/contents/${category}/${currentFile.replace(".md", "")}`;
+                contentData.urlPath = `/contents/${subpath}/${currentFile.replace(".md", "")}`;
 
-                await addNearbyContentData(contentData, allFiles, currentFile, baseUrl, contentDir);
+                await addNearbyContentData(contentData, allFiles, currentFile, baseUrl, categoryDir);
 
                 const updatedArgs = [...args, JSON.stringify(contentData)];
                 const pageTemplate = await buildComponent(
@@ -67,9 +69,9 @@ export async function buildContent (mdPath, pagePath, componentsDir, mdsDir, arg
                 const htmlContent = mdit.render(removeCodeLWS(removeLWS(fileContent)));
                 const contentData = {};
                 contentData.body = htmlContent;
-                contentData.urlPath = `/contents/${category}/${currentFile.replace(".md", "")}`;
+                contentData.urlPath = `/contents/${subpath}/${currentFile.replace(".md", "")}`;
 
-                await addNearbyContentData(contentData, allFiles, currentFile, baseUrl, contentDir);
+                await addNearbyContentData(contentData, allFiles, currentFile, baseUrl, categoryDir);
 
                 const updatedArgs = [...args, JSON.stringify(contentData)];
                 const pageTemplate = await buildComponent(
@@ -87,9 +89,9 @@ export async function buildContent (mdPath, pagePath, componentsDir, mdsDir, arg
             const htmlContent = mdit.render(removeCodeLWS(removeLWS(fileContent)));
             const contentData = {};
             contentData.body = htmlContent;
-            contentData.urlPath = `/contents/${category}/${currentFile.replace(".md", "")}`;
+            contentData.urlPath = `/contents/${subpath}/${currentFile.replace(".md", "")}`;
 
-            await addNearbyContentData(contentData, allFiles, currentFile, baseUrl, contentDir);
+            await addNearbyContentData(contentData, allFiles, currentFile, baseUrl, categoryDir);
 
             const updatedArgs = [...args, JSON.stringify(contentData)];
             const pageTemplate = await buildComponent(
@@ -140,13 +142,13 @@ function replaceContentTags (template, contentData)
     });
 }
 
-async function addNearbyContentData (contentData, allFiles, currentFile, baseUrl, contentDir)
+async function addNearbyContentData (contentData, allFiles, currentFile, baseUrl, categoryDir)
 {
     const currentIndex = allFiles.indexOf(currentFile);
     const getLink = (file) => baseUrl + file.replace(/\.md$/, "");
     const getMetaFromFile = async (file) =>
     {
-        const filePath = path.join(contentDir, file);
+        const filePath = path.join(categoryDir, file);
         const meta = {
             link: getLink(file)
         };
@@ -173,7 +175,7 @@ async function addNearbyContentData (contentData, allFiles, currentFile, baseUrl
     const start = Math.max(0, currentIndex - 4);
     const end = Math.min(allFiles.length, currentIndex + 5);
 
-    for (let i = start; i < end; i++)
+    for (let i = end - 1; i > start - 1; i--)
     {
         const file = allFiles[i];
         const meta = await getMetaFromFile(file);

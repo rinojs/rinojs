@@ -243,11 +243,12 @@ function generateDescription ()
 function kebabCase (str)
 {
     return str
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, "")
+        .normalize("NFKD")
+        .replace(/[^\p{L}\p{N}\s-]/gu, "")
         .trim()
         .replace(/\s+/g, "-")
-        .slice(0, 40);
+        .replace(/-+/g, "-")
+        .slice(0, 60);
 }
 
 async function generateFilePath ()
