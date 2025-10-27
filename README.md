@@ -22,8 +22,10 @@ npm i rinojs
 
 ## 📢 Notice
 ### 🎉 Release version v2.17.0
-Please use the latest version. Recommended to upgrade version of Rino after at least a day or a week after the release. So you don't have to deal with huge bug with new version. Because it is going to be tested in production level by development team after release.
 - Fixed bug that occurs when contents directory is missing
+
+### 🎉 Release version v2.17.1
+- Added staticSiteServer()
 
 ### 👍 Releasing Version 2
 
