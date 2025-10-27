@@ -27,6 +27,9 @@ npm i rinojs
 ### 🎉 Release version v2.17.1
 - Added staticSiteServer()
 
+### 🎉 Release version v2.17.2
+- Updated staticSiteServer()
+
 ### 👍 Releasing Version 2
 
 New version, better development experience and totally different from version 1.

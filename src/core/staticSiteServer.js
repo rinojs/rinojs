@@ -7,7 +7,6 @@ import http from "http";
 import express from "express";
 import { defaultMessage } from "./consoleMessages.js";
 import { createWSS } from "./wss.js";
-import { openBrowser } from "./browser.js";
 import { injectReload } from "./inject-reload.js";
 import { buildComponent } from "./component.js";
 import { bundleJS } from "./bundleJS.js";
@@ -57,8 +56,6 @@ export async function staticSiteServer(projectPath, port = 3000)
         .on("all", (event, filePath) => handleFileChange(filePath, event, port));
 
     await startServer(projectPath, port);
-    const devUrl = `http://localhost:${ port }`;
-    await openBrowser(devUrl);
 }
 
 function handleFileChange(filePath, event, port)
@@ -67,7 +64,7 @@ function handleFileChange(filePath, event, port)
     console.log(defaultMessage);
     console.log(`
 Server listening on port ${ port }
-Development: ${ chalk.blueBright.underline(`http://localhost:` + port) }
+${ chalk.blueBright.underline(`http://localhost:` + port) }
             `);
 
     console.log(`${ chalk.bgMagenta(filePath) } is ${ chalk.blue(event) }!`);
@@ -343,7 +340,7 @@ async function startServer(projectPath, port)
         console.log(defaultMessage);
         console.log(`
 Server listening on port ${ port }
-Development: ${ chalk.blueBright(`http://localhost:` + port) }
+${ chalk.blueBright(`http://localhost:` + port) }
             `);
     });
 
