@@ -7,4 +7,8 @@ export default {
     sitemap: [
         "https://example.com/example",
     ],
+    i18n: {
+        defaultLocale: "en",
+        locales: ["en", "ko"]
+    }
 }

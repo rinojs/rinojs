@@ -21,9 +21,68 @@ npm i rinojs
 ```
 
 ## 📢 Notice
-### 🎉 Release version v2.17.0
-Please use the latest version. Recommended to upgrade version of Rino after at least a day or a week after the release. So you don't have to deal with huge bug with new version. Because it is going to be tested in production level by development team after release.
-- Fixed bug that occurs when contents directory is missing
+
+### 🎉 Release version v2.18.0
+
+Rino.js now has a fully-featured, flexible, and developer-friendly JSON-based internationalization system for both dev server and static generation.
+Localization is now deeply integrated into the compiler pipeline while staying simple and intuitive to use.
+
+#### Example structure:
+
+```
+pages/
+  index.html
+  about.html
+
+i18n/
+  en/
+    index.json
+    about.json
+  ko/
+    index.json
+    about.json
+```
+
+Each `<lang>...</lang>` tag in your HTML will map to a key inside the corresponding JSON file:
+
+#### index.html:
+
+```
+<h1><lang>header.title</lang></h1>
+<p><lang>body.content.top[0]</lang></p>
+```
+
+#### i18n/en/index.json:
+
+```
+{
+  "header": { "title": "Welcome" },
+  "body": {
+    "content": { "top": ["First content block"] }
+  }
+}
+```
+
+#### rino-config:
+
+You can explicitly define which locales should be built and served.
+Only "en" and "ko" directories under `/i18n/` are used.
+All other locale folders are ignored (safe, predictable output).
+defaultLocale is applied to root pages (e.g. `/index.html`).
+Localized pages will be generated under `/dist/<locale>/` automatically.
+
+```
+    i18n: {
+        defaultLocale: "en",
+        locales: ["en", "ko"]
+    }
+```
+
+#### Other things to note for i18n feature:
+
+- Supports nested objects
+- Supports array indexing (e.g. items[0].label)
+- Missing keys gracefully fallback to default locale if configured
 
 ### 👍 Releasing Version 2
 
@@ -73,21 +132,30 @@ Development Build System is changed to the `server side rendering` with memory d
 ## 🕵️ Test
 
 ### E2E Test
+
 Right now end to end testing is implemented for test backoffice website with cypresss and playright.
 Both can be used to test backoffice website by:
+
 #### Cypress:
+
 ```
 npm run test-cp
 ```
+
 Which is `npx cypress open`
+
 #### Playwright
+
 ```
 npm run test-pw
 ```
+
 Which is `npx playwright test`
 
 ### Unit Test
+
 I am thinking of using `jest`.
+
 ## 📖 Documentation
 
 [Official Website](https://rinojs.org/)

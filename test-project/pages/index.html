@@ -1,20 +1,31 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <script src="/scripts/testTS.js"></script>
+    <link rel="stylesheet" href="/styles/test.css" />
+    <link rel="stylesheet" href="/bulma.min.css" />
+  </head>
 
-<head>
-  <script src="/scripts/testTS.js"></script>
-  <link rel="stylesheet" href="/styles/test.css">
-  <link rel="stylesheet" href="/bulma.min.css">
-</head>
-
-<body>
-  <img src="/images/f16g5sg.webp">
-  <button class="button">Button</button>
-  test index!!
-  <component @path="button" @tag="button" type="button" onclick="alert('Hello world!')" />
-  <component @path="footer" @tag="footer"></component>
-  <script @path="test" @tag="section" @type="md" type="text/markdown"></script>
-  <script @type="md" style="color: red" type="text/markdown">
+  <body>
+    <lang>name</lang>
+    <lang>body.test1[0].test2.test3</lang>
+    <img src="/images/f16g5sg.webp" />
+    <button class="button">Button</button>
+    test index!!
+    <component
+      @path="button"
+      @tag="button"
+      type="button"
+      onclick="alert('Hello world!')"
+    />
+    <component @path="footer" @tag="footer"></component>
+    <script
+      @path="test"
+      @tag="section"
+      @type="md"
+      type="text/markdown"
+    ></script>
+    <script @type="md" style="color: red" type="text/markdown">
       ## asdasd
 
       asdasd
@@ -44,34 +55,31 @@
       ```
     </script>
 
-  <script @type="js" type="text/javascript">
-    const args = JSON.parse(process.argv[1]);
-    const categoryLinks = args.categoryLinks;
+    <script @type="js" type="text/javascript">
+      const args = JSON.parse(process.argv[1]);
+      const categoryLinks = args.categoryLinks;
 
-    console.log("Category Links:");
-    for (const [category, link] of Object.entries(categoryLinks))
-    {
-      console.log(`${category}: ${link}`);
-    }
+      console.log("Category Links:");
+      for (const [category, link] of Object.entries(categoryLinks)) {
+        console.log(`${category}: ${link}`);
+      }
 
-    console.log("<nav><ul>");
-    for (const [category, link] of Object.entries(categoryLinks))
-    {
-      console.log(`<li><a href="${link}">${category}</a></li>`);
-    }
-    console.log("</ul></nav>");
-  </script>
-  <script @type="ts" type="text/typescript">
+      console.log("<nav><ul>");
+      for (const [category, link] of Object.entries(categoryLinks)) {
+        console.log(`<li><a href="${link}">${category}</a></li>`);
+      }
+      console.log("</ul></nav>");
+    </script>
+    <script @type="ts" type="text/typescript">
       // This is for templating html content
       let world: string = "Hello world! from typescript!";
       console.log(world);
     </script>
-  <script @type="js" type="text/javascript">
-    import os from "os";
-    // This is for templating html content
-    console.log("Hello world! from javascript!");
-    console.log(os.type());
-  </script>
-</body>
-
+    <script @type="js" type="text/javascript">
+      import os from "os";
+      // This is for templating html content
+      console.log("Hello world! from javascript!");
+      console.log(os.type());
+    </script>
+  </body>
 </html>
