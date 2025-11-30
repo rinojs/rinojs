@@ -20,11 +20,14 @@ import { loadConfig } from "./configLoader.js";
 import { fileExists, dirExists } from "./fsHelper.js"
 import { generateProjectSitemap } from './projectSitemap.js';
 import { generateProjectAtomFeed, generateProjectRSSFeed } from './projectFeed.js';
+import { loadI18nIndex, applyI18n } from "./i18n.js"
 
 let wss = null;
 let config = null;
+let locales = [];
+let i18nIndex = new Map();
 
-export async function devStaticSite (projectPath)
+export async function devStaticSite(projectPath)
 {
     if (!projectPath)
     {
@@ -44,7 +47,17 @@ export async function devStaticSite (projectPath)
         mds: path.join(projectPath, "mds"),
         contents: path.join(projectPath, "contents"),
         contentTheme: path.join(projectPath, "content-theme"),
+        i18n: path.join(projectPath, "i18n"),
     };
+
+    try
+    {
+        await updateI18N(projectPath);
+    }
+    catch (error)
+    {
+        console.error(`${ chalk.yellowBright(`Failed to reload i18n index: `) } ${ chalk.red(error) }`);
+    }
 
     chokidar
         .watch([
@@ -55,25 +68,35 @@ export async function devStaticSite (projectPath)
             dirs.scripts,
             dirs.styles,
             dirs.contents,
-            dirs.contentTheme
+            dirs.contentTheme,
+            dirs.i18n
         ], { ignoreInitial: true })
-        .on("all", (event, filePath) => handleFileChange(filePath, event, resolvedPort));
+        .on("all", (event, filePath) => handleFileChange(projectPath, filePath, event, resolvedPort));
 
     await startServer(projectPath, resolvedPort);
-    const devUrl = `http://localhost:${resolvedPort}`;
+    const devUrl = `http://localhost:${ resolvedPort }`;
     await openBrowser(devUrl);
 }
 
-function handleFileChange (filePath, event, port)
+async function handleFileChange(projectPath, filePath, event, port)
 {
     console.clear();
     console.log(defaultMessage);
     console.log(`
-Server listening on port ${port}
-Development: ${chalk.blueBright.underline(`http://localhost:` + port)}
+Server listening on port ${ port }
+Development: ${ chalk.blueBright.underline(`http://localhost:` + port) }
             `);
 
-    console.log(`${chalk.bgMagenta(filePath)} is ${chalk.blue(event)}!`);
+    console.log(`${ chalk.bgMagenta(filePath) } is ${ chalk.blue(event) }!`);
+
+    try
+    {
+        await updateI18N(projectPath);
+    }
+    catch (error)
+    {
+        console.error(`${ chalk.yellowBright(`Failed to reload i18n index: `) } ${ chalk.red(error) }`);
+    }
 
     if (wss)
     {
@@ -84,8 +107,12 @@ Development: ${chalk.blueBright.underline(`http://localhost:` + port)}
     }
 }
 
+async function updateI18N(projectPath)
+{
+    ({ locales, index: i18nIndex } = await loadI18nIndex(projectPath, config?.i18n?.locales));
+}
 
-async function startServer (projectPath, port)
+async function startServer(projectPath, port)
 {
     const app = express();
     app.use(cors());
@@ -178,8 +205,8 @@ async function startServer (projectPath, port)
                     const files = (await fsp.readdir(categoryDir)).filter(f => f.endsWith(".md"));
                     if (files.length > 0)
                     {
-                        const path = `/contents-list/${theme}/${category}/${category}-1`;
-                        categoryLinks[`${theme}/${category}`] = path;
+                        const path = `/contents-list/${ theme }/${ category }/${ category }-1`;
+                        categoryLinks[`${ theme }/${ category }`] = path;
                     }
                 }
             }
@@ -235,8 +262,8 @@ async function startServer (projectPath, port)
                     const files = (await fsp.readdir(categoryDir)).filter(f => f.endsWith(".md"));
                     if (files.length > 0)
                     {
-                        const path = `/contents-list/${theme}/${category}/${category}-1`;
-                        categoryLinks[`${theme}/${category}`] = path;
+                        const path = `/contents-list/${ theme }/${ category }/${ category }-1`;
+                        categoryLinks[`${ theme }/${ category }`] = path;
                     }
                 }
             }
@@ -252,7 +279,7 @@ async function startServer (projectPath, port)
         };
 
         let content = await buildContentList(
-            `${theme}/${category}/${pageName}`,
+            `${ theme }/${ category }/${ pageName }`,
             path.join(projectPath, "contents"),
             templatePath,
             path.join(projectPath, "components"),
@@ -310,26 +337,110 @@ async function startServer (projectPath, port)
                     const files = (await fsp.readdir(categoryDir)).filter(f => f.endsWith(".md"));
                     if (files.length > 0)
                     {
-                        const path = `/contents-list/${theme}/${category}/${category}-1`;
-                        categoryLinks[`${theme}/${category}`] = path;
+                        const path = `/contents-list/${ theme }/${ category }/${ category }-1`;
+                        categoryLinks[`${ theme }/${ category }`] = path;
                     }
                 }
             }
         }
 
         let decodedPath = decodeURIComponent(req.path);
-        let reqPath = decodedPath.endsWith("/") ? decodedPath + "index.html" : decodedPath;
+
+        let activeLocale = null;
+
+        const segments = decodedPath.split("/").filter(Boolean);
+        if (segments.length > 0 && locales.includes(segments[0]))
+        {
+            activeLocale = segments[0];
+            decodedPath = "/" + segments.slice(1).join("/");
+        }
+
+        let reqPath = decodedPath === "" || decodedPath === "/" ? "/index.html" : (decodedPath.endsWith("/") ? decodedPath + "index.html" : decodedPath);
+
         let pagePath = path.join(projectPath, "pages", reqPath);
         if (!pagePath.endsWith(".html")) pagePath += ".html";
 
         const pageArgs = {
             pagePath: pagePath,
             categoryLinks: categoryLinks
-        }
+        };
 
         if (await fileExists(pagePath))
         {
-            let content = await buildComponent(pagePath, path.join(projectPath, "components"), path.join(projectPath, "mds"), [JSON.stringify(pageArgs)]);
+            let content = await buildComponent(
+                pagePath,
+                path.join(projectPath, "components"),
+                path.join(projectPath, "mds"),
+                [JSON.stringify(pageArgs)]
+            );
+
+            const relativeHtmlPath = path
+                .relative(path.join(projectPath, "pages"), pagePath)
+                .replace(/\\/g, "/");
+
+            const defaultLocale = config?.i18n?.defaultLocale;
+            if (!activeLocale && defaultLocale)
+            {
+                const jsonPath = i18nIndex.get(`${ defaultLocale }:${ relativeHtmlPath }`);
+                if (jsonPath && await fileExists(jsonPath))
+                {
+                    try
+                    {
+                        const raw = await fsp.readFile(jsonPath, "utf8");
+                        const translations = JSON.parse(raw);
+                        content = applyI18n(content, translations);
+                    }
+                    catch (err)
+                    {
+                        console.error(
+                            `Failed to apply default i18n for ${ relativeHtmlPath } (${ defaultLocale }) in dev:`,
+                            err
+                        );
+                    }
+                }
+            }
+
+            if (activeLocale)
+            {
+                let mergedTranslations = {};
+
+                const defaultLocale = config?.i18n?.defaultLocale;
+                const defaultJsonPath = defaultLocale
+                    ? i18nIndex.get(`${ defaultLocale }:${ relativeHtmlPath }`)
+                    : null;
+
+                if (defaultJsonPath && await fileExists(defaultJsonPath))
+                {
+                    try
+                    {
+                        const raw = await fsp.readFile(defaultJsonPath, "utf8");
+                        mergedTranslations = JSON.parse(raw);
+                    }
+                    catch (err)
+                    {
+                        console.error(`Default i18n parse failed (${ defaultLocale })`, err);
+                    }
+                }
+
+                const localeJsonPath = i18nIndex.get(`${ activeLocale }:${ relativeHtmlPath }`);
+                if (localeJsonPath && await fileExists(localeJsonPath))
+                {
+                    try
+                    {
+                        const raw = await fsp.readFile(localeJsonPath, "utf8");
+                        const translations = JSON.parse(raw);
+                        mergedTranslations = { ...mergedTranslations, ...translations };
+                    }
+                    catch (err)
+                    {
+                        console.error(`Locale i18n parse failed (${ activeLocale })`, err);
+                    }
+                }
+
+                content = applyI18n(content, mergedTranslations);
+            }
+
+
             content = await injectReload(content, port);
             res.send(content);
         }
@@ -345,8 +456,8 @@ async function startServer (projectPath, port)
     {
         console.log(defaultMessage);
         console.log(`
-Server listening on port ${port}
-Development: ${chalk.blueBright(`http://localhost:` + port)}
+Server listening on port ${ port }
+Development: ${ chalk.blueBright(`http://localhost:` + port) }
             `);
     });
 
