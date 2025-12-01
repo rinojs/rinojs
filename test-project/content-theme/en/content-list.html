@@ -1,80 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Content List</title>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <title>Content List</title>
-</head>
+  <body>
+    <main>
+      <h1>Content List Page</h1>
+      <ol>
+        <script rino-type="js" type="text/javascript">
+          var args = process.argv;
+          var contentListDataString = args[args.length - 1];
+          var contentListData = JSON.parse(contentListDataString);
+          var contentList = contentListData.contentList;
 
-<body>
-  <main>
-    <h1>Content List Page</h1>
-    <ol>
-      <script @type="js" type="text/javascript">
-        var args = process.argv;
-        var contentListDataString = args[args.length - 1];
-        var contentListData = JSON.parse(contentListDataString);
-        var contentList = contentListData.contentList;
-
-        for (let i = 0; i < contentList.length; i++)
-        {
-          const item = contentList[i];
-          if (item?.title && item?.link)
-          {
-            console.log(`<li><a href="${item.link}">${item.title}</a></li>`);
+          for (let i = 0; i < contentList.length; i++) {
+            const item = contentList[i];
+            if (item?.title && item?.link) {
+              console.log(`<li><a href="${item.link}">${item.title}</a></li>`);
+            }
           }
-        }
-      </script>
-    </ol>
+        </script>
+      </ol>
 
-    <nav>
-      <script @type="js" type="text/javascript">
-        var args = process.argv;
-        var contentListDataString = args[args.length - 1];
-        var contentListData = JSON.parse(contentListDataString);
-        var pagination = contentListData.pagination;
+      <nav>
+        <script rino-type="js" type="text/javascript">
+          var args = process.argv;
+          var contentListDataString = args[args.length - 1];
+          var contentListData = JSON.parse(contentListDataString);
+          var pagination = contentListData.pagination;
 
-        if (pagination.prevLink)
-        {
-          console.log(`
+          if (pagination.prevLink) {
+            console.log(`
             <div>
               <a href="{{ pagination.prevLink }}">Previous List</a>
             </div>
           `);
-        }
-        if (pagination.nextLink)
-        {
-          console.log(`
+          }
+          if (pagination.nextLink) {
+            console.log(`
             <div>
               <a href="{{ pagination.nextLink }}">Next List</a>
             </div>
           `);
+          }
+        </script>
+      </nav>
+
+      <script rino-type="js" type="text/javascript">
+        const args = JSON.parse(process.argv[1]);
+        const categoryLinks = args.categoryLinks;
+
+        console.log("Category Links:");
+        for (const [category, link] of Object.entries(categoryLinks)) {
+          const [theme] = category.split("/");
+          if (theme !== "en") continue;
+          console.log(`${category}: ${link}`);
         }
+
+        console.log("<nav><ul>");
+        for (const [category, link] of Object.entries(categoryLinks)) {
+          const [theme] = category.split("/");
+          if (theme !== "en") continue;
+          console.log(`<li><a href="${link}">${category}</a></li>`);
+        }
+        console.log("</ul></nav>");
       </script>
-    </nav>
-
-    <script @type="js" type="text/javascript">
-      const args = JSON.parse(process.argv[1]);
-      const categoryLinks = args.categoryLinks;
-
-      console.log("Category Links:");
-      for (const [category, link] of Object.entries(categoryLinks))
-      {
-        const [theme] = category.split("/");
-        if (theme !== "en") continue;
-        console.log(`${category}: ${link}`);
-      }
-
-      console.log("<nav><ul>");
-      for (const [category, link] of Object.entries(categoryLinks))
-      {
-        const [theme] = category.split("/");
-        if (theme !== "en") continue;
-        console.log(`<li><a href="${link}">${category}</a></li>`);
-      }
-      console.log("</ul></nav>");
-    </script>
-  </main>
-</body>
-
+    </main>
+  </body>
 </html>

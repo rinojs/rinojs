@@ -4,26 +4,30 @@
   <body>
     kokokokokokokokokokokokokokokokokokokokokoko
     <component
-      @path="button"
-      @tag="button"
+      rino-path="button"
+      rino-tag="button"
       type="button"
       onclick="alert('Hello world!')"
     />
-    <component @path="button" type="button" onclick="alert('Hello world!')" />
-    <component @path="footer" @tag="footer" />
-    <script @type="md" style="color: red" type="text/markdown">
+    <component
+      rino-path="button"
+      type="button"
+      onclick="alert('Hello world!')"
+    />
+    <component rino-path="footer" rino-tag="footer" />
+    <script rino-type="md" style="color: red" type="text/markdown">
       ## test
 
       test
 
       - test
     </script>
-    <script @type="ts" type="text/typescript">
+    <script rino-type="ts" type="text/typescript">
       // This is for templating html content
       let world: string = "Hello world! from typescript";
       result = world;
     </script>
-    <script @type="js" type="text/javascript">
+    <script rino-type="js" type="text/javascript">
       // This is for templating html content
       result = "Hello world! from javascript";
     </script>

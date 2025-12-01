@@ -1,64 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ content.title }}</title>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <title>{{ content.title }}</title>
-</head>
+  <body>
+    <main>
+      <h1>{{ content.title }}</h1>
+      <p><em>Published: {{ content.time }}</em></p>
+      <article>{{ content.body }}</article>
+      <nav>
+        <script rino-type="js" type="text/javascript">
+          const args = process.argv;
+          const contentDataString = args[args.length - 1];
+          const contentData = JSON.parse(contentDataString);
 
-<body>
-  <main>
-    <h1>{{ content.title }}</h1>
-    <p><em>Published: {{ content.time }}</em></p>
-    <article>
-      {{ content.body }}
-    </article>
-    <nav>
-      <script @type="js" type="text/javascript">
-        const args = process.argv;
-        const contentDataString = args[args.length - 1];
-        const contentData = JSON.parse(contentDataString);
+          if (Array.isArray(contentData.nearby)) {
+            console.log(`<ul>`);
+            contentData.nearby.forEach((post) => {
+              if (post.link === contentData.urlPath) {
+                console.log(`<li><span>${post.title}</span></li>`);
+              } else {
+                console.log(
+                  `<li><a href="${post.link}">${post.title}</a></li>`
+                );
+              }
+            });
+            console.log(`</ul>`);
+          }
+        </script>
+      </nav>
 
-        if (Array.isArray(contentData.nearby))
-        {
-          console.log(`<ul>`);
-          contentData.nearby.forEach(post =>
-          {
-            if (post.link === contentData.urlPath)
-            {
-              console.log(`<li><span>${post.title}</span></li>`);
-            } else
-            {
-              console.log(`<li><a href="${post.link}">${post.title}</a></li>`);
-            }
-          });
-          console.log(`</ul>`);
+      <script rino-type="js" type="text/javascript">
+        const args = JSON.parse(process.argv[1]);
+        const categoryLinks = args.categoryLinks;
+
+        console.log("Category Links:");
+        for (const [category, link] of Object.entries(categoryLinks)) {
+          const [theme] = category.split("/");
+          if (theme !== "ko") continue;
+          console.log(`${category}: ${link}`);
         }
+
+        console.log("<nav><ul>");
+        for (const [category, link] of Object.entries(categoryLinks)) {
+          const [theme] = category.split("/");
+          if (theme !== "ko") continue;
+          console.log(`<li><a href="${link}">${category}</a></li>`);
+        }
+        console.log("</ul></nav>");
       </script>
-    </nav>
-
-    <script @type="js" type="text/javascript">
-      const args = JSON.parse(process.argv[1]);
-      const categoryLinks = args.categoryLinks;
-
-      console.log("Category Links:");
-      for (const [category, link] of Object.entries(categoryLinks))
-      {
-        const [theme] = category.split("/");
-        if (theme !== "ko") continue;
-        console.log(`${category}: ${link}`);
-      }
-
-      console.log("<nav><ul>");
-      for (const [category, link] of Object.entries(categoryLinks))
-      {
-        const [theme] = category.split("/");
-        if (theme !== "ko") continue;
-        console.log(`<li><a href="${link}">${category}</a></li>`);
-      }
-      console.log("</ul></nav>");
-    </script>
-  </main>
-</body>
-
+    </main>
+  </body>
 </html>

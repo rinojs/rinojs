@@ -13,19 +13,19 @@
     <button class="button">Button</button>
     test index!!
     <component
-      @path="button"
-      @tag="button"
+      rino-path="button"
+      rino-tag="button"
       type="button"
       onclick="alert('Hello world!')"
     />
-    <component @path="footer" @tag="footer"></component>
+    <component rino-path="footer" rino-tag="footer"></component>
     <script
-      @path="test"
-      @tag="section"
-      @type="md"
+      rino-path="test"
+      rino-tag="section"
+      rino-type="md"
       type="text/markdown"
     ></script>
-    <script @type="md" style="color: red" type="text/markdown">
+    <script rino-type="md" style="color: red" type="text/markdown">
       ## asdasd
 
       asdasd
@@ -55,7 +55,7 @@
       ```
     </script>
 
-    <script @type="js" type="text/javascript">
+    <script rino-type="js" type="text/javascript">
       const args = JSON.parse(process.argv[1]);
       const categoryLinks = args.categoryLinks;
 
@@ -70,12 +70,12 @@
       }
       console.log("</ul></nav>");
     </script>
-    <script @type="ts" type="text/typescript">
+    <script rino-type="ts" type="text/typescript">
       // This is for templating html content
       let world: string = "Hello world! from typescript!";
       console.log(world);
     </script>
-    <script @type="js" type="text/javascript">
+    <script rino-type="js" type="text/javascript">
       import os from "os";
       // This is for templating html content
       console.log("Hello world! from javascript!");

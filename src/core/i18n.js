@@ -3,22 +3,29 @@ import path from 'path';
 import { dirExists, getFilesRecursively } from "./fsHelper.js";
 import { getDeepValue } from "./valueGetter.js";
 
+const ESC_OPEN = "___RINO_ESCAPE_LANG_OPEN___";
+const ESC_CLOSE = "___RINO_ESCAPE_LANG_CLOSE___";
 
 export function applyI18n(html, translations = {})
 {
     if (!translations || typeof translations !== "object")
         return html;
 
-    return html.replace(/<lang>([\s\S]*?)<\/lang>/g, (match, key) =>
-    {
-        const path = key.trim();
-        const value = getDeepValue(translations, path);
+    return html
+        .replace(/\\<lang>/g, ESC_OPEN)
+        .replace(/\\<\/lang>/g, ESC_CLOSE)
+        .replace(/<lang>([\s\S]*?)<\/lang>/g, (match, key) =>
+        {
+            const path = key.trim();
+            const value = getDeepValue(translations, path);
 
-        if (value === "" || value === undefined || value === null)
-            return match;
+            if (value === "" || value === undefined || value === null)
+                return match;
 
-        return value;
-    });
+            return value;
+        })
+        .replace(new RegExp(ESC_OPEN, "g"), "<lang>")
+        .replace(new RegExp(ESC_CLOSE, "g"), "</lang>");
 }
 
 export async function loadI18nIndex(projectPath, configLocales)
