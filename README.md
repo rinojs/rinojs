@@ -22,6 +22,46 @@ npm i rinojs
 
 ## 📢 Notice
 
+### 🚀 Planning to go version v3.0.0
+
+Rino.js is going to be version 3.0.0 after some of new features and bugs are sorted.
+I know my versioning style is not that great.
+But I want Rino.js version 3 to be more completed than beginning of version 2.
+
+### 🎉 Release version v2.19.0
+
+#### 1. Deprecation of `@`
+
+Now from version 2.19.0 we need to `rino-` instead of `@` for attributes.
+
+```
+<component rino-path="/common/head" />
+<component rino-path="/common/header" rino-tag="header"></component>
+<script rino-type="markdown" rino-path="/docs/getting-started.md"></script>
+```
+
+#### 2. Added escape to i18n system.
+
+Input:
+
+```
+\<lang>head.title\</lang>
+<p><lang>head.title</lang></p>
+<p><lang>missing.value</lang></p>
+```
+
+Output:
+
+```
+<lang>head.title</lang>
+<p>Translated Title Here</p>
+<p><lang>missing.value</lang></p>
+```
+
+### 3. Added i18n pages' urls to project sitemap system
+
+Now i18n pages are going to be included in project sitemap generation.
+
 ### 🎉 Release version v2.18.0
 
 Rino.js now has a fully-featured, flexible, and developer-friendly JSON-based internationalization system for both dev server and static generation.
