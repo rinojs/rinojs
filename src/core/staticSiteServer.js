@@ -85,7 +85,7 @@ async function startServer(projectPath, port)
     app.use(cors());
     app.use(express.static(path.join(projectPath, "public")));
 
-    app.get("/scripts/*.js", async (req, res) =>
+    app.get(/^\/scripts\/.*\.js$/, async (req, res) =>
     {
         const requestPath = decodeURIComponent(req.path).replace("/scripts", "");
         const jsPath = path.join(projectPath, "scripts/export", requestPath);
@@ -123,7 +123,7 @@ async function startServer(projectPath, port)
         res.status(404).send("File not found");
     });
 
-    app.get("/styles/*.css", async (req, res) =>
+    app.get(/^\/styles\/.*\.css$/, async (req, res) =>
     {
         const requestPath = decodeURIComponent(req.path).replace("/styles", "");
         const stylePath = path.join(projectPath, "styles/export", requestPath);
@@ -148,7 +148,7 @@ async function startServer(projectPath, port)
         res.status(404).send("File not found");
     });
 
-    app.get("/contents/*", async (req, res) =>
+    app.get(/^\/contents\/.+/, async (req, res) =>
     {
         const categoryLinks = {};
         const contentDir = path.join(projectPath, "contents");
@@ -205,7 +205,7 @@ async function startServer(projectPath, port)
         res.send(content);
     });
 
-    app.get("/contents-list/*", async (req, res) =>
+    app.get(/^\/contents-list\/.+/, async (req, res) =>
     {
         const categoryLinks = {};
         const contentDir = path.join(projectPath, "contents");
@@ -280,7 +280,7 @@ async function startServer(projectPath, port)
     });
 
 
-    app.get("*", async (req, res) =>
+    app.get(/.*/, async (req, res) =>
     {
         const categoryLinks = {};
         const contentDir = path.join(projectPath, "contents");

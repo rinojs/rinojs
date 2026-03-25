@@ -2,7 +2,24 @@ import { exec } from 'child_process';
 
 export async function openBrowser(url)
 {
-    if (process.platform === 'darwin') exec(`open ${ url }`);
-    else if (process.platform === 'win32') exec(`start ${ url }`);
-    else exec(`xdg-open ${ url }`);
+    const command = process.platform === 'darwin'
+        ? `open "${ url }"`
+        : process.platform === 'win32'
+            ? `start "" "${ url }"`
+            : `xdg-open "${ url }"`;
+
+    try
+    {
+        exec(command, (error) =>
+        {
+            if (error)
+            {
+                console.warn(`Failed to open browser automatically: ${ error.message }`);
+            }
+        });
+    }
+    catch (error)
+    {
+        console.warn(`Failed to open browser automatically: ${ error.message }`);
+    }
 }
