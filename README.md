@@ -28,7 +28,7 @@ Rino.js is going to be version 3.0.0 after some of new features and bugs are sor
 I know my versioning style is not that great.
 But I want Rino.js version 3 to be more completed than beginning of version 2.
 
-### 🎉 Release version v2.20.0
+### 🎉 Release version v2.22.0
 
 Cleared outdated packages and checked bugs. Which caused some changes. Please report any problem.
 
