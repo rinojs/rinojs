@@ -2,6 +2,7 @@ import fs from "fs/promises";
 import path from "path";
 import { renderSSRMD } from "./ssrMDRenderer.js";
 import { fileExists } from "../fsHelper.js";
+import { renderDiagnostic } from "../renderDiagnostic.js";
 
 export async function buildSSRComponent(componentPath, componentsDir, mdDir, args = [])
 {
@@ -65,7 +66,8 @@ export async function buildSSRComponent(componentPath, componentsDir, mdDir, arg
   }
   catch (error)
   {
-    return error;
+    console.error(error);
+    return renderDiagnostic("Building SSR component failed", error);
   }
 }
 
@@ -86,7 +88,8 @@ async function renderSSRComponent(attributes, componentsDir, mdDir, args = [])
   }
   catch (error)
   {
-    return error;
+    console.error(error);
+    return renderDiagnostic("Rendering SSR component failed", error);
   }
 }
 

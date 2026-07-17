@@ -175,30 +175,17 @@ Development Build System is changed to the `server side rendering` with memory d
 
 ## 🕵️ Test
 
-### E2E Test
-
-Right now end to end testing is implemented for test backoffice website with cypresss and playright.
-Both can be used to test backoffice website by:
-
-#### Cypress:
+Use the included test project scripts for local checks:
 
 ```
-npm run test-cp
+npm test
+npm run test-generate
+npm run test-sitemap
+npm run test-feed
+npm run test-ssr
+npm run test-dev
+npm run test-backoffice
 ```
-
-Which is `npx cypress open`
-
-#### Playwright
-
-```
-npm run test-pw
-```
-
-Which is `npx playwright test`
-
-### Unit Test
-
-I am thinking of using `jest`.
 
 ## 📖 Documentation
 

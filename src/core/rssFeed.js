@@ -1,4 +1,5 @@
 import fsp from "fs/promises";
+import { escapeXmlText } from "./xmlEscape.js";
 
 export async function generateRSSFeed (contentItems, siteUrl)
 {
@@ -7,9 +8,9 @@ export async function generateRSSFeed (contentItems, siteUrl)
   const pubDate = new Date().toUTCString();
   const rssItems = contentItems.map(({ title, link }) => `
       <item>
-        <title>${title}</title>
-        <link>${link}</link>
-        <guid>${link}</guid>
+        <title>${escapeXmlText(title)}</title>
+        <link>${escapeXmlText(link)}</link>
+        <guid>${escapeXmlText(link)}</guid>
         <pubDate>${pubDate}</pubDate>
       </item>
     `).join('');
@@ -17,9 +18,9 @@ export async function generateRSSFeed (contentItems, siteUrl)
   const rss = `<?xml version="1.0" encoding="UTF-8"?>
     <rss version="2.0">
       <channel>
-        <title>${siteUrl}</title>
-        <link>${siteUrl}</link>
-        <description>RSS Feed for content of ${siteUrl}</description>
+        <title>${escapeXmlText(siteUrl)}</title>
+        <link>${escapeXmlText(siteUrl)}</link>
+        <description>RSS Feed for content of ${escapeXmlText(siteUrl)}</description>
         <lastBuildDate>${pubDate}</lastBuildDate>
         ${rssItems}
       </channel>
@@ -37,9 +38,9 @@ export async function generateRSSFeedFile (contentItems, filename, siteUrl)
     const pubDate = new Date().toUTCString();
     const rssItems = contentItems.map(({ title, link }) => `
       <item>
-        <title>${title}</title>
-        <link>${link}</link>
-        <guid>${link}</guid>
+        <title>${escapeXmlText(title)}</title>
+        <link>${escapeXmlText(link)}</link>
+        <guid>${escapeXmlText(link)}</guid>
         <pubDate>${pubDate}</pubDate>
       </item>
     `).join('');
@@ -47,9 +48,9 @@ export async function generateRSSFeedFile (contentItems, filename, siteUrl)
     const rss = `<?xml version="1.0" encoding="UTF-8"?>
     <rss version="2.0">
       <channel>
-        <title>${siteUrl}</title>
-        <link>${siteUrl}</link>
-        <description>${siteUrl} RSS Feed</description>
+        <title>${escapeXmlText(siteUrl)}</title>
+        <link>${escapeXmlText(siteUrl)}</link>
+        <description>${escapeXmlText(siteUrl)} RSS Feed</description>
         <lastBuildDate>${pubDate}</lastBuildDate>
         ${rssItems}
       </channel>

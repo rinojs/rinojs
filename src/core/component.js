@@ -4,6 +4,7 @@ import { getResultFromCode } from "./scriptRenderer.js";
 import { renderMD } from "./mdRenderer.js";
 import typescript from "typescript";
 import { fileExists } from "./fsHelper.js";
+import { renderDiagnostic } from "./renderDiagnostic.js";
 
 export async function buildComponent(componentPath, componentsDir, mdsDir, args = [])
 {
@@ -88,7 +89,8 @@ export async function buildComponent(componentPath, componentsDir, mdsDir, args 
   }
   catch (error)
   {
-    return error;
+    console.error(error);
+    return renderDiagnostic("Building component failed", error);
   }
 }
 
@@ -109,7 +111,8 @@ async function renderComponent(attributes, componentsDir, mdsDir, args = [])
   }
   catch (error)
   {
-    return error;
+    console.error(error);
+    return renderDiagnostic("Rendering component failed", error);
   }
 }
 

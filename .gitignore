@@ -106,3 +106,6 @@ dist
 .tern-port
 
 test-results/
+Agents.md
+AGENTS.md
+temp/
