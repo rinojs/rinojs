@@ -11,21 +11,15 @@ import { createWSS } from "./wss.js";
 import { openBrowser } from "./browser.js";
 import { injectReload } from "./inject-reload.js";
 import { buildComponent } from "./component.js";
-import { bundleJS } from "./bundleJS.js";
-import { bundleTS } from "./bundleTS.js";
-import { bundleCSS } from "./bundleCSS.js";
-import { buildContent } from "./content.js";
-import { buildContentList } from "./contentList.js";
 import { loadConfig } from "./configLoader.js";
-import { fileExists, dirExists } from "./fsHelper.js"
-import { generateProjectSitemap } from './projectSitemap.js';
-import { generateProjectAtomFeed, generateProjectRSSFeed } from './projectFeed.js';
+import { fileExists } from "./fsHelper.js"
 import { loadI18nIndex, applyI18n } from "./i18n.js"
-
-let wss = null;
-let config = null;
-let locales = [];
-let i18nIndex = new Map();
+import { deepMerge } from "./deepMerge.js";
+import { registerAssetRoutes } from "./server/assetRoutes.js";
+import { buildCategoryLinks } from "./server/categoryLinks.js";
+import { registerContentRoutes } from "./server/contentRoutes.js";
+import { registerMetadataRoutes } from "./server/metadataRoutes.js";
+import { createServerController } from "./server/serverController.js";
 
 export async function devStaticSite(projectPath)
 {
@@ -35,8 +29,13 @@ export async function devStaticSite(projectPath)
         return;
     }
 
-    config = await loadConfig(projectPath);
-    const port = config.port || 3000;
+    const state = {
+        config: await loadConfig(projectPath),
+        locales: [],
+        i18nIndex: new Map(),
+        wss: null
+    };
+    const port = state.config.port || 3000;
     const resolvedPort = await findPort(port);
     const dirs = {
         pages: path.join(projectPath, "pages"),
@@ -52,14 +51,14 @@ export async function devStaticSite(projectPath)
 
     try
     {
-        await updateI18N(projectPath);
+        await updateI18N(projectPath, state);
     }
     catch (error)
     {
         console.error(`${ chalk.yellowBright(`Failed to reload i18n index: `) } ${ chalk.red(error) }`);
     }
 
-    chokidar
+    const watcher = chokidar
         .watch([
             dirs.pages,
             dirs.components,
@@ -71,14 +70,21 @@ export async function devStaticSite(projectPath)
             dirs.contentTheme,
             dirs.i18n
         ], { ignoreInitial: true })
-        .on("all", (event, filePath) => handleFileChange(projectPath, filePath, event, resolvedPort));
+        .on("all", (event, filePath) => handleFileChange(projectPath, filePath, event, resolvedPort, state));
 
-    await startServer(projectPath, resolvedPort);
+    const server = await startServer(projectPath, resolvedPort, state);
     const devUrl = `http://localhost:${ resolvedPort }`;
     await openBrowser(devUrl);
+
+    return createServerController({
+        port: resolvedPort,
+        server,
+        watcher,
+        wss: state.wss
+    });
 }
 
-async function handleFileChange(projectPath, filePath, event, port)
+async function handleFileChange(projectPath, filePath, event, port, state)
 {
     console.clear();
     console.log(defaultMessage);
@@ -91,265 +97,48 @@ Development: ${ chalk.blueBright.underline(`http://localhost:` + port) }
 
     try
     {
-        await updateI18N(projectPath);
+        await updateI18N(projectPath, state);
     }
     catch (error)
     {
         console.error(`${ chalk.yellowBright(`Failed to reload i18n index: `) } ${ chalk.red(error) }`);
     }
 
-    if (wss)
+    if (state.wss)
     {
-        wss.clients.forEach((client) =>
+        state.wss.clients.forEach((client) =>
         {
             client.send("reload");
         });
     }
 }
 
-async function updateI18N(projectPath)
+async function updateI18N(projectPath, state)
 {
-    ({ locales, index: i18nIndex } = await loadI18nIndex(projectPath, config?.i18n?.locales));
+    ({ locales: state.locales, index: state.i18nIndex } = await loadI18nIndex(projectPath, state.config?.i18n?.locales));
 }
 
-async function startServer(projectPath, port)
+async function startServer(projectPath, port, state)
 {
     const app = express();
     app.use(cors());
     app.use(express.static(path.join(projectPath, "public")));
 
-    app.get(/^\/scripts\/.*\.js$/, async (req, res) =>
-    {
-        const requestPath = decodeURIComponent(req.path).replace("/scripts", "");
-        const jsPath = path.join(projectPath, "scripts/export", requestPath);
-        const tsPath = path.join(
-            projectPath,
-            "scripts/export",
-            path.basename(requestPath, path.extname(requestPath)) + ".ts"
-        );
-
-        try
-        {
-            if (await fileExists(jsPath))
-            {
-                const script = await bundleJS(jsPath, path.basename(jsPath, path.extname(jsPath)));
-                res.setHeader("Content-Type", "application/javascript");
-                res.send(script);
-                return;
-            }
-            else if (await fileExists(tsPath))
-            {
-                const script = await bundleTS(tsPath, projectPath, path.basename(tsPath, path.extname(tsPath)));
-                res.setHeader("Content-Type", "application/javascript");
-                res.send(script);
-                return;
-            }
-
-        }
-        catch (err)
-        {
-            console.error("Script bundling error:", err);
-            return;
-        }
-
-
-        res.status(404).send("File not found");
-    });
-
-    app.get(/^\/styles\/.*\.css$/, async (req, res) =>
-    {
-        const requestPath = decodeURIComponent(req.path).replace("/styles", "");
-        const stylePath = path.join(projectPath, "styles/export", requestPath);
-
-        try
-        {
-            if (await fileExists(stylePath))
-            {
-                const raw = await fsp.readFile(stylePath, "utf8");
-                const compiled = await bundleCSS(raw, path.dirname(stylePath));
-                res.setHeader("Content-Type", "text/css");
-                res.send(compiled);
-                return;
-            }
-        }
-        catch (err)
-        {
-            res.status(404).send("Style not found");
-            return;
-        }
-
-        res.status(404).send("File not found");
-    });
-
-    app.get(/^\/contents\/.+/, async (req, res) =>
-    {
-        const categoryLinks = {};
-        const contentDir = path.join(projectPath, "contents");
-
-        if (await dirExists(contentDir))
-        {
-            const themeDirs = (await fsp.readdir(contentDir, { withFileTypes: true }))
-                .filter(dirent => dirent.isDirectory())
-                .map(dirent => dirent.name);
-
-            for (const theme of themeDirs)
-            {
-                const themeDir = path.join(contentDir, theme);
-                const categoryDirs = (await fsp.readdir(themeDir, { withFileTypes: true }))
-                    .filter(dirent => dirent.isDirectory())
-                    .map(dirent => dirent.name);
-
-                for (const category of categoryDirs)
-                {
-                    const categoryDir = path.join(themeDir, category);
-                    const files = (await fsp.readdir(categoryDir)).filter(f => f.endsWith(".md"));
-                    if (files.length > 0)
-                    {
-                        const path = `/contents-list/${ theme }/${ category }/${ category }-1`;
-                        categoryLinks[`${ theme }/${ category }`] = path;
-                    }
-                }
-            }
-        }
-
-        const slug = req.path.replace(/^\/contents\//, "");
-        const decodedSlug = decodeURIComponent(slug);
-        const mdPath = path.join(projectPath, "contents", decodedSlug + ".md");
-
-        if (!await fileExists(mdPath)) return res.status(404).send("Content not found");
-
-        const parts = decodedSlug.split("/");
-        const theme = parts[0];
-        const category = parts[1];
-        const templatePath = path.join(projectPath, "content-theme", theme, "content.html");
-        const pageArgs = {
-            pagePath: templatePath,
-            categoryLinks
-        };
-
-        let content = await buildContent(
-            mdPath,
-            templatePath,
-            path.join(projectPath, "components"),
-            path.join(projectPath, "mds"),
-            [JSON.stringify(pageArgs)]
-        );
-        content = await injectReload(content, port);
-        res.send(content);
-    });
-
-    app.get(/^\/contents-list\/.+/, async (req, res) =>
-    {
-        const categoryLinks = {};
-        const contentDir = path.join(projectPath, "contents");
-
-        if (await dirExists(contentDir))
-        {
-            const themeDirs = (await fsp.readdir(contentDir, { withFileTypes: true }))
-                .filter(dirent => dirent.isDirectory())
-                .map(dirent => dirent.name);
-
-            for (const theme of themeDirs)
-            {
-                const themeDir = path.join(contentDir, theme);
-                const categoryDirs = (await fsp.readdir(themeDir, { withFileTypes: true }))
-                    .filter(dirent => dirent.isDirectory())
-                    .map(dirent => dirent.name);
-
-                for (const category of categoryDirs)
-                {
-                    const categoryDir = path.join(themeDir, category);
-                    const files = (await fsp.readdir(categoryDir)).filter(f => f.endsWith(".md"));
-                    if (files.length > 0)
-                    {
-                        const path = `/contents-list/${ theme }/${ category }/${ category }-1`;
-                        categoryLinks[`${ theme }/${ category }`] = path;
-                    }
-                }
-            }
-        }
-
-        const slug = req.path.replace(/^\/contents-list\//, "");
-        const decodedSlug = decodeURIComponent(slug);
-        const [theme, category, pageName] = decodedSlug.split("/");
-        const templatePath = path.join(projectPath, "content-theme", theme, "content-list.html");
-        const pageArgs = {
-            pagePath: templatePath,
-            categoryLinks
-        };
-
-        let content = await buildContentList(
-            `${ theme }/${ category }/${ pageName }`,
-            path.join(projectPath, "contents"),
-            templatePath,
-            path.join(projectPath, "components"),
-            path.join(projectPath, "mds"),
-            10,
-            [JSON.stringify(pageArgs)]
-        );
-        content = await injectReload(content, port);
-        res.send(content);
-    });
-
-    app.get("/sitemap.xml", async (req, res) =>
-    {
-        const content = await generateProjectSitemap(projectPath, config);
-        res.setHeader("Content-Type", "application/xml");
-        res.send(content);
-    });
-
-    app.get("/rss.xml", async (req, res) =>
-    {
-        const content = await generateProjectRSSFeed(projectPath, config);
-        res.setHeader("Content-Type", "application/xml");
-        res.send(content);
-    });
-
-    app.get("/atom.xml", async (req, res) =>
-    {
-        const content = await generateProjectAtomFeed(projectPath, config);
-        res.setHeader("Content-Type", "application/xml");
-        res.send(content);
-    });
+    registerAssetRoutes(app, projectPath);
+    registerContentRoutes(app, projectPath, port);
+    registerMetadataRoutes(app, projectPath, state.config);
 
 
     app.get(/.*/, async (req, res) =>
     {
-        const categoryLinks = {};
-        const contentDir = path.join(projectPath, "contents");
-
-        if (await dirExists(contentDir))
-        {
-            const themeDirs = (await fsp.readdir(contentDir, { withFileTypes: true }))
-                .filter(dirent => dirent.isDirectory())
-                .map(dirent => dirent.name);
-
-            for (const theme of themeDirs)
-            {
-                const themeDir = path.join(contentDir, theme);
-                const categoryDirs = (await fsp.readdir(themeDir, { withFileTypes: true }))
-                    .filter(dirent => dirent.isDirectory())
-                    .map(dirent => dirent.name);
-
-                for (const category of categoryDirs)
-                {
-                    const categoryDir = path.join(themeDir, category);
-                    const files = (await fsp.readdir(categoryDir)).filter(f => f.endsWith(".md"));
-                    if (files.length > 0)
-                    {
-                        const path = `/contents-list/${ theme }/${ category }/${ category }-1`;
-                        categoryLinks[`${ theme }/${ category }`] = path;
-                    }
-                }
-            }
-        }
+        const categoryLinks = await buildCategoryLinks(path.join(projectPath, "contents"));
 
         let decodedPath = decodeURIComponent(req.path);
 
         let activeLocale = null;
 
         const segments = decodedPath.split("/").filter(Boolean);
-        if (segments.length > 0 && locales.includes(segments[0]))
+        if (segments.length > 0 && state.locales.includes(segments[0]))
         {
             activeLocale = segments[0];
             decodedPath = "/" + segments.slice(1).join("/");
@@ -378,10 +167,10 @@ async function startServer(projectPath, port)
                 .relative(path.join(projectPath, "pages"), pagePath)
                 .replace(/\\/g, "/");
 
-            const defaultLocale = config?.i18n?.defaultLocale;
+            const defaultLocale = state.config?.i18n?.defaultLocale;
             if (!activeLocale && defaultLocale)
             {
-                const jsonPath = i18nIndex.get(`${ defaultLocale }:${ relativeHtmlPath }`);
+                const jsonPath = state.i18nIndex.get(`${ defaultLocale }:${ relativeHtmlPath }`);
                 if (jsonPath && await fileExists(jsonPath))
                 {
                     try
@@ -404,9 +193,9 @@ async function startServer(projectPath, port)
             {
                 let mergedTranslations = {};
 
-                const defaultLocale = config?.i18n?.defaultLocale;
+                const defaultLocale = state.config?.i18n?.defaultLocale;
                 const defaultJsonPath = defaultLocale
-                    ? i18nIndex.get(`${ defaultLocale }:${ relativeHtmlPath }`)
+                    ? state.i18nIndex.get(`${ defaultLocale }:${ relativeHtmlPath }`)
                     : null;
 
                 if (defaultJsonPath && await fileExists(defaultJsonPath))
@@ -422,14 +211,14 @@ async function startServer(projectPath, port)
                     }
                 }
 
-                const localeJsonPath = i18nIndex.get(`${ activeLocale }:${ relativeHtmlPath }`);
+                const localeJsonPath = state.i18nIndex.get(`${ activeLocale }:${ relativeHtmlPath }`);
                 if (localeJsonPath && await fileExists(localeJsonPath))
                 {
                     try
                     {
                         const raw = await fsp.readFile(localeJsonPath, "utf8");
                         const translations = JSON.parse(raw);
-                        mergedTranslations = { ...mergedTranslations, ...translations };
+                        mergedTranslations = deepMerge(mergedTranslations, translations);
                     }
                     catch (err)
                     {
@@ -461,5 +250,6 @@ Development: ${ chalk.blueBright(`http://localhost:` + port) }
             `);
     });
 
-    wss = await createWSS(server);
+    state.wss = await createWSS(server);
+    return server;
 }

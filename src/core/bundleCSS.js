@@ -1,9 +1,17 @@
 import fs from "fs";
 import path from "path";
 
-async function resolveCSSImports(cssContent, baseDir)
+function isInsideDir(filePath, rootDir)
+{
+    const relativePath = path.relative(rootDir, filePath);
+    return relativePath === "" || (!relativePath.startsWith("..") && !path.isAbsolute(relativePath));
+}
+
+async function resolveCSSImports(cssContent, baseDir, options)
 {
     const importRegex = /@import\s+['"]([^'"]+)['"];/g;
+    const rootDir = options.rootDir;
+    const visited = options.visited;
     let resolvedContent = cssContent;
     let match;
 
@@ -21,10 +29,26 @@ async function resolveCSSImports(cssContent, baseDir)
             ? path.normalize(importPath)
             : path.resolve(baseDir, importPath);
 
+        if (!isInsideDir(resolvedPath, rootDir))
+        {
+            console.warn(`Skipping import outside CSS root: ${ importPath }`);
+            resolvedContent = resolvedContent.replace(match[0], `/* Skipped outside root: ${ importPath } */`);
+            continue;
+        }
+
+        if (visited.has(resolvedPath))
+        {
+            console.warn(`Skipping circular CSS import: ${ importPath }`);
+            resolvedContent = resolvedContent.replace(match[0], `/* Skipped circular import: ${ importPath } */`);
+            continue;
+        }
+
         if (fs.existsSync(resolvedPath))
         {
+            visited.add(resolvedPath);
             const importedCSS = fs.readFileSync(resolvedPath, "utf8");
-            const resolvedImportedCSS = await resolveCSSImports(importedCSS, path.dirname(resolvedPath));
+            const resolvedImportedCSS = await resolveCSSImports(importedCSS, path.dirname(resolvedPath), options);
+            visited.delete(resolvedPath);
             resolvedContent = resolvedContent.replace(match[0], resolvedImportedCSS);
         }
         else
@@ -38,8 +62,12 @@ async function resolveCSSImports(cssContent, baseDir)
 }
 
 
-export async function bundleCSS(cssContent, baseDir)
+export async function bundleCSS(cssContent, baseDir, options = {})
 {
-    const resolvedCSS = await resolveCSSImports(cssContent, baseDir);
+    const rootDir = path.resolve(options.rootDir || baseDir);
+    const resolvedCSS = await resolveCSSImports(cssContent, path.resolve(baseDir), {
+        rootDir,
+        visited: new Set()
+    });
     return resolvedCSS;
 }

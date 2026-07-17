@@ -1,4 +1,5 @@
 import fsp from "fs/promises";
+import { escapeXmlAttribute, escapeXmlText } from "./xmlEscape.js";
 
 export async function generateAtomFeed (contentItems, siteUrl)
 {
@@ -7,19 +8,19 @@ export async function generateAtomFeed (contentItems, siteUrl)
   const updated = new Date().toISOString();
   const atomEntries = contentItems.map(({ title, link }) => `
       <entry>
-        <title>${title}</title>
-        <link href="${link}" />
-        <id>${link}</id>
+        <title>${escapeXmlText(title)}</title>
+        <link href="${escapeXmlAttribute(link)}" />
+        <id>${escapeXmlText(link)}</id>
         <updated>${updated}</updated>
       </entry>
     `).join('');
 
   const atom = `<?xml version="1.0" encoding="utf-8"?>
     <feed xmlns="http://www.w3.org/2005/Atom">
-      <title>${siteUrl} Atom Feed</title>
-      <link href="${siteUrl}" />
+      <title>${escapeXmlText(siteUrl)} Atom Feed</title>
+      <link href="${escapeXmlAttribute(siteUrl)}" />
       <updated>${updated}</updated>
-      <id>${siteUrl}/feed</id>
+      <id>${escapeXmlText(siteUrl)}/feed</id>
       ${atomEntries}
     </feed>`;
 
@@ -35,19 +36,19 @@ export async function generateAtomFeedFile (contentItems, filename, siteUrl)
     const updated = new Date().toISOString();
     const atomEntries = contentItems.map(({ title, link }) => `
       <entry>
-        <title>${title}</title>
-        <link href="${link}" />
-        <id>${link}</id>
+        <title>${escapeXmlText(title)}</title>
+        <link href="${escapeXmlAttribute(link)}" />
+        <id>${escapeXmlText(link)}</id>
         <updated>${updated}</updated>
       </entry>
     `).join('');
 
     const atom = `<?xml version="1.0" encoding="utf-8"?>
     <feed xmlns="http://www.w3.org/2005/Atom">
-      <title>${siteUrl} Atom Feed</title>
-      <link href="${siteUrl}" />
+      <title>${escapeXmlText(siteUrl)} Atom Feed</title>
+      <link href="${escapeXmlAttribute(siteUrl)}" />
       <updated>${updated}</updated>
-      <id>${siteUrl}/feed</id>
+      <id>${escapeXmlText(siteUrl)}/feed</id>
       ${atomEntries}
     </feed>`;
 
