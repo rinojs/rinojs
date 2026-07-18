@@ -31,7 +31,16 @@ export async function dirExists (dirPath)
 export async function getFilesRecursively (dir, extensions)
 {
     const results = [];
-    const files = await fsp.readdir(dir, { withFileTypes: true });
+    let files;
+    try
+    {
+        files = await fsp.readdir(dir, { withFileTypes: true });
+    }
+    catch (error)
+    {
+        if (error.code === "ENOENT") return results;
+        throw error;
+    }
     for (const file of files)
     {
         const filePath = path.join(dir, file.name);

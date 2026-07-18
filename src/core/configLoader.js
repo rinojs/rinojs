@@ -1,6 +1,7 @@
 import path from "path";
 import chalk from "chalk";
 import url from "url";
+import fsp from "node:fs/promises";
 import { fileExists } from "./fsHelper.js";
 
 export async function loadConfig (projectPath)
@@ -20,7 +21,9 @@ export async function loadConfig (projectPath)
     {
         try
         {
-            const configModule = await import(url.pathToFileURL(configPath));
+            const configUrl = url.pathToFileURL(configPath);
+            configUrl.searchParams.set("modified", String((await fsp.stat(configPath)).mtimeMs));
+            const configModule = await import(configUrl);
             config = { ...config, ...configModule.default };
 
             console.log(chalk.greenBright("Configuration loaded successfully! \n"));
