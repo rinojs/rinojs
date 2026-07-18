@@ -1,0 +1,31 @@
+<section class="rino-export-demo">
+  <h2>Rino export demo</h2>
+  <p>
+    This component exports its inline style into <code>/styles/test.css</code>
+    and its inline script into <code>/scripts/export-demo.js</code>.
+  </p>
+</section>
+
+<style rino-export="./test.css">
+  .rino-export-demo {
+    margin-block: 1rem;
+    padding: 1rem;
+    border: 2px solid rebeccapurple;
+    border-radius: 0.5rem;
+  }
+</style>
+
+<style rino-export="/test.css">
+  .rino-export-demo code {
+    color: rebeccapurple;
+    font-weight: 700;
+  }
+</style>
+
+<script rino-export="/export-demo.js">
+  console.log("Rino exported component script is working.");
+</script>
+
+<script rino-export="./export-demo.js">
+  window.rinoExportDemoLoaded = true;
+</script>

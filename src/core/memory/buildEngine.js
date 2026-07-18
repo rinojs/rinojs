@@ -6,6 +6,7 @@ import { buildScopes } from "./siteBuilder.js";
 import { buildMemoryPages, pageOutputUrls } from "./buildPages.js";
 import { buildMemoryContent } from "./buildContent.js";
 import { buildTemplateDependencyGraph } from "./templateDependencyGraph.js";
+import { applyRinoExports } from "./rinoExports.js";
 
 export class MemoryBuildEngine extends EventEmitter
 {
@@ -58,7 +59,11 @@ export class MemoryBuildEngine extends EventEmitter
         {
             for (const [url, entry] of this.#scopeEntries.get(scope) || []) next.set(url, entry);
         }
-        return next;
+        const htmlUrls = new Set([
+            ...(this.#scopeEntries.get("pages")?.keys() || []),
+            ...(this.#scopeEntries.get("content")?.keys() || [])
+        ]);
+        return applyRinoExports(next, htmlUrls);
     }
 
     async #performBuild(scopes)
