@@ -134,7 +134,14 @@ New version, better development experience and totally different from version 1.
 
 Many syntax is simplified and following html, css and javascript standard. And many things are updated for automation.
 
-Development Build System is changed to the `server side rendering` with memory data management with individual IO update on change. I call this, `build on request`. This is so much faster than version 1.
+The development and SSR servers build the complete website into memory before
+listening, then serve the committed output like a static website. File changes
+trigger atomic rebuilds of related page, content, asset, public, or metadata
+scopes before connected browsers reload. Static generation uses the same build
+producers with a disk-backed output store. The `public` directory is served
+directly from disk by development and SSR servers, while an ephemeral in-memory
+dependency graph targets pages and content themes affected by component or
+Markdown changes.
 
 #### Example of Rino 2
 
