@@ -106,3 +106,33 @@ build cost remain visible.
 
 To diagnose stale output, restart the server; startup always performs a complete
 build. Compiler failures intentionally retain the last successful snapshot.
+
+## Inline Script and Style Exports
+
+Generated page and content HTML may export inline blocks with `rino-export`:
+
+```html
+<style rino-export="/kimchi.css">.kimchi { color: red; }</style>
+<script rino-export="./kimchi.js">console.log("kimchi");</script>
+```
+
+Style paths are relative to `/styles` and script paths are relative to
+`/scripts`, so both leading `/` and `./` forms above produce
+`/styles/kimchi.css` and `/scripts/kimchi.js`. Parent traversal with `..` is
+rejected.
+
+Exports are derived after all generated pages and content templates render.
+Identical blocks targeting the same file are included once, even when a shared
+component appears on multiple pages or localized variants. Different blocks are
+appended in deterministic build order. If an ordinary compiled asset already
+owns the target URL, exported blocks are appended to that build entry.
+
+The original inline element remains in its rendered HTML. `rino-export` is an
+export side effect and does not automatically replace the element with a
+stylesheet link or external script reference. Public HTML is not compiler input
+and therefore does not produce exports.
+
+Every full or targeted memory build derives these files again from current raw
+HTML. Export data is not appended to the previous snapshot, preventing repeated
+rebuilds from accumulating duplicate content. Static generation uses the same
+derivation before writing its disk snapshot.

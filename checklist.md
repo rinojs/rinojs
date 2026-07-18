@@ -161,3 +161,24 @@
 - Replace stylesheets in the browser without a full-page reload.
 - Add a hybrid disk/memory policy for exceptionally large public assets.
 - Add ETag support and production-specific HTTP caching policies.
+
+## Inline Script and Style Exports
+
+- [x] Parse `rino-export` on generated `<style>` and `<script>` elements.
+- [x] Normalize leading `/` and `./` values beneath `/styles` or `/scripts` and
+  reject paths that escape those output roots.
+- [x] Aggregate exports only after page and content rendering so nested/shared
+  component output is included.
+- [x] Deduplicate identical element content targeting the same output file.
+- [x] Append unique blocks deterministically when several elements target one
+  output and append to an existing compiled asset entry when present.
+- [x] Recompute derived exports from current generated HTML after full and
+  targeted builds so rebuilds never accumulate duplicate content.
+- [x] Preserve original inline elements and their behavior in rendered HTML.
+- [x] Include derived exports in memory SSR/dev serving and disk static output.
+- [x] Keep public HTML outside compiler export processing.
+- [x] Add focused parser, deduplication, append, traversal, memory-build, and
+  static-generation tests.
+- [x] Document export paths, append/deduplication behavior, and limitations.
+- [x] Run the complete test suite, representative static generation, and diff
+  validation.
