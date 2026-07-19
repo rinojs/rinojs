@@ -16,14 +16,14 @@
     <img src="/images/f16g5sg.webp" />
     <button class="button">Button</button>
     test index!!
-    <component rino-path="export-demo" />
+    <component rino-import="export-demo" />
     <component
-      rino-path="button"
+      rino-import="button"
       rino-tag="button"
       type="button"
       onclick="alert('Hello world!')"
     />
-    <component rino-path="footer" rino-tag="footer"></component>
+    <component rino-import="footer" rino-tag="footer"></component>
     <script
       rino-export="/typescript-export-demo.ts"
       type="text/typescript"
@@ -40,7 +40,7 @@
       console.log("Typescript export: 222");
     </script>
     <script
-      rino-path="test"
+      rino-import="test"
       rino-tag="section"
       rino-type="md"
       type="text/markdown"

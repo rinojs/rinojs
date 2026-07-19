@@ -4,6 +4,8 @@
 
 - [x] Escape dynamic XML values in RSS, Atom, and sitemap output.
 - [x] Replace shallow i18n fallback merging with deep object merging.
+- [x] Rename template import attributes from `rino-path` to `rino-import`
+  without retaining `rino-path` compatibility.
 - [x] Extract duplicated server route helpers into focused modules.
 - [x] Split static build orchestration into focused helpers.
 - [x] Return explicit component render diagnostics.

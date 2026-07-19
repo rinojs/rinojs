@@ -51,7 +51,7 @@ export async function buildComponent(componentPath, componentsDir, mdsDir, args 
 
         if (scriptType === "markdown" || scriptType === "md")
         {
-          const mdPath = attributes.find((attr) => attr.name === "rino-path")?.content || "";
+          const mdPath = attributes.find((attr) => attr.name === "rino-import")?.content || "";
           let filteredCode = innerContent;
 
           if (!mdPath && innerContent)
@@ -104,12 +104,12 @@ async function renderComponent(attributes, componentsDir, mdsDir, args = [])
 {
   try
   {
-    const componentPath = attributes.find((attr) => attr.name === "rino-path")?.content;
+    const componentPath = attributes.find((attr) => attr.name === "rino-import")?.content;
     const componentTag = attributes.find((attr) => attr.name === "rino-tag")?.content || "";
     const renderedContent = await buildComponent(path.join(componentsDir, componentPath + ".html"), componentsDir, mdsDir, args);
 
     const otherAttributes = attributes
-      .filter((attr) => !["rino-path", "rino-tag"].includes(attr.name))
+      .filter((attr) => !["rino-import", "rino-tag"].includes(attr.name))
       .map((attr) => `${ attr.name }="${ attr.content }"`)
       .join(" ");
 

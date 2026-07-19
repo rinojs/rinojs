@@ -39,9 +39,9 @@ Cleared outdated packages and checked bugs. Which caused some changes. Please re
 Now from version 2.19.0 we need to `rino-` instead of `@` for attributes.
 
 ```
-<component rino-path="/common/head" />
-<component rino-path="/common/header" rino-tag="header"></component>
-<script rino-type="markdown" rino-path="/docs/getting-started.md"></script>
+<component rino-import="/common/head" />
+<component rino-import="/common/header" rino-tag="header"></component>
+<script rino-type="markdown" rino-import="/docs/getting-started.md"></script>
 ```
 
 #### 2. Added escape to i18n system.

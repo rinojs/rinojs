@@ -18,7 +18,7 @@ async function templateReferences(filePath, dirs, seen, dependencies)
     const html = await fsp.readFile(resolved, "utf8");
     for (const match of html.matchAll(/<component\s+([^>]+?)(?:\/?>)/gi))
     {
-        const component = attribute(match[1], "rino-path");
+        const component = attribute(match[1], "rino-import");
         if (!component) continue;
         await templateReferences(path.join(dirs.components, `${ component }.html`), dirs, seen, dependencies);
     }
@@ -26,7 +26,7 @@ async function templateReferences(filePath, dirs, seen, dependencies)
     for (const match of html.matchAll(/<script\s+([^>]+)>/gi))
     {
         const type = attribute(match[1], "rino-type")?.toLowerCase();
-        const markdown = attribute(match[1], "rino-path");
+        const markdown = attribute(match[1], "rino-import");
         if ((type === "md" || type === "markdown") && markdown)
         {
             dependencies.add(path.resolve(dirs.mds, `${ markdown }.md`));

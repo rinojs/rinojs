@@ -82,8 +82,8 @@ test("static generation writes deduplicated component exports", async (t) =>
         await fsp.mkdir(path.join(project, dir), { recursive: true });
     }
     await fsp.writeFile(path.join(project, "components/shared.html"), '<style rino-export="/shared.css">.shared { display: block; }</style><script rino-export="/shared.ts">const count: number = 1; console.log(count);</script>');
-    await fsp.writeFile(path.join(project, "pages/index.html"), '<component rino-path="shared"/>');
-    await fsp.writeFile(path.join(project, "pages/about.html"), '<component rino-path="shared"/>');
+    await fsp.writeFile(path.join(project, "pages/index.html"), '<component rino-import="shared"/>');
+    await fsp.writeFile(path.join(project, "pages/about.html"), '<component rino-import="shared"/>');
 
     const engine = createMemoryBuildEngine(project);
     await engine.buildInitial();

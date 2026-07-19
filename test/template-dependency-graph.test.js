@@ -13,13 +13,13 @@ test("template graph follows nested component and Markdown edges safely", async 
     {
         await fsp.mkdir(path.join(root, dir), { recursive: true });
     }
-    await fsp.writeFile(path.join(root, "pages/index.html"), '<component rino-path="shared"/>', "utf8");
+    await fsp.writeFile(path.join(root, "pages/index.html"), '<component rino-import="shared"/>', "utf8");
     await fsp.writeFile(path.join(root, "pages/about.html"), "<h1>About</h1>", "utf8");
-    await fsp.writeFile(path.join(root, "pages/future.html"), '<component rino-path="not-created-yet"/>', "utf8");
-    await fsp.writeFile(path.join(root, "components/shared.html"), '<component rino-path="nested"/>', "utf8");
-    await fsp.writeFile(path.join(root, "components/nested.html"), '<component rino-path="shared"/><script rino-type="md" rino-path="intro"></script>', "utf8");
+    await fsp.writeFile(path.join(root, "pages/future.html"), '<component rino-import="not-created-yet"/>', "utf8");
+    await fsp.writeFile(path.join(root, "components/shared.html"), '<component rino-import="nested"/>', "utf8");
+    await fsp.writeFile(path.join(root, "components/nested.html"), '<component rino-import="shared"/><script rino-type="md" rino-import="intro"></script>', "utf8");
     await fsp.writeFile(path.join(root, "mds/intro.md"), "# Intro", "utf8");
-    await fsp.writeFile(path.join(root, "content-theme/blog/content.html"), '<component rino-path="shared"/>', "utf8");
+    await fsp.writeFile(path.join(root, "content-theme/blog/content.html"), '<component rino-import="shared"/>', "utf8");
     await fsp.writeFile(path.join(root, "content-theme/blog/content-list.html"), "<main>List</main>", "utf8");
 
     const context = { dirs: {

@@ -14,7 +14,7 @@ async function fixture()
     }
     await fsp.writeFile(path.join(project, "rino-config.js"), "export default { site: { url: 'https://example.com' }, sitemap: [], i18n: { defaultLocale: 'en', locales: ['en'] } }", "utf8");
     await fsp.writeFile(path.join(project, "components/title.html"), "<h1>First</h1>", "utf8");
-    await fsp.writeFile(path.join(project, "pages/index.html"), '<component rino-path="title"/>', "utf8");
+    await fsp.writeFile(path.join(project, "pages/index.html"), '<component rino-import="title"/>', "utf8");
     await fsp.writeFile(path.join(project, "public/logo.svg"), "<svg></svg>", "utf8");
     await fsp.writeFile(path.join(project, "styles/export/main.css"), "body { color: red; }", "utf8");
 }
