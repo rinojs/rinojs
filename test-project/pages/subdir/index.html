@@ -1,20 +1,20 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head> </head>
   <body>
     kokokokokokokokokokokokokokokokokokokokokoko
     <component
-      rino-path="button"
+      rino-import="button"
       rino-tag="button"
       type="button"
       onclick="alert('Hello world!')"
     />
     <component
-      rino-path="button"
+      rino-import="button"
       type="button"
       onclick="alert('Hello world!')"
     />
-    <component rino-path="footer" rino-tag="footer" />
+    <component rino-import="footer" rino-tag="footer" />
     <script rino-type="md" style="color: red" type="text/markdown">
       ## test
 
@@ -25,11 +25,11 @@
     <script rino-type="ts" type="text/typescript">
       // This is for templating html content
       let world: string = "Hello world! from typescript";
-      result = world;
+      console.log(world);
     </script>
     <script rino-type="js" type="text/javascript">
       // This is for templating html content
-      result = "Hello world! from javascript";
+      console.log("Hello world! from javascript");
     </script>
   </body>
 </html>

@@ -2,8 +2,9 @@ import fsp from "fs/promises";
 import path from "path";
 import { getResultFromCode } from "./scriptRenderer.js";
 import { renderMD } from "./mdRenderer.js";
-import typescript from "typescript";
 import { fileExists } from "./fsHelper.js";
+import { renderDiagnostic } from "./renderDiagnostic.js";
+import { transpileTSCode } from "./transpileTS.js";
 
 export async function buildComponent(componentPath, componentsDir, mdsDir, args = [])
 {
@@ -32,6 +33,12 @@ export async function buildComponent(componentPath, componentsDir, mdsDir, args 
 
       if (tagType === "script")
       {
+        if (attributes.some((attr) => attr.name === "rino-export"))
+        {
+          result += fullMatch;
+          continue;
+        }
+
         const scriptType = attributes.find((attr) => attr.name === "rino-type")?.content.toLowerCase();
 
         if (!scriptType)
@@ -44,7 +51,7 @@ export async function buildComponent(componentPath, componentsDir, mdsDir, args 
 
         if (scriptType === "markdown" || scriptType === "md")
         {
-          const mdPath = attributes.find((attr) => attr.name === "rino-path")?.content || "";
+          const mdPath = attributes.find((attr) => attr.name === "rino-import")?.content || "";
           let filteredCode = innerContent;
 
           if (!mdPath && innerContent)
@@ -62,15 +69,7 @@ export async function buildComponent(componentPath, componentsDir, mdsDir, args 
         {
           if (innerContent)
           {
-            const compiledCode = typescript.transpile(innerContent,
-              {
-                compilerOptions:
-                {
-                  module: typescript.ModuleKind.ESNext,
-                  target: typescript.ScriptTarget.ESNext,
-                },
-              });
-
+            const compiledCode = await transpileTSCode(innerContent, path.dirname(componentsDir), "template-script");
             processedContent = await getResultFromCode(compiledCode, componentsDir, args);
           }
         }
@@ -88,7 +87,8 @@ export async function buildComponent(componentPath, componentsDir, mdsDir, args 
   }
   catch (error)
   {
-    return error;
+    console.error(error);
+    return renderDiagnostic("Building component failed", error);
   }
 }
 
@@ -96,12 +96,12 @@ async function renderComponent(attributes, componentsDir, mdsDir, args = [])
 {
   try
   {
-    const componentPath = attributes.find((attr) => attr.name === "rino-path")?.content;
+    const componentPath = attributes.find((attr) => attr.name === "rino-import")?.content;
     const componentTag = attributes.find((attr) => attr.name === "rino-tag")?.content || "";
     const renderedContent = await buildComponent(path.join(componentsDir, componentPath + ".html"), componentsDir, mdsDir, args);
 
     const otherAttributes = attributes
-      .filter((attr) => !["rino-path", "rino-tag"].includes(attr.name))
+      .filter((attr) => !["rino-import", "rino-tag"].includes(attr.name))
       .map((attr) => `${ attr.name }="${ attr.content }"`)
       .join(" ");
 
@@ -109,7 +109,8 @@ async function renderComponent(attributes, componentsDir, mdsDir, args = [])
   }
   catch (error)
   {
-    return error;
+    console.error(error);
+    return renderDiagnostic("Rendering component failed", error);
   }
 }
 

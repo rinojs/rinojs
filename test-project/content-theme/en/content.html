@@ -3,10 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <title>{{ content.title }}</title>
+    <style rino-export="/content-theme.css">
+      .content-export-demo {
+        color: darkgreen;
+      }
+    </style>
+    <style rino-export="./content-theme.css">
+      .content-export-demo strong {
+        text-decoration: underline;
+      }
+    </style>
   </head>
 
   <body>
     <main>
+      <p class="content-export-demo"><strong>Content export demo</strong></p>
       <h1>{{ content.title }}</h1>
       <p><em>Published: {{ content.time }}</em></p>
       <article>{{ content.body }}</article>
@@ -50,6 +61,12 @@
           console.log(`<li><a href="${link}">${category}</a></li>`);
         }
         console.log("</ul></nav>");
+      </script>
+      <script rino-export="/content-theme.js">
+        console.log("Content theme export is working.");
+      </script>
+      <script rino-export="./content-theme.js">
+        window.rinoContentThemeLoaded = true;
       </script>
     </main>
   </body>

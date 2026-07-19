@@ -10,7 +10,6 @@ export async function injectReload(page, port)
                 }
             };
         </script>
-        </head>
         `;
-    return page.replace("</head>", reloadScript);
+    return `${ page }\n${ reloadScript }`;
 }

@@ -3,10 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <title>Content List</title>
+    <style rino-export="/content-theme.css">
+      .content-export-demo {
+        color: darkgreen;
+      }
+    </style>
   </head>
 
   <body>
     <main>
+      <p class="content-export-demo">Content-list export demo</p>
       <h1>Content List Page</h1>
       <ol>
         <script rino-type="js" type="text/javascript">
@@ -66,6 +72,9 @@
           console.log(`<li><a href="${link}">${category}</a></li>`);
         }
         console.log("</ul></nav>");
+      </script>
+      <script rino-export="/content-theme.js">
+        console.log("Content theme export is working.");
       </script>
     </main>
   </body>

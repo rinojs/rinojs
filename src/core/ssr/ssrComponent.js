@@ -1,7 +1,10 @@
 import fs from "fs/promises";
 import path from "path";
+import { getResultFromCode } from "../scriptRenderer.js";
 import { renderSSRMD } from "./ssrMDRenderer.js";
 import { fileExists } from "../fsHelper.js";
+import { renderDiagnostic } from "../renderDiagnostic.js";
+import { transpileTSCode } from "../transpileTS.js";
 
 export async function buildSSRComponent(componentPath, componentsDir, mdDir, args = [])
 {
@@ -29,6 +32,12 @@ export async function buildSSRComponent(componentPath, componentsDir, mdDir, arg
 
       if (tagType === "script")
       {
+        if (attributes.some((attr) => attr.name === "rino-export"))
+        {
+          result += fullMatch;
+          continue;
+        }
+
         const scriptType = attributes.find((attr) => attr.name === "rino-type")?.content.toLowerCase();
 
         if (!scriptType)
@@ -41,7 +50,7 @@ export async function buildSSRComponent(componentPath, componentsDir, mdDir, arg
 
         if (scriptType === "markdown" || scriptType === "md")
         {
-          const mdPath = attributes.find((attr) => attr.name === "rino-path")?.content || "";
+          const mdPath = attributes.find((attr) => attr.name === "rino-import")?.content || "";
           let filteredCode = innerContent;
 
           if (!mdPath && innerContent)
@@ -50,6 +59,18 @@ export async function buildSSRComponent(componentPath, componentsDir, mdDir, arg
           }
 
           processedContent = await renderSSRMD(filteredCode, attributes, mdDir);
+        }
+        else if (scriptType === "javascript" || scriptType === "js")
+        {
+          if (innerContent) processedContent = await getResultFromCode(innerContent, componentsDir, args);
+        }
+        else if (scriptType === "typescript" || scriptType === "ts")
+        {
+          if (innerContent)
+          {
+            const compiledCode = await transpileTSCode(innerContent, path.dirname(componentsDir), "template-script");
+            processedContent = await getResultFromCode(compiledCode, componentsDir, args);
+          }
         }
 
         result += processedContent;
@@ -65,7 +86,8 @@ export async function buildSSRComponent(componentPath, componentsDir, mdDir, arg
   }
   catch (error)
   {
-    return error;
+    console.error(error);
+    return renderDiagnostic("Building SSR component failed", error);
   }
 }
 
@@ -73,12 +95,12 @@ async function renderSSRComponent(attributes, componentsDir, mdDir, args = [])
 {
   try
   {
-    const componentPath = attributes.find((attr) => attr.name === "rino-path")?.content;
+    const componentPath = attributes.find((attr) => attr.name === "rino-import")?.content;
     const componentTag = attributes.find((attr) => attr.name === "rino-tag")?.content || "";
     const renderedContent = await buildSSRComponent(path.join(componentsDir, componentPath + ".html"), componentsDir, mdDir, args);
 
     const otherAttributes = attributes
-      .filter((attr) => !["rino-path", "rino-tag"].includes(attr.name))
+      .filter((attr) => !["rino-import", "rino-tag"].includes(attr.name))
       .map((attr) => `${ attr.name }="${ attr.content }"`)
       .join(" ");
 
@@ -86,7 +108,8 @@ async function renderSSRComponent(attributes, componentsDir, mdDir, args = [])
   }
   catch (error)
   {
-    return error;
+    console.error(error);
+    return renderDiagnostic("Rendering SSR component failed", error);
   }
 }
 

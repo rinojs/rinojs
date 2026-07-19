@@ -1,26 +1,46 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
+    <script src="/scripts/export-demo.js"></script>
+    <script src="/scripts/typescript-export-demo.js"></script>
+    <script src="/scripts/test.js"></script>
     <script src="/scripts/testTS.js"></script>
     <link rel="stylesheet" href="/styles/test.css" />
     <link rel="stylesheet" href="/bulma.min.css" />
   </head>
 
   <body>
+    test kimchi
     <lang>name</lang>
     <lang>body.test1[0].test2.test3</lang>
     <img src="/images/f16g5sg.webp" />
     <button class="button">Button</button>
     test index!!
+    <component rino-import="export-demo" />
     <component
-      rino-path="button"
+      rino-import="button"
       rino-tag="button"
       type="button"
       onclick="alert('Hello world!')"
     />
-    <component rino-path="footer" rino-tag="footer"></component>
+    <component rino-import="footer" rino-tag="footer"></component>
     <script
-      rino-path="test"
+      rino-export="/typescript-export-demo.ts"
+      type="text/typescript"
+    >
+      const exportMessage: string = "Rino TypeScript export is working.";
+      window.rinoTypeScriptExportDemoLoaded = true;
+      console.log(exportMessage);
+
+      (window as any).testExportTypescript = function (): void {
+        console.log("function test typescript");
+      };
+    </script>
+    <script rino-export="/typescript-export-demo.ts" type="text/typescript">
+      console.log("Typescript export: 222");
+    </script>
+    <script
+      rino-import="test"
       rino-tag="section"
       rino-type="md"
       type="text/markdown"

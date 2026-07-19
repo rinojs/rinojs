@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { escapeXmlText } from "./xmlEscape.js";
 
 export async function generateSitemap (list)
 {
@@ -21,7 +22,7 @@ export async function generateSitemap (list)
             }
 
 
-            result += `<url><loc>${link}</loc><lastmod>${formattedDate}</lastmod></url>`;
+            result += `<url><loc>${escapeXmlText(link)}</loc><lastmod>${formattedDate}</lastmod></url>`;
         }
 
         result += `</urlset>`;
@@ -53,7 +54,7 @@ export async function generateSitemapFile (list, filename)
                 link = link.replace('.html', '');
             }
 
-            result += `<url><loc>${link}</loc><lastmod>${formattedDate}</lastmod></url>`;
+            result += `<url><loc>${escapeXmlText(link)}</loc><lastmod>${formattedDate}</lastmod></url>`;
         }
 
         result += `</urlset>`;

@@ -6,10 +6,10 @@ import { removeLWS, removeCodeLWS } from "./mdFilter.js";
 
 export async function renderMD(content, attributes, mdsDir)
 {
-    const mdPath = attributes.find(attr => attr.name === 'rino-path')?.content || '';
+    const mdPath = attributes.find(attr => attr.name === 'rino-import')?.content || '';
     const mdTag = attributes.find(attr => attr.name === 'rino-tag')?.content || 'div';
     const otherAttributes = attributes
-        .filter(attr => !['rino-type', 'rino-path', 'rino-tag'].includes(attr.name))
+        .filter(attr => !['rino-type', 'rino-import', 'rino-tag'].includes(attr.name))
         .map(attr => `${ attr.name }="${ attr.content }"`)
         .join(' ');
 
