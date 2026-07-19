@@ -1,10 +1,10 @@
 import fs from "fs/promises";
 import path from "path";
-import typescript from "typescript";
 import { getResultFromCode } from "../scriptRenderer.js";
 import { renderSSRMD } from "./ssrMDRenderer.js";
 import { fileExists } from "../fsHelper.js";
 import { renderDiagnostic } from "../renderDiagnostic.js";
+import { transpileTSCode } from "../transpileTS.js";
 
 export async function buildSSRComponent(componentPath, componentsDir, mdDir, args = [])
 {
@@ -68,15 +68,7 @@ export async function buildSSRComponent(componentPath, componentsDir, mdDir, arg
         {
           if (innerContent)
           {
-            const compiledCode = typescript.transpile(innerContent,
-              {
-                compilerOptions:
-                {
-                  module: typescript.ModuleKind.ESNext,
-                  target: typescript.ScriptTarget.ESNext,
-                },
-              });
-
+            const compiledCode = await transpileTSCode(innerContent, path.dirname(componentsDir), "template-script");
             processedContent = await getResultFromCode(compiledCode, componentsDir, args);
           }
         }

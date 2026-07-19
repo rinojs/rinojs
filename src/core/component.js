@@ -2,9 +2,9 @@ import fsp from "fs/promises";
 import path from "path";
 import { getResultFromCode } from "./scriptRenderer.js";
 import { renderMD } from "./mdRenderer.js";
-import typescript from "typescript";
 import { fileExists } from "./fsHelper.js";
 import { renderDiagnostic } from "./renderDiagnostic.js";
+import { transpileTSCode } from "./transpileTS.js";
 
 export async function buildComponent(componentPath, componentsDir, mdsDir, args = [])
 {
@@ -69,15 +69,7 @@ export async function buildComponent(componentPath, componentsDir, mdsDir, args 
         {
           if (innerContent)
           {
-            const compiledCode = typescript.transpile(innerContent,
-              {
-                compilerOptions:
-                {
-                  module: typescript.ModuleKind.ESNext,
-                  target: typescript.ScriptTarget.ESNext,
-                },
-              });
-
+            const compiledCode = await transpileTSCode(innerContent, path.dirname(componentsDir), "template-script");
             processedContent = await getResultFromCode(compiledCode, componentsDir, args);
           }
         }

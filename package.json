@@ -1,8 +1,8 @@
 {
   "name": "rinojs",
-  "version": "2.25.0",
+  "version": "3.0.0",
   "description": "Fast learning, preprocessing, intuitive web framework",
-  "main": "dist/index.js",
+  "main": "src/index.js",
   "bin": {
     "rinojs": "src/index.js"
   },
@@ -41,13 +41,12 @@
   "bugs": {
     "url": "https://github.com/rinojs/rinojs/discussions"
   },
-  "homepage": "https://rinojs.org/",
+  "homepage": "https://rinojs.com/",
   "dependencies": {
     "@rollup/plugin-commonjs": "^29.0.3",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^1.0.0",
-    "@rollup/plugin-typescript": "^12.3.0",
     "@rollup/plugin-virtual": "^3.0.2",
     "chalk": "^5.6.2",
     "chokidar": "^5.0.0",
@@ -61,7 +60,7 @@
     "sharp": "^0.35.3",
     "totjs": "^2.0.1",
     "tslib": "^2.8.1",
-    "typescript": "^5.9.3",
+    "typescript": "7.0.2",
     "ws": "^8.21.1"
   }
 }
