@@ -9,6 +9,8 @@
 - [x] Return explicit component render diagnostics.
 - [x] Add bounded CSS import resolution with cycle and root checks.
 - [x] Remove module-global server state.
+- [x] Replace per-template-script process spawning with a reusable isolated
+  child-process runner for JavaScript and TypeScript template scripts.
 - [x] Add focused tests and compiler documentation.
 
 ## In-Memory Development and SSR System
@@ -172,9 +174,13 @@
 - [x] Deduplicate identical element content targeting the same output file.
 - [x] Append unique blocks deterministically when several elements target one
   output and append to an existing compiled asset entry when present.
+- [x] Bundle inline `<script rino-export>` blocks with the JavaScript bundler
+  defaults before writing generated script assets.
+- [x] Infer TypeScript inline script exports from TypeScript file extensions,
+  while still supporting explicit `rino-type` aliases and JavaScript defaults.
 - [x] Recompute derived exports from current generated HTML after full and
   targeted builds so rebuilds never accumulate duplicate content.
-- [x] Preserve original inline elements and their behavior in rendered HTML.
+- [x] Remove original exporting inline elements from rendered compiler HTML.
 - [x] Include derived exports in memory SSR/dev serving and disk static output.
 - [x] Keep public HTML outside compiler export processing.
 - [x] Add focused parser, deduplication, append, traversal, memory-build, and

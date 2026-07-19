@@ -52,7 +52,7 @@ export class MemoryBuildEngine extends EventEmitter
         return result;
     }
 
-    #composeSnapshot()
+    async #composeSnapshot()
     {
         const next = new Map();
         for (const scope of allBuildScopes)
@@ -63,7 +63,7 @@ export class MemoryBuildEngine extends EventEmitter
             ...(this.#scopeEntries.get("pages")?.keys() || []),
             ...(this.#scopeEntries.get("content")?.keys() || [])
         ]);
-        return applyRinoExports(next, htmlUrls);
+        return await applyRinoExports(next, htmlUrls, { projectPath: this.projectPath });
     }
 
     async #performBuild(scopes)
@@ -82,7 +82,7 @@ export class MemoryBuildEngine extends EventEmitter
                 this.#scopeEntries.set(scope, built.entriesByScope.get(scope) || new Map());
             }
 
-            this.store.replace(this.#composeSnapshot());
+            this.store.replace(await this.#composeSnapshot());
             this.dependencyGraph = graph;
             this.buildId += 1;
             this.status = "ready";
@@ -154,7 +154,7 @@ export class MemoryBuildEngine extends EventEmitter
 
             this.#scopeEntries.set("pages", pageScope);
             this.#scopeEntries.set("content", contentScope);
-            this.store.replace(this.#composeSnapshot());
+            this.store.replace(await this.#composeSnapshot());
             this.dependencyGraph = graph;
             this.buildId += 1;
             this.status = "ready";

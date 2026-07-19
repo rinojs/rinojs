@@ -33,6 +33,12 @@ export async function buildComponent(componentPath, componentsDir, mdsDir, args 
 
       if (tagType === "script")
       {
+        if (attributes.some((attr) => attr.name === "rino-export"))
+        {
+          result += fullMatch;
+          continue;
+        }
+
         const scriptType = attributes.find((attr) => attr.name === "rino-type")?.content.toLowerCase();
 
         if (!scriptType)

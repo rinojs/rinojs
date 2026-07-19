@@ -3,6 +3,7 @@ import virtual from '@rollup/plugin-virtual';
 import terser from '@rollup/plugin-terser';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
+import { jsBundleName } from "./jsBundleName.js";
 
 export async function bundleGeneralJS(code, name = "jsbundle")
 {
@@ -42,7 +43,7 @@ export async function bundleGeneralJS(code, name = "jsbundle")
 
     const { output } = await bundle.generate({
         format: 'iife',
-        name: name,
+        name: jsBundleName(name),
         inlineDynamicImports: true,
         exports: 'auto',
     });

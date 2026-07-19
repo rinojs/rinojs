@@ -1,6 +1,9 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
+    <script src="/scripts/export-demo.js"></script>
+    <script src="/scripts/typescript-export-demo.js"></script>
+    <script src="/scripts/test.js"></script>
     <script src="/scripts/testTS.js"></script>
     <link rel="stylesheet" href="/styles/test.css" />
     <link rel="stylesheet" href="/bulma.min.css" />
@@ -21,6 +24,21 @@
       onclick="alert('Hello world!')"
     />
     <component rino-path="footer" rino-tag="footer"></component>
+    <script
+      rino-export="/typescript-export-demo.ts"
+      type="text/typescript"
+    >
+      const exportMessage: string = "Rino TypeScript export is working.";
+      window.rinoTypeScriptExportDemoLoaded = true;
+      console.log(exportMessage);
+
+      (window as any).testExportTypescript = function (): void {
+        console.log("function test typescript");
+      };
+    </script>
+    <script rino-export="/typescript-export-demo.ts" type="text/typescript">
+      console.log("Typescript export: 222");
+    </script>
     <script
       rino-path="test"
       rino-tag="section"

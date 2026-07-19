@@ -114,6 +114,10 @@ Generated page and content HTML may export inline blocks with `rino-export`:
 ```html
 <style rino-export="/kimchi.css">.kimchi { color: red; }</style>
 <script rino-export="./kimchi.js">console.log("kimchi");</script>
+<script rino-export="./kimchi.ts">
+const message: string = "kimchi";
+console.log(message);
+</script>
 ```
 
 Style paths are relative to `/styles` and script paths are relative to
@@ -126,11 +130,18 @@ Identical blocks targeting the same file are included once, even when a shared
 component appears on multiple pages or localized variants. Different blocks are
 appended in deterministic build order. If an ordinary compiled asset already
 owns the target URL, exported blocks are appended to that build entry.
+Script exports are bundled with the same default Rollup/Terser settings used
+for JavaScript assets before they are written to `/scripts`. JavaScript is the
+default script export type and may also be declared with `rino-type="js"` or
+`rino-type="javascript"`. TypeScript exports are inferred from export paths
+ending in `.ts`, `.mts`, `.cts`, or `.tsx`, or may be declared with
+`rino-type="ts"` or `rino-type="typescript"`. TypeScript exports are
+transpiled before bundling and written with a `.js` extension.
 
-The original inline element remains in its rendered HTML. `rino-export` is an
-export side effect and does not automatically replace the element with a
-stylesheet link or external script reference. Public HTML is not compiler input
-and therefore does not produce exports.
+After export collection, the original exporting inline element is removed from
+rendered compiler HTML. Use normal `<link>` or `<script src>` elements when a
+page should load the generated file. Public HTML is not compiler input and
+therefore does not produce exports or have export tags removed by the compiler.
 
 Every full or targeted memory build derives these files again from current raw
 HTML. Export data is not appended to the previous snapshot, preventing repeated

@@ -23,7 +23,7 @@ export async function buildStaticSite(projectPath)
         ...(built.urlsByScope.get("pages") || []),
         ...(built.urlsByScope.get("content") || [])
     ]);
-    const entries = applyRinoExports(built.entries, htmlUrls);
+    const entries = await applyRinoExports(built.entries, htmlUrls, { projectPath });
     await new DiskOutputStore(context.dirs.dist).replace(entries);
     console.log(chalk.blueBright(`\nBuild completed: ${ entries.size } outputs written to ${ context.dirs.dist }\n`));
 }

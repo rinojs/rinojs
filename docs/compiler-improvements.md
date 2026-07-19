@@ -47,3 +47,18 @@ CSS import bundling now keeps import resolution inside a configured root directo
 ## Server State
 
 Development and static servers now keep WebSocket/config/i18n data in per-server state objects instead of module globals. The server functions return a small controller with `port`, `server`, `watcher`, `wss`, and `close()`, while preserving the existing startup behavior.
+
+## Template Script Runner
+
+JavaScript and TypeScript template scripts use a reusable isolated child process
+instead of spawning `node -e` for every `<script rino-type="js">` or
+`<script rino-type="ts">` tag. The parent sends each script to the worker over
+IPC, the worker runs it as an ES module, captures `console.log()` output, and
+returns that output for insertion into rendered HTML.
+
+Each script still runs as a fresh module evaluation, so top-level variables do
+not leak from one template script into the next. The worker temporarily switches
+to the requested template working directory for execution, then switches back so
+temporary test and build directories are not left locked on Windows. Normal
+component rendering, SSR component rendering, development memory builds, and
+static generation share this path.

@@ -1,8 +1,9 @@
 <section class="rino-export-demo">
   <h2>Rino export demo</h2>
   <p>
-    This component exports its inline style into <code>/styles/test.css</code>
-    and its inline script into <code>/scripts/export-demo.js</code>.
+    This component exports its inline style into
+    <code>/styles/test.css</code> and its inline script into
+    <code>/scripts/export-demo.js</code>.
   </p>
 </section>
 
@@ -15,17 +16,9 @@
   }
 </style>
 
-<style rino-export="/test.css">
-  .rino-export-demo code {
-    color: rebeccapurple;
-    font-weight: 700;
-  }
-</style>
-
 <script rino-export="/export-demo.js">
   console.log("Rino exported component script is working.");
-</script>
-
-<script rino-export="./export-demo.js">
-  window.rinoExportDemoLoaded = true;
+  window.testExport = function () {
+    console.log("function test");
+  };
 </script>

@@ -4,6 +4,7 @@ import terser from "@rollup/plugin-terser";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import typescript from '@rollup/plugin-typescript';
+import { jsBundleName } from "./jsBundleName.js";
 
 
 export async function bundleTS(scriptPath, projectPath, name = "tsbundle")
@@ -44,7 +45,7 @@ export async function bundleTS(scriptPath, projectPath, name = "tsbundle")
 
     const { output } = await bundle.generate({
         format: 'iife',
-        name: name,
+        name: jsBundleName(name),
         inlineDynamicImports: true,
         exports: 'auto',
     });
